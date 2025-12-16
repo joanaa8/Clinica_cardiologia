@@ -1,0 +1,34 @@
+Dashboard médico
+
+1. Geral
+    agenda do dia
+    estatisticas,  talvez revisões pendentes
+    notificações do sistema
+
+2. Pacientes
+    barra de pesquisa
+    registos
+
+3. gestão medicamentosa
+    plano medicamentosos
+    emissão
+    estado da receita
+    registo de medicação
+
+4. Suporte
+    alertas de interações
+    alertas de conflito por exemplo condições médicas
+    controlo do tratamento
+
+Arquitetura
+    camada de apresentação - frontend
+    camada de gateway - backend api por exemplo
+    camada de dominio - aplicar regras de negócio
+
+separação de preocupaçoes
+segurança
+comunicação interna
+
+estudar a técnica prisma que dá mais segurança ao projeto nas ligações da base de dados com o backend
+
+fazer api para enviar a prescrição, 

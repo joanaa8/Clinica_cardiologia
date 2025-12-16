@@ -1,0 +1,6 @@
+npm init -y
+npm install pg
+npm install express dotenv jsonwebtoken bcrypt cors
+mkdir db ; mkdir controllers ; mkdir routes ; mkdir middlewares ; mkdir config
+ cd para entrar em pastas
+ cd.. para sair
