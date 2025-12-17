@@ -1,6 +1,6 @@
 Dashboard médico
 
-1. Geral
+1. Geral: estado
     agenda do dia
     estatisticas,  talvez revisões pendentes
     notificações do sistema
