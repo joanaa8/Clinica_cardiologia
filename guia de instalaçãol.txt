@@ -4,3 +4,4 @@ npm install express dotenv jsonwebtoken bcrypt cors
 mkdir controllers ; mkdir routes ; mkdir middlewares ; mkdir config
  cd para entrar em pastas
  cd.. para sair
+ 

@@ -1,43 +1,34 @@
-require('dotenv').config();
-const express = require('express');
-const path = require("path");
-const cors = require('cors');
-const pool = require('./db/db');
-const app = express();
+require('dotenv').config(); 
 
-// 1. Importar as Rotas de Autenticação
+const express = require('express');
+const path = require('path');
 const authRoutes = require('./routes/auth.routes');
 
-const port = process.env.PORT || 3000;
+const app = express();
 
-// --- Middlewares ---
-app.use(express.json()); // Essencial para ler o body do fetch (username/password)
-app.use(cors());
+// Middlewares Essenciais
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true }));
 
-// --- Servir Ficheiros Estáticos (Frontend) ---
-// Isto permite que o browser aceda ao index.html, css/ e js/ dentro de 'public'
+// Frontend
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- Rotas da API ---
-// Liga os ficheiros de rotas que criámos. O prefixo será /api/auth
+// 3. Rotas 
 app.use('/api/auth', authRoutes);
 
-// --- Rota de Teste da Base de Dados ---
-const pool = require('./db/db'); // Certifique-se que o caminho está correto para o seu ficheiro de conexão 
-app.get("/test-db", async (req, res) => {
-    try {
-        const result = await pool.query("SELECT current_database()");
-        res.send("Ligado à base de dados: " + result.rows[0].current_database);
-    } catch (err) {
-        res.status(500).send("Erro ao ligar à BD: " + err.message);
-    }
-});
-
-// --- Rota Padrão (Redireciona para o Login se não encontrar nada) ---
-app.get("*", (req, res) => {
+// 4. Rota Principal
+app.get(/.*/, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(port, () => {
-    console.log(` Servidor da Clínica Machado Lemos em http://localhost:${port}`);
+// 5. Middleware de Erro 
+app.use((err, req, res, next) => {
+    console.error(' Ocorreu um erro no Servidor:', err.stack);
+    res.status(500).json({ status: 500, message: 'Erro interno no servidor' });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor da Clínica a correr na porta ${PORT}`);
+    console.log(`Link: http://localhost:${PORT}`);
 });
