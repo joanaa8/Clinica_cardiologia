@@ -32,3 +32,4 @@ comunicação interna
 estudar a técnica prisma que dá mais segurança ao projeto nas ligações da base de dados com o backend
 
 fazer api para enviar a prescrição, 
+ariana
