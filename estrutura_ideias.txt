@@ -33,4 +33,4 @@ estudar a técnica prisma que dá mais segurança ao projeto nas ligações da b
 
 fazer api para enviar a prescrição, 
 ariana
-sara 
+sara
