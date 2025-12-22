@@ -13,4 +13,6 @@ pool.on("connect", () => {
   console.log("Connection pool established with Database");
 });
 
-module.exports = pool;
+module.exports = {
+  query: (text, params) => pool.query(text, params),
+};

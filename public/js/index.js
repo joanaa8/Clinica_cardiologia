@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const splashScreen = document.getElementById('splash-screen');
     const loginScreen = document.getElementById('login-screen');
 
+    const loginForm = document.getElementById('loginForm');
+
         setTimeout(() => {
 
             if (splashScreen) {
@@ -28,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const username = document.getElementById('username').value;
                 const password = document.getElementById('password').value;
+               
                 await realizarLogin({ username, password });
             });
         }
@@ -36,9 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (recoveryLink) {
             recoveryLink.addEventListener('click', function(event) {
                 event.preventDefault();
-                alert('Redirecionar para a página de recuperação...');
+                window.location.href = 'recuperarpass.html'; // Corrigido de .herf para .href
             });
-        }   
+        }
+           
 
 });
 
