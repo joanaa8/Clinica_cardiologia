@@ -1,4 +1,4 @@
-// Função para capturar o email da URL (ex: redefinir.html?email=dr.machado@clinica.pt)
+
 document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     const email = params.get('email');
