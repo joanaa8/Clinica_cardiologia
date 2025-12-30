@@ -3,6 +3,8 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const authRoutes = require('./routes/auth.routes');
+const accountRoutes = require('./routes/account.routes')
+const prescriptionRoutes = require('./routes/prescription.routes');
 
 const app = express();
 
@@ -15,6 +17,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // 3. Rotas 
 app.use('/api/auth', authRoutes);
+app.use('/api/account', accountRoutes);
+app.use('/api/prescricoes', prescriptionRoutes);
 
 // 4. Rota Principal
 app.get(/.*/, (req, res) => {
