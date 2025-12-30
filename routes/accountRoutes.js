@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const prescriptionController = require('../controllers/prescription.Controller');
+const accountController = require('../controllers/accountController');
 const authMiddleware = require('../middlewares/authMiddlewares');
 
-router.get('/', authMiddleware, prescriptionController.getMyPrescriptions);
+router.get('/me', authMiddleware, accountController.getMe);
 
 module.exports = router;

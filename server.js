@@ -3,8 +3,8 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const authRoutes = require('./routes/authRoutes');
-const accountRoutes = require('./routes/account.routes')
-const prescriptionRoutes = require('./routes/prescription.routes');
+const accountRoutes = require('./routes/accountRoutes')
+const prescriptionRoutes = require('./routes/prescriptionRoutes');
 
 const app = express();
 

@@ -1,5 +1,7 @@
 const argon2 = require('argon2');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
+
 
 const { findByUsername, increaseAttempts, resetAttempts, updatePassword, findByEmail, setResetToken, findByResetToken } = require("../models/userModels.js");
 const { enviarEmail } = require('../services/emailService');
@@ -43,12 +45,22 @@ const login = async (req, res) => {
         await resetAttempts(user.id_user);// reset das tentativas falhadas, quando o login é efetuado corretamente
 
         const is_professional = !!user.professional_license;// verificação da categoria
+        
+        //criar token JWT
+        const token = jwt.sign(
+                {
+                    id_user: user.id_user,
+                    is_professional: is_professional
+                },
+                process.env.JWT_SECRET,
+                { expiresIn: '1h' }
+            );
 
-        res.status(200).json({ 
-            message: 'Login bem-sucedido', 
-            id_user: user.id_user,
-            is_professional: is_professional
-        });
+            res.status(200).json({
+                message: 'Login bem-sucedido',
+                token: token
+            });
+
 
     } catch (err) {
         console.error('Erro ao efetuar login:', err);

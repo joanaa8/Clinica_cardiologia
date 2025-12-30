@@ -1,4 +1,4 @@
-const PrescriptionModel = require('../models/prescription.model');
+const PrescriptionModel = require('../models/prescriptionModels');
 
 exports.getMyPrescriptions = async (req, res) => {
     try {

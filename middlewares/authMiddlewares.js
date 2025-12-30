@@ -9,7 +9,12 @@ const verifyToken = (req, res, next) => {
     try {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);//validação
-        req.userId = decoded.id;//guardar id
+        
+        req.user = { 
+            id_user: decoded.id_user, // UUID da tabela Users 
+            is_professional: decoded.is_professional 
+        };
+
         next();
 
     } catch (err) { //tratamento de erros
