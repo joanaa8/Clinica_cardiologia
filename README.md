@@ -4,18 +4,18 @@ Sistema de gestão de autenticação e dashboard para clínica de cardiologia.
 
 ## Funcionalidades
 
-- ✅ Autenticação de utilizadores (login/logout)
-- ✅ Reset de password com email
-- ✅ Dashboard para profissionais
-- ✅ Proteção de rotas com JWT
-- ✅ Bloqueio de conta após múltiplas tentativas de login
-- ✅ Interface responsiva
+  - Autenticação de utilizadores (login/logout)
+  - Reset de password com email
+  - Dashboard para profissionais
+  - Proteção de rotas com JWT
+  - Bloqueio de conta após múltiplas tentativas de login
+  - Interface responsiva
 
 ## Pré-requisitos
 
-- Node.js v14+
-- PostgreSQL v10+
-- npm ou yarn
+  - Node.js v14+
+  - PostgreSQL v10+
+  - npm ou yarn
 
 ## Instalação
 
@@ -39,6 +39,9 @@ cp .env.example .env
 # DB_USER=seu_usuario
 # DB_PASSWORD=sua_senha
 # JWT_SECRET=sua_chave_secreta
+# EMAIL_USER=teu_email@gmail.com
+# EMAIL_PASS=sua_app_password
+# APP_BASE_URL=http://localhost:3000
 ```
 
 4. **Configure a base de dados**
@@ -70,12 +73,14 @@ http://localhost:3000
 ```
 ├── config/           # Configurações (BD)
 ├── controllers/      # Lógica das rotas
-├── models/          # Modelos de dados
-├── routes/          # Definição das rotas
-├── middlewares/     # Middlewares de autenticação
-├── public/          # Ficheiros estáticos (HTML, CSS, JS)
-├── server.js        # Entrada da aplicação
-└── .env.example     # Variáveis de ambiente (exemplo)
+├── models/           # Modelos de dados
+├── routes/           # Definição das rotas
+├── middlewares/      # Middlewares de autenticação e validação
+├── public/           # Ficheiros estáticos (HTML, CSS, JS)
+├── scripts/          # Scripts auxiliares (gerar hash)
+├── server.js         # Entrada da aplicação
+└── .env.example      # Variáveis de ambiente (exemplo)
+
 ```
 
 ## Rotas da API
@@ -90,12 +95,19 @@ http://localhost:3000
   }
   ```
 
-- `POST /api/auth/reset-password` - Reset de password
+- `POST /api/auth/recuperar` - Pedido de recuperação de password
   ```json
   {
-    "email": "utilizador@email.com",
+    "email": "utilizador@email.com"
+  }
+  ```
+
+- `POST /api/auth/reset-password/:token` - Redefinição de password
+  ```json
+  {
     "password": "nova_senha"
   }
+
   ```
 
 ## Páginas Públicas
@@ -110,20 +122,43 @@ http://localhost:3000
 
 ## Tecnologias
 
-- **Backend**: Node.js + Express.js
-- **Base de Dados**: PostgreSQL
-- **Autenticação**: JWT (JSON Web Tokens)
-- **Criptografia**: Bcrypt
-- **Frontend**: HTML5 + CSS3 + JavaScript
+  - **Backend**: Node.js + Express.js
+  - **Base de Dados**: PostgreSQL
+  - **Autenticação**: JWT (JSON Web Tokens)
+  - **Criptografia**: Argon2
+  - **Email**: Nodemailer
+  - **Frontend**: HTML5 + CSS3 + JavaScript
 
 ## Segurança
 
-- ✅ Senhas criptografadas com Bcrypt
-- ✅ Tokens JWT com expiração de 1 hora
-- ✅ Proteção contra força bruta (bloqueio após 3 tentativas)
-- ✅ Variáveis sensíveis em `.env` (não incluído no Git)
-- ✅ CORS configurado
-- ✅ Tratamento de erros seguro
+  - Senhas criptografadas com Argon2
+  - Tokens JWT com expiração de 1 hora
+  - Tokens de redefinição de password válidos por 15 minutos
+  - Proteção contra força bruta (bloqueio após 3 tentativas)
+  - Variáveis sensíveis em `.env` (não incluído no Git)
+  - CORS configurado
+  - Tratamento de erros seguro
+
+
+## Comandos Úteis
+
+  - Iniciar servidor 
+    ```bash
+      node server.js
+      # ou para desenvolvimento com reload automático
+      npx nodemon server.js
+    ```
+
+  - Gerar hash de password 
+    ```bash
+      node scripts/gerar_hash.js <password>
+    ```
+    
+  - Verificar password 
+    ```bash
+      node scripts/verify_password.js <username> <password>
+    ```
+  
 
 ## Contribuição
 

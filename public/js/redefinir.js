@@ -1,42 +1,62 @@
-
+//listener que é executado quando a página carrega, captura do token
 document.addEventListener('DOMContentLoaded', () => {
-    const params = new URLSearchParams(window.location.search);
-    const email = params.get('email');
-    if (email) {
-        document.getElementById('email').value = email;
-    }
-});
 
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+
+    if (!token) {
+
+        alert('Token inválido ou em falta.');
+        return;
+
+    }
+
+    document.getElementById('token').value = token;
+
+});
+// verifica a pass nos dois campos para perceber se é compatível, envio de uma mensagem de resposta do servidor
 async function redefinirPassword(event) {
+
     event.preventDefault();
 
-    const email = document.getElementById('email').value;
-    const nova_password = document.getElementById('nova_password').value;
-    const confirmar_password = document.getElementById('confirmar_password').value;
+    const password = document.getElementById('nova_password').value;
+    const confirmar = document.getElementById('confirmar_password').value;
+    const token = document.getElementById('token').value;
 
-    // Validação básica no cliente
-    if (nova_password !== confirmar_password) {
-        alert("As passwords não coincidem!");
+    if (password !== confirmar) {
+
+        alert('As passwords não coincidem!');
         return;
+
     }
 
     try {
-        const response = await fetch('/api/auth/reset-password', {
+
+        const response = await fetch(`/api/auth/reset-password/${token}`, {
+
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password: nova_password })
+            body: JSON.stringify({ password })
+
         });
 
         const result = await response.json();
 
         if (response.ok) {
-            alert(result.message); // "Password redefinida com sucesso"
-            window.location.href = 'index.html'; // Volta para o login
+
+            alert(result.message);
+            window.location.href = 'index.html';
+
         } else {
-            alert(result.message || "Erro ao redefinir password");
+
+            alert(result.message || 'Erro ao redefinir password');
+
         }
+
     } catch (error) {
-        console.error('Erro:', error);
-        alert("Erro de conexão com o servidor.");
+
+        console.error(error);
+        alert('Erro de ligação ao servidor.');
+
     }
 }

@@ -1,15 +1,19 @@
 //RN1
 const validatePassword = (req, res, next) => {
 
-    const { new_password } = req.body;
+    const { password } = req.body;
 
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{13,}$/;
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{13,}$/;
 
-    if (!regex.test(new_password)) {
+    if (!regex.test(password)) {
+
         return res.status(400).json({ 
-            message: "A password deve ter 13 caracteres, incluindo maiúscula, minúscula, número e símbolo." 
+
+            message: "A password deve ter pelo menos 13 caracteres, incluindo maiúscula, minúscula, número e símbolo." 
+        
         });
     }
     next();
 };
+
 module.exports = { validatePassword };

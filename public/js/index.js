@@ -8,20 +8,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     setTimeout(() => {
+
         if (splashScreen) {
-            splashScreen.style.opacity = 0;
+
+            splashScreen.style.opacity = 0;//fade out
+
             setTimeout(() => {
+
                 splashScreen.style.display = 'none';
                 if (loginScreen) {
-                    loginScreen.style.display = 'flex';
-                    setTimeout(() => { loginScreen.style.opacity = 1; }, 50);
-                }   
-            }, 1000); 
+
+                    loginScreen.style.display = 'flex';// mostrar o login
+                    setTimeout(() => { loginScreen.style.opacity = 1; }, 50); // fade in
+                
+                }  
+
+            }, 1000); //tempo do fade out
+
         }
+    
     }, SPLASH_DURATION);
 
     
     if (loginForm) {
+
         loginForm.addEventListener('submit', async (event) => {
             event.preventDefault();
 
@@ -47,12 +57,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (response.ok) {
+
                     console.log('Login com sucesso:', data);
                     window.location.href = data.is_professional ? '/profissional.html' : '/utente.html'; //RN3
                 
                 } else {
 
-                    alert(data.message); //RN2
+                    alert(data.message); //mostrar o erro RN2
 
                 }
             } catch (error) {
@@ -60,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Erro de ligação ao servidor.');
             }
         });
+
     }
 
     const recoveryLink = document.getElementById('recoveryLink');
