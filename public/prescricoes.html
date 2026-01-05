@@ -34,15 +34,12 @@
                 <div class="header-wrapper">
                     <div class="titulo-e-acao">
                         <h1>Prescrições</h1>
-                        <button class="btn-nova" onclick="novaPrescricao()">
-                            + Nova Prescrição
-                        </button>
                     </div>
 
                     <div class="filter-box">
-                        <select id="filtro-tipo" onchange="aplicarFiltro()">
+                        <select id="filtro-tipo" onchange="aplicarFiltro()" aria-label="Filtrar prescrições">
                             <option value="todas" selected>Todas as Prescrições</option>
-                            <option value="ativas" >Prescrições Ativas</option>
+                            <option value="ativas">Prescrições Ativas</option>
                             <option value="expirar">Prestes a Expirar (10 dias)</option>
                         </select>
                     </div>
@@ -53,12 +50,11 @@
                 <table class="prescricoes-table">
                     <thead>
                         <tr>
-                            <th style="width: 50px;"></th> 
-                            <th>Nome do Utente</th>
-                            <th>MCDTs</th>
-                            <th>Data de Emissão</th>
-                            <th>Validade da Prescrição:</th>
-                            <th>Mais Informações</th>
+                            <th style="width: 50px;"></th> <th scope="col">Nome do Utente</th>
+                            <th scope="col">MCDTs</th>
+                            <th scope="col">Data de Emissão</th>
+                            <th scope="col">Validade da Prescrição</th>
+                            <th scope="col">Mais Informações</th>
                         </tr>
                     </thead>
                     <tbody id="lista-prescricoes">
@@ -68,7 +64,7 @@
         </main>
     </div>
 
-    <div id="modal-detalhes" class="modal-overlay">
+    <div id="modal-detalhes" class="modal-overlay" role="dialog" aria-hidden="true">
         <div class="modal-content">
             <span class="close-btn" onclick="fecharModal()">&times;</span>
             
@@ -78,17 +74,11 @@
             </div>
 
             <div class="modal-body">
-                
-                <div class="info-row">
-                    <div class="info-group"> 
-                        <label>Utente:</label>
-                        <p id="modal-paciente" class="texto-destaque">--</p>
-                    </div>
-                    <div class="info-group">
-                        <label>Nº de Saúde:</label>
-                        <p id="modal-nsaude" class="texto-destaque">--</p>
-                    </div>
+                <div class="info-group"> 
+                    <label>Utente:</label>
+                    <p id="modal-paciente" class="texto-destaque">--</p>
                 </div>
+                
                 <div class="info-row">
                     <div class="info-group">
                         <label>Prescritor:</label>
@@ -111,10 +101,10 @@
                     </div>
                 </div>
 
-                    <div class="info-group">
-                        <label>Código de Acesso:</label>
-                        <p id="modal-codacesso">--</p>
-                    </div>
+                <div class="info-group">
+                    <label>Código de Acesso:</label>
+                    <p id="modal-codacesso">--</p>
+                </div>
                     
                 <hr class="modal-divider">
 
@@ -135,7 +125,7 @@
                             <label>Forma Farmacêutica:</label>
                             <p id="modal-formafarma">--</p>
                         </div>
-                         <div>
+                        <div>
                             <label>Observações:</label>
                             <p id="modal-observacoes">--</p>
                         </div>
@@ -146,12 +136,80 @@
                     <button id="btn-renovar" class="btn-renovar" onclick="renovarPrescricao()" style="display: none;">
                         &#x21bb; Renovar Prescrição
                     </button>
-                    
                 </div>
             </div>
         </div>
     </div>
+<div id="meuModalRenovacao" class="modal-overlay" role="dialog" aria-hidden="true" style="z-index: 1200;">
+    <div class="modal-content" style="width: 500px;"> <span class="close-btn" onclick="fecharModalRenovacao()">&times;</span>
 
+        <div class="modal-header">
+            <h2>Renovar Prescrição</h2>
+            <span class="status-badge" style="background-color: var(--cor-secundaria); color: white;">Ação</span>
+        </div>
+
+        <div class="modal-body">
+            <form id="formRenovacao">
+                
+                <div class="form-group">
+                    <label>Utente:</label>
+                    <input type="text" id="renew-utente" name="utente" readonly class="input-readonly">
+                </div>
+
+                <div class="info-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Local:</label>
+                        <input type="text" id="renew-local" name="local" readonly class="input-readonly">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Prescritor:</label>
+                        <input type="text" id="renew-prescritor" name="prescritor" readonly class="input-readonly">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Data de Emissão:</label>
+                    <input type="date" id="renew-data" name="dataEmissao" readonly class="input-readonly">
+                </div>
+
+                <hr class="modal-divider" style="margin: 20px 0; border: 0; border-top: 1px solid #eee;"> 
+
+                <div class="form-group">
+                    <label>Medicamento:</label>
+                    <input type="text" id="renew-medicamento" name="medicamento">
+                </div>
+
+                <div class="form-group">
+                    <label>Validade:</label>
+                    <input type="text" id="renew-validade" name="validade">
+                </div>
+
+                <div class="form-group">
+                    <label>Qtd Dispensa:</label>
+                    <input type="text" id="renew-qtd-dispensa" name="qtdDispensa">
+                </div>
+
+                <div class="form-group">    
+                    <label>Forma Farmacêutica:</label>
+                    <input type="text" id="renew-forma-farma" name="formaFarmaceutica">
+                </div>
+
+                <div class="form-group">    
+                    <label>Dosagem e Frequência:</label>
+                    <textarea id="renew-dosagem-frequencia" name="dosagemFrequencia" rows="2"></textarea>
+                </div>
+                <div class="form-group">    
+                    <label>Observações:</label>
+                    <textarea id="renew-observacoes" name="observacoes" rows="4"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="fecharModalRenovacao()">Cancelar</button>
+                    <button type="submit" class="btn-confirm">Confirmar Renovação</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
     <script src="js/prescricoes.js"></script>
 </body> 
 </html>

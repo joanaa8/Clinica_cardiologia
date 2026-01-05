@@ -1,29 +1,27 @@
-/* ============================================================
-   1. VARIÁVEIS E RESET GERAL
-   ============================================================ */
+/*1. VARIÁVEIS E RESET*/
 :root {
-    --cor-primaria: #0d1a26;      /* Azul escuro */
-    --cor-secundaria: #00bcd4;    /* Azul claro (Ciano) */
-    --cor-fundo-cards: #ffffff;   
-    --cor-linhas: #e0f7fa;        
+    --cor-primaria: #0d1a26;
+    --cor-secundaria: #00bcd4;
+    --cor-fundo-cards: #ffffff;
+    --cor-linhas: #e0f7fa;
     --cor-texto: #555555;
     --cor-botao-sair: #607d8b;
     --borda-raio: 20px;
     --gap-padrao: 20px;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
 
-/* ============================================================
-   2. ESTRUTURA PRINCIPAL (LAYOUT)
-   ============================================================ */
+/* 2. BODY & LAYOUT*/
 body {
     background-color: var(--cor-primaria);
     height: 100vh;
     overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 .dashboard-container {
@@ -34,9 +32,7 @@ body {
     gap: var(--gap-padrao);
 }
 
-/* ============================================================
-   3. BARRA LATERAL (SIDEBAR)
-   ============================================================ */
+/*3. SIDEBAR*/
 .sidebar {
     width: 280px;
     background-color: var(--cor-fundo-cards);
@@ -47,192 +43,255 @@ body {
     justify-content: space-between;
 }
 
-.user-profile-link { text-decoration: none; color: inherit; display: block; margin-bottom: 30px; border-radius: 12px; transition: background-color 0.2s; }
-.user-profile-link:hover { background-color: #f5f5f5; }
-.user-profile { display: flex; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px solid #eee; }
-.avatar-circle { width: 50px; height: 50px; background-color: #d9d9d9; border-radius: 50%; }
-.user-profile h3 { font-size: 1.1rem; color: var(--cor-texto); }
+.user-profile-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    margin-bottom: 30px;
+}
 
-.sidebar nav ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-.nav-btn { display: flex; align-items: center; gap: 15px; text-decoration: none; color: var(--cor-texto); font-weight: 600; padding: 12px; border-radius: 10px; transition: all 0.3s; border: 1px solid transparent; }
-.nav-btn:hover { background-color: #f9f9f9; color: var(--cor-primaria); padding-left: 15px; }
-.nav-btn.active { background-color: #f0fcfd; color: var(--cor-primaria); border: 1px solid #e0f7fa; }
-.icon-dot { width: 30px; height: 30px; background-color: var(--cor-linhas); border-radius: 50%; display: inline-block; }
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
 
-.logout-btn { width: 100%; padding: 12px; background-color: var(--cor-botao-sair); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
-.logout-btn:hover { background-color: #455a64; }
+.avatar-circle {
+    width: 50px;
+    height: 50px;
+    background-color: #ddd;
+    border-radius: 50%;
+}
 
-/* ============================================================
-   4. ÁREA PRINCIPAL
-   ============================================================ */
-.main-content { flex: 1; display: flex; flex-direction: column; gap: var(--gap-padrao); }
+.user-profile h3 {
+    font-size: 1.1rem;
+    color: var(--cor-texto);
+}
 
-.header-banner { background-color: var(--cor-fundo-cards); padding: 30px 40px; border-radius: var(--borda-raio); }
-.header-wrapper { display: flex; justify-content: space-between; align-items: center; }
-.titulo-e-acao { display: flex; align-items: center; gap: 20px; }
-.header-banner h1 { color: #777; font-size: 2rem; font-weight: 700; margin: 0; }
+.sidebar nav ul {
+    list-style: none;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 
-.btn-nova {
-    background-color: var(--cor-secundaria);
+.nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+    color: var(--cor-texto);
+    font-weight: 600;
+    padding: 12px;
+    border-radius: 10px;
+    transition: 0.2s;
+}
+
+.nav-btn:hover {
+    background-color: #f5f5f5;
+}
+
+.nav-btn.active {
+    background-color: #f0fcfd;
+    color: var(--cor-primaria);
+}
+
+.icon-dot {
+    width: 30px;
+    height: 30px;
+    background-color: var(--cor-linhas);
+    border-radius: 50%;
+}
+
+.logout-btn {
+    padding: 12px;
+    background-color: var(--cor-botao-sair);
     color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 0.95rem;
+    border-radius: 8px;
+    font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 188, 212, 0.2);
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-.btn-nova:hover { background-color: #00acc1; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0, 188, 212, 0.3); }
-
-.filter-box select { padding: 10px 15px; border-radius: 10px; border: 1px solid #ddd; background-color: white; color: var(--cor-texto); font-size: 0.95rem; cursor: pointer; outline: none; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-.filter-box select:hover { border-color: var(--cor-secundaria); }
-
-.content-area { background-color: var(--cor-fundo-cards); border-radius: var(--borda-raio); padding: 30px; flex: 1; overflow-y: auto; }
-
-/* ============================================================
-   5. TABELA
-   ============================================================ */
-.prescricoes-table { width: 100%; border-collapse: separate; border-spacing: 0 15px; }
-.prescricoes-table th { text-align: left; padding: 0 20px 10px 20px; font-weight: bold; color: var(--cor-primaria); }
-.prescricoes-table tbody tr { background-color: var(--cor-linhas); box-shadow: 0 2px 5px rgba(0,0,0,0.02); transition: transform 0.2s; }
-.prescricoes-table tbody tr:hover { transform: scale(1.005); }
-.prescricoes-table td { padding: 20px; color: var(--cor-texto); vertical-align: middle; }
-.prescricoes-table td:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
-.prescricoes-table td:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
-
-.checkbox { width: 24px; height: 24px; background-color: white; border-radius: 6px; border: 1px solid transparent; }
-.btn-detalhes { background-color: white; border: 1px solid #ddd; padding: 10px 20px; border-radius: 8px; color: #888; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; font-weight: 600; }
-.btn-detalhes:hover { border-color: var(--cor-secundaria); color: var(--cor-secundaria); background-color: #f0fcfd; }
-
-/* ============================================================
-   6. MODAL
-   ============================================================ */
-.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(13, 26, 38, 0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(3px); animation: fadeIn 0.3s ease; }
-.modal-content { background-color: white; width: 70%; max-width: 900px; padding: 40px; border-radius: var(--borda-raio); position: relative; animation: slideUp 0.3s ease; }
-.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.modal-header h2 { color: var(--cor-primaria); margin: 0; font-size: 1.5rem; }
-.status-badge { background-color: #e0f7fa; color: var(--cor-secundaria); padding: 5px 12px; border-radius: 15px; font-size: 0.8rem; font-weight: bold; }
-.close-btn { position: absolute; top: 20px; right: 25px; font-size: 28px; color: #aaa; cursor: pointer; }
-.close-btn:hover { color: var(--cor-secundaria); }
-
-/* ============================================================
-   7. INFORMAÇÕES (ALINHAMENTO LADO A LADO)
-   ============================================================ */
-.info-row { 
-    display: flex; 
-    gap: 30px; 
-    margin-bottom: 15px;
 }
 
-/* Colunas Flexíveis */
-.info-row > .info-group:first-child { flex: 1.3; } /* Esquerda */
-.info-row > .info-group:last-child { flex: 1; }   /* Direita */
+/* 4. MAIN CONTENT*/
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-padrao);
+}
+
+.header-banner {
+    background-color: var(--cor-fundo-cards);
+    padding: 30px 40px;
+    border-radius: var(--borda-raio);
+}
+
+.header-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-banner h1 {
+    font-size: 2rem;
+    color: #777;
+}
+
+.filter-box select {
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+}
+
+/* 5. TABELA*/
+.content-area {
+    background-color: var(--cor-fundo-cards);
+    border-radius: var(--borda-raio);
+    padding: 0 30px 30px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.prescricoes-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 15px;
+}
+
+.prescricoes-table th {
+    position: sticky;
+    top: 0;
+    background-color: var(--cor-fundo-cards);
+    padding: 25px 20px 15px;
+    text-align: left;
+    font-weight: bold;
+    color: var(--cor-primaria);
+    z-index: 10;
+}
+
+.prescricoes-table tbody tr {
+    background-color: var(--cor-linhas);
+    transition: transform 0.2s;
+}
+
+.prescricoes-table tbody tr:hover {
+    transform: scale(1.01);
+}
+
+.prescricoes-table td {
+    padding: 20px;
+    color: var(--cor-texto);
+}
+
+.prescricoes-table td:first-child {
+    border-radius: 12px 0 0 12px;
+}
+
+.prescricoes-table td:last-child {
+    border-radius: 0 12px 12px 0;
+}
+
+.btn-detalhes {
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* 6. MODAL DETALHES*/
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(13, 26, 38, 0.6);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    width: 70%;
+    max-width: 900px;
+    padding: 40px;
+    border-radius: var(--borda-raio);
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 26px;
+    cursor: pointer;
+    color: #aaa;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.status-badge {
+    background-color: var(--cor-linhas);
+    padding: 6px 14px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+}
+
+/* 7. INFO & MEDICAÇÃO*/
+.info-row {
+    display: flex;
+    gap: 30px;
+    width: 100%;
+}
 
 .info-group {
-    display: flex;         
-    align-items: baseline; 
-    gap: 8px;              
-    margin-bottom: 10px; 
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
 }
 
-.info-group label { 
-    font-size: 0.9rem; 
-    color: #888; 
-    margin-bottom: 0; 
-    white-space: nowrap; 
+.info-group label {
     font-weight: 600;
+    color: #888;
 }
 
-.info-group p {
-    font-size: 0.95rem;    
-    font-weight: 600;      
-    color: var(--cor-texto);
-    margin: 0;
-}
-
-.texto-destaque { color: var(--cor-primaria) !important; }
-.modal-divider { border: 0; border-top: 1px solid var(--cor-linhas); margin: 20px 0; }
-
-/* ============================================================
-   8. CAIXA DE MEDICAMENTO
-   ============================================================ */
-.medication-box {  
-    background-color: #f9f9f9; 
-    border: 1px solid #eef2f5;
-    border-radius: 12px; 
-    border-left: 5px solid var(--cor-secundaria);
-    padding: 15px; 
-    box-shadow: 0 5px 20px rgba(0,0,0,0.03);
-    margin-bottom: 25px; 
-    position: relative;
-    overflow: hidden;
-}
-
-.medication-box h4 {
-    font-size: 1.4rem;
+.texto-destaque {
     color: var(--cor-primaria);
-    margin-bottom: 20px;
     font-weight: 700;
-    padding-bottom: 10px;
-    border-bottom: 1px dashed #dae1e7;
+}
+
+.medication-box {
+    background-color: #f9f9f9;
+    border-left: 5px solid var(--cor-secundaria);
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 20px;
 }
 
 .med-details-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); 
+    grid-template-columns: repeat(2, 1fr);
     gap: 15px;
 }
 
-.med-details-grid > div {
-    display: flex;         
-    align-items: baseline; 
-    gap: 8px;              
+/* 8. BOTÕES MODAL*/
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
 }
-
-.med-details-grid label {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #90a4ae;         
-    font-weight: 700;
-    white-space: nowrap;    
-    margin-bottom: 0;       
-}
-
-.med-details-grid p {
-    font-size: 0.95rem;    
-    color: #37474f;
-    font-weight: 600;
-    margin: 0;
-}
-
-.med-details-grid div:last-child {
-    grid-column: 1 / -1;    
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #f0f0f0;
-}
-
-.med-details-grid div:last-child p {
-    font-size: 0.95rem;
-    color: #555;
-    font-weight: 400;
-    font-style: italic;
-}
-
-@media (max-width: 700px) {
-    .med-details-grid { grid-template-columns: 1fr; }
-    .info-row { flex-direction: column; gap: 10px; }
-}
-
-/* ============================================================
-   9. BOTÕES
-   ============================================================ */
-.modal-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 20px; }
-.btn-fechar { background-color: #f0f0f0; border: none; color: #666; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
-.btn-fechar:hover { background-color: #e0e0e0; }
 
 .btn-renovar {
     background-color: var(--cor-secundaria);
@@ -240,16 +299,111 @@ body {
     border: none;
     padding: 10px 20px;
     border-radius: 8px;
-    font-weight: 600;
     cursor: pointer;
-    display: flex;       
-    align-items: center;
-    gap: 8px;
-    margin-right: auto;
-    transition: background-color 0.2s;
-    box-shadow: 0 4px 10px rgba(0, 188, 212, 0.2);
 }
-.btn-renovar:hover { background-color: #00acc1; }
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+/* 9. MODAL RENOVAÇÃO*/
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(13, 26, 38, 0.6);
+    z-index: 1200;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal .modal-content {
+    width: 500px;
+    padding: 30px;
+}
+
+.modal .close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 26px;
+    cursor: pointer;
+}
+
+/* 10. FORMULÁRIOS */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group textarea,
+
+.form-group select {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 0.95rem;
+    width: 100%;
+    outline: none; /* Remove a linha azul padrão do browser */
+    transition: border-color 0.2s;
+    background-color: white;
+}
+.form-group textarea {
+    resize: vertical; 
+    min-height: 80px;
+}
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--cor-secundaria);
+}
+.input-readonly {
+    background-color: #e9ecef !important;
+    color: #6c757d;
+    cursor: not-allowed;
+    border: 1px solid #dee2e6;
+}
+/* 4. Botões do fundo do formulário */
+.modal-actions {
+    display: flex;
+    justify-content: flex-end; /* Encosta à direita */
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.btn-confirm {
+    background-color: var(--cor-secundaria);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-confirm:hover {
+    background-color: #00acc1; /* Um pouco mais escuro ao passar o rato */
+}
+
+.btn-cancel {
+    background-color: transparent;
+    border: 1px solid #ccc;
+    color: #666;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+    background-color: #f1f1f1;
+    color: #333;
+}
