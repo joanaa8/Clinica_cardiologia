@@ -19,8 +19,10 @@
 
 /* 2. BODY & LAYOUT*/
 body {
+    width: 100%;
+    height: 100%;
+    font-family: 'Inter', 'Gantari', sans-serif;
     background-color: var(--cor-primaria);
-    height: 100vh;
     overflow: hidden;
 }
 
@@ -35,11 +37,13 @@ body {
 /*3. SIDEBAR*/
 .sidebar {
     width: 280px;
-    background-color: var(--cor-fundo-cards);
-    border-radius: var(--borda-raio);
-    padding: 30px;
+    height: 100%;
+    background-color: #ffffff;
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
+    padding: 20px;
+    flex-shrink: 0; 
     justify-content: space-between;
 }
 
@@ -122,12 +126,18 @@ body {
     display: flex;
     flex-direction: column;
     gap: var(--gap-padrao);
+    height: 100%;
 }
 
 .header-banner {
-    background-color: var(--cor-fundo-cards);
+    width: 100%;
+    height: 120px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
     padding: 30px 40px;
-    border-radius: var(--borda-raio);
+    flex-shrink: 0; /* não encolhe */
 }
 
 .header-wrapper {
@@ -150,10 +160,10 @@ body {
 
 /* 5. TABELA*/
 .content-area {
-    background-color: var(--cor-fundo-cards);
-    border-radius: var(--borda-raio);
-    padding: 0 30px 30px;
     flex: 1;
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 30px;
     overflow-y: auto;
 }
 
