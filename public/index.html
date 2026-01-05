@@ -1,55 +1,53 @@
 <!DOCTYPE html>
 <html lang="pt-pt">
-            <head>
-            <meta charset="UTF-8">                                                                  <!--serve para permitir acentos-->
-            <meta http-equiv="X-UA-Compatible" content="IE-edge">                                   <!--compatibilidade com dispositivos de telemovel-->
-            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">  <!--controlo da tela, tag responsiva-->
-            <title>Abertura do Sistema</title>
-            <link rel="stylesheet" href="css\index.css">  
+
+    <head>
+        <meta charset="UTF-8">                                                                  <!--serve para permitir acentos-->
+        <meta http-equiv="X-UA-Compatible" content="IE-edge">                                   <!--compatibilidade com dispositivos de telemovel-->
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">  <!--controlo da tela, tag responsiva-->
+        <title>Abertura do Sistema</title>
+        <link rel="stylesheet" href="css\index.css">  
  
-        </head>
+    </head>
+    <body>
 
-       <div id="splash-screen">
-        <div class="splash-logo">
-            ⚕️
+        <div id="splash-screen">
+            <div class="splash-logo">⚕️</div>
+            <div class="splash-name"> Clínica Dr.Machado Lemos </div>
+            <p style="margin-top: 20px; color: #90a4ae;">A abrir o sistema...</p>
         </div>
-        <div class="splash-name">
-            Clínica Dr.Machado Lemos
+
+        <div id="login-screen" style="display: none; opacity: 0;">
+            <div class="login-card">
+                
+                <h2>Bem-vindo de volta</h2>
+
+                <form id="loginForm">
+                    <div class="input-group">
+                        <label for="username">Nome de Utilizador</label>
+                        <input type="text" id="username" name="username" required placeholder="Digite seu registro médico" autocomplete="username">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="password">Palavra-Passe</label>
+                        <input type="password" id="password" name="password" required placeholder="Sua senha" autocomplete="current-password">
+                    </div>
+
+                    <button href="profissional.html" type="submit" class="login-button">
+                        ENTRAR
+                    </button>
+
+                    <a href="recuperarpass.html" class="recovery-link" id="recoveryLink">
+                        Esqueceu a Palavra-Passe?
+                    </a>
+                </form>
+
+                <p class="role-hint">
+                    Exclusivo para Acesso Médico
+                </p>
+            </div>
         </div>
-        <p style="margin-top: 20px; color: #90a4ae;">A abrir o sistema...</p>
-    </div>
+            <script src="js\index.js"></script>
 
-    <div id="login-screen">
-        <div class="login-card">
-            
-            <h2>Bem-vindo de volta</h2>
-
-            <form onsubmit="event.preventDefault(); alert('Tentativa de Login efetuada!');">
-                <div class="input-group">
-                    <label for="username">Nome de Utilizador</label>
-                    <input type="text" id="username" name="username" required placeholder="Digite seu registro médico" autocomplete="username">
-                </div>
-
-                <div class="input-group">
-                    <label for="password">Palavra-Passe</label>
-                    <input type="password" id="password" name="password" required placeholder="Sua senha" autocomplete="current-password">
-                </div>
-
-                <button href="profissional.html" type="submit" class="login-button">
-                    ENTRAR
-                </button>
-
-                <a href="recuperarpass.html" class="recovery-link" id="recoveryLink">
-                    Esqueceu a Palavra-Passe?
-                </a>
-            </form>
-
-            <p class="role-hint">
-                Exclusivo para Acesso Médico
-            </p>
-        </div>
-    </div>
-        <script src="js\index.js"></script>
-
-</body> 
+    </body> 
 </html>

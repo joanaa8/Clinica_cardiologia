@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Prescrições - Clínica Dr. Machado Lemos</title>
+    <link rel="stylesheet" href="css/prescricoes.css">  
+</head>
+<body>
+    <div class="dashboard-container">
+
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <a href="perfil.html" class="user-profile-link">
+                    <div class="user-profile">
+                        <div class="avatar-circle"></div>
+                        <h3 id="nome-medico">A carregar...</h3> 
+                    </div>
+                </a>
+
+                <nav>
+                    <ul>
+                        <li><a href="consultas.html" class="nav-btn"><span class="icon-dot"></span> Consultas</a></li>
+                        <li><a href="prescricoes.html" class="nav-btn active"><span class="icon-dot"></span> Prescrições</a></li>
+                        <li><a href="utentes.html" class="nav-btn"><span class="icon-dot"></span> Utentes</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <button class="logout-btn" onclick="terminarSessao()">Terminar Sessão</button>
+        </aside>
+
+        <main class="main-content">
+            <header class="header-banner">
+                <h1>Prescrições Efetuadas</h1>
+            </header>
+
+            <div class="content-area">
+                <table class="prescricoes-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">
+                                </th> 
+                            <th>Nome do Utente</th> <th>MCDTs</th> <th>Data de Início</th> <th>Data Final</th> <th>Mais Informações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-prescricoes">
+                        </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</div> 
+<div id="modal-detalhes" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-btn" onclick="fecharModal()">&times;</span>
+            
+            <div class="modal-header">
+                <h2>Detalhes da Prescrição</h2>
+                <span class="status-badge">Ativa</span>
+            </div>
+
+            <div class="modal-body">
+                <div class="info-group">
+                    <label>Utente:</label>
+                    <p id="modal-paciente" class="texto-destaque">Nome do Paciente...</p>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-group">
+                        <label>Data de Início:</label>
+                        <p id="modal-inicio">--/--/----</p>
+                    </div>
+                    <div class="info-group">
+                        <label>Data de Fim:</label>
+                        <p id="modal-fim">--/--/----</p>
+                    </div>
+                </div>
+
+                <hr class="modal-divider">
+
+                <h3>Medicamento Prescrito</h3>
+                <div class="medication-box">
+                    <h4 id="modal-medicamento">Nome do Medicamento</h4>
+                    <p><strong>Posologia:</strong> <span id="modal-posologia">Tomar 1 comp. a cada 8 horas</span></p>
+                    <p class="instrucoes"><strong>Nota:</strong> Ingerir após as refeições. Manter fora do alcance das crianças.</p>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-imprimir">Imprimir Guia</button>
+                    <button class="btn-fechar" onclick="fecharModal()">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/prescricoes.js"></script>
+</body> 
+</html>

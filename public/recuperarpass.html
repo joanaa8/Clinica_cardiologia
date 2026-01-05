@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+
+    <head>
+
+        <meta charset="UTF-8">
+        <title>Recuperar Password</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="css/index.css">
+
+    </head>
+
+    <body>
+
+        <div id="redefinir-screen">
+
+            <div class="login-card">
+
+                <h1>Recuperar Password</h1>
+                <form onsubmit="recuperarPassword(event)">
+
+                    <div class="input-group">
+
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" placeholder="O teu email" required>
+                    
+                    </div>
+                    
+                    <button type="submit" class="login-button">Recuperar Password</button>
+                
+                </form>
+
+                <div id="message" class="role-hint"></div>
+                <p><a href="index.html" class="recovery-link">Voltar ao login</a></p>
+            
+            </div>
+
+        </div>
+
+        <script src="js/recuperar.js"></script>
+
+    </body>
+
+</html>

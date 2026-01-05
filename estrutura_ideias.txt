@@ -1,38 +1,42 @@
 Dashboard médico
 
-1. Geral: estado
-    agenda do dia
-    estatisticas,  talvez revisões pendentes
-    notificações do sistema
+    1. Geral: estado
+        agenda do dia
+        estatisticas,  talvez revisões pendentes
+        notificações do sistema
 
-2. Pacientes
-    barra de pesquisa
-    registos
+    2. Utente
+        barra de pesquisa
+        registos
 
-3. gestão medicamentosa
-    plano medicamentosos
-    emissão
-    estado da receita
-    registo de medicação
+    3. gestão medicamentosa
+        plano de medicação
+        emissão de receitas
+        estado da receita
+        registo de medicação
 
-4. Suporte
-    alertas de interações
-    alertas de conflito por exemplo condições médicas
-    controlo do tratamento
+    4. Suporte clínico
+        alertas de interações
+        alertas de conflito por exemplo condições médicas
+        controlo do tratamento
 
 Arquitetura
     camada de apresentação - frontend
     camada de gateway - backend api por exemplo
     camada de dominio - aplicar regras de negócio
 
-separação de preocupaçoes
-segurança
-comunicação interna
+Principios de desenvolvimento:
+    separação de preocupaçoes
+    segurança
+    comunicação interna
 
-estudar a técnica prisma que dá mais segurança ao projeto nas ligações da base de dados com o backend
 
+
+<<<<<<< HEAD
 fazer api para enviar a prescrição, 
 ariana
 sara
 matilde
 
+=======
+>>>>>>> 87749bcf1b6cd8fd194c35464e2a461b68edaeb3

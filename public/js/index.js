@@ -1,69 +1,88 @@
- const SPLASH_DURATION = 3000; // 3 segundos
+const SPLASH_DURATION = 3000;// 3segundos
 
 document.addEventListener('DOMContentLoaded', () => {
+
     const splashScreen = document.getElementById('splash-screen');
     const loginScreen = document.getElementById('login-screen');
+    const loginForm = document.getElementById('loginForm');
 
-        setTimeout(() => {
 
-            if (splashScreen) {
-                 splashScreen.style.opacity = 0;
-                 setTimeout(() => {
-                    splashScreen.style.display = 'none';
+    setTimeout(() => {
 
-                    if (loginScreen) {
-                        loginScreen.style.display = 'flex';
-                        setTimeout(() => {
-                            loginScreen.style.opacity = 1;
-                        }, 50);
-                    }   
-                }, 1000); 
-            }
+        if (splashScreen) {
 
-        }, SPLASH_DURATION);
+            splashScreen.style.opacity = 0;//fade out
 
-        if(loginForm) {
-            loginForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
+            setTimeout(() => {
 
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-                await realizarLogin({ username, password });
-            });
+                splashScreen.style.display = 'none';
+                if (loginScreen) {
+
+                    loginScreen.style.display = 'flex';// mostrar o login
+                    setTimeout(() => { loginScreen.style.opacity = 1; }, 50); // fade in
+                
+                }  
+
+            }, 1000); //tempo do fade out
+
         }
+    
+    }, SPLASH_DURATION);
 
-        const recoveryLink = document.getElementById('recoveryLink');
-        if (recoveryLink) {
-            recoveryLink.addEventListener('click', function(event) {
-                event.preventDefault();
-                alert('Redirecionar para a página de recuperação...');
-            });
-        }   
+    
+    if (loginForm) {
 
-});
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
 
+            
+            const usernameInput = document.getElementById('username').value;
+            const passwordInput = document.getElementById('password').value;
 
-async function realizarLogin(dados) {
-    try {
-        const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            body: JSON.stringify(dados),
-            headers: { 'Content-Type': 'application/json' }
+            try {
+                
+               
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        
+                        'Content-Type': 'application/json' 
+                    },
+                    body: JSON.stringify({ 
+                        username: usernameInput, 
+                        password: passwordInput 
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+
+                    console.log('Login com sucesso:', data);
+                    window.location.href = data.is_professional ? '/profissional.html' : '/utente.html'; //RN3
+                
+                } else {
+
+                    alert(data.message); //mostrar o erro RN2
+
+                }
+            } catch (error) {
+                console.error('Erro ao conectar ao servidor:', error);
+                alert('Erro de ligação ao servidor.');
+            }
         });
 
-        const result = await response.json();
-
-        if (response.ok) {
-            
-            localStorage.setItem('medico_token', result.data.token);
-            window.location.href = result.data.redirect;
-        } else {
-           
-            alert(result.message || "Erro ao realizar login");
-        }
-
-    } catch (error) {
-        console.error('Erro durante o login:', error);
-        alert('Ocorreu um erro de conexão com o servidor.');
     }
-}
+
+    const recoveryLink = document.getElementById('recoveryLink');
+
+    if (recoveryLink) {
+
+        recoveryLink.addEventListener('click', function(event) {
+
+            event.preventDefault();
+            window.location.href = 'recuperarpass.html'; 
+
+        });
+    }
+});
