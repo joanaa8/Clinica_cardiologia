@@ -22,7 +22,6 @@
                     <ul>
                         <li><a href="consultas.html" class="nav-btn"><span class="icon-dot"></span> Consultas</a></li>
                         <li><a href="prescricoes.html" class="nav-btn active"><span class="icon-dot"></span> Prescrições</a></li>
-                        <li><a href="utentes.html" class="nav-btn"><span class="icon-dot"></span> Utentes</a></li>
                     </ul>
                 </nav>
             </div>
@@ -32,16 +31,34 @@
 
         <main class="main-content">
             <header class="header-banner">
-                <h1>Prescrições Efetuadas</h1>
+                <div class="header-wrapper">
+                    <div class="titulo-e-acao">
+                        <h1>Prescrições</h1>
+                        <button class="btn-nova" onclick="novaPrescricao()">
+                            + Nova Prescrição
+                        </button>
+                    </div>
+
+                    <div class="filter-box">
+                        <select id="filtro-tipo" onchange="aplicarFiltro()">
+                            <option value="todas" selected>Todas as Prescrições</option>
+                            <option value="ativas" >Prescrições Ativas</option>
+                            <option value="expirar">Prestes a Expirar (10 dias)</option>
+                        </select>
+                    </div>
+                </div>
             </header>
 
             <div class="content-area">
                 <table class="prescricoes-table">
                     <thead>
                         <tr>
-                            <th style="width: 50px;">
-                                </th> 
-                            <th>Nome do Utente</th> <th>MCDTs</th> <th>Data de Início</th> <th>Data Final</th> <th>Mais Informações</th>
+                            <th style="width: 50px;"></th> 
+                            <th>Nome do Utente</th>
+                            <th>MCDTs</th>
+                            <th>Data de Emissão</th>
+                            <th>Validade da Prescrição:</th>
+                            <th>Mais Informações</th>
                         </tr>
                     </thead>
                     <tbody id="lista-prescricoes">
@@ -50,49 +67,91 @@
             </div>
         </main>
     </div>
-</div> 
-<div id="modal-detalhes" class="modal-overlay">
+
+    <div id="modal-detalhes" class="modal-overlay">
         <div class="modal-content">
             <span class="close-btn" onclick="fecharModal()">&times;</span>
             
             <div class="modal-header">
                 <h2>Detalhes da Prescrição</h2>
-                <span class="status-badge">Ativa</span>
+                <span id="status-badge" class="status-badge">Informação</span>
             </div>
 
             <div class="modal-body">
-                <div class="info-group">
-                    <label>Utente:</label>
-                    <p id="modal-paciente" class="texto-destaque">Nome do Paciente...</p>
+                
+                <div class="info-row">
+                    <div class="info-group"> 
+                        <label>Utente:</label>
+                        <p id="modal-paciente" class="texto-destaque">--</p>
+                    </div>
+                    <div class="info-group">
+                        <label>Nº de Saúde:</label>
+                        <p id="modal-nsaude" class="texto-destaque">--</p>
+                    </div>
                 </div>
-
                 <div class="info-row">
                     <div class="info-group">
-                        <label>Data de Início:</label>
-                        <p id="modal-inicio">--/--/----</p>
+                        <label>Prescritor:</label>
+                        <p id="modal-prescritor">--</p>
                     </div>
                     <div class="info-group">
-                        <label>Data de Fim:</label>
-                        <p id="modal-fim">--/--/----</p>
+                        <label>Local:</label>
+                        <p id="modal-local">--</p>
+                    </div>
+                </div>
+                    
+                <div class="info-row">
+                    <div class="info-group">
+                        <label>Data de Emissão:</label>
+                        <p id="modal-dataemissao">--</p>
+                    </div>
+                    <div class="info-group">
+                        <label>Validade:</label>
+                        <p id="modal-validade">--</p>
                     </div>
                 </div>
 
+                    <div class="info-group">
+                        <label>Código de Acesso:</label>
+                        <p id="modal-codacesso">--</p>
+                    </div>
+                    
                 <hr class="modal-divider">
 
-                <h3>Medicamento Prescrito</h3>
+                <h3>Medicamento</h3>
                 <div class="medication-box">
-                    <h4 id="modal-medicamento">Nome do Medicamento</h4>
-                    <p><strong>Posologia:</strong> <span id="modal-posologia">Tomar 1 comp. a cada 8 horas</span></p>
-                    <p class="instrucoes"><strong>Nota:</strong> Ingerir após as refeições. Manter fora do alcance das crianças.</p>
+                    <h4 id="modal-medicamento">--</h4>
+                    
+                    <div class="med-details-grid">
+                        <div>
+                            <label>Qtd. Dispensa:</label>
+                            <p id="modal-quantidadedispensa">--</p>
+                        </div>
+                        <div>
+                            <label>Dosagem e Freq:</label>
+                            <p id="modal-dosagemfrequencia">--</p>
+                        </div>
+                        <div>
+                            <label>Forma Farmacêutica:</label>
+                            <p id="modal-formafarma">--</p>
+                        </div>
+                         <div>
+                            <label>Observações:</label>
+                            <p id="modal-observacoes">--</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="modal-actions">
-                    <button class="btn-imprimir">Imprimir Guia</button>
-                    <button class="btn-fechar" onclick="fecharModal()">Fechar</button>
+                    <button id="btn-renovar" class="btn-renovar" onclick="renovarPrescricao()" style="display: none;">
+                        &#x21bb; Renovar Prescrição
+                    </button>
+                    
                 </div>
             </div>
         </div>
     </div>
+
     <script src="js/prescricoes.js"></script>
 </body> 
 </html>
