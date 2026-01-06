@@ -1,0 +1,349 @@
+:root {
+    --cor-primaria: #0d1a26; 
+    --cor-secundaria: #00bcd4;
+  --cor-fundo-cards: #ffffff;
+    --cor-linhas: #e0f7fa;
+    --cor-texto: #555555;
+    --cor-botao-sair: #607d8b;
+    --borda-raio: 20px;
+    --gap-padrao: 20px;
+}
+
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Garante que padding não quebre o tamanho */
+     font-family: 'Segoe UI', sans-serif;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    font-family: 'Inter', 'Gantari', sans-serif;
+    background-color: var(--cor-primaria);
+    overflow: hidden; /* Evita barras de rolagem desnecessárias no corpo */
+}
+
+
+.dashboard-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    padding: var(--gap-padrao);
+    gap: var(--gap-padrao);
+}
+
+.main {
+    flex: 1; /* ocupa todo o espaço à direita */
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-padrao);
+    height: 100%;
+}
+
+
+/* 3. Sidebar (Lado Esquerdo) */
+.sidebar {
+    width: 260px;
+    height: 100%;
+    background-color: #ffffff;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    flex-shrink: 0; /* Impede que a sidebar encolha */
+    justify-content: space-between;
+}
+
+/* Header */
+.header-banner {
+    width: 100%;
+    height: 120px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+    flex-shrink: 0; /* não encolhe */
+}
+
+
+/* Área de Conteúdo (Tabela/Cards) */
+.content {
+    flex: 1; /* ocupa o resto da altura */
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+/* ============================================================
+   1. VARIÁVEIS E RESET (Igual ao Prescrições)
+   ============================================================ */
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    background-color: var(--cor-primaria);
+    height: 100vh;
+    overflow: hidden;
+}
+
+.dashboard-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: var(--gap-padrao);
+    gap: var(--gap-padrao);
+}
+
+/* ============================================================
+   2. SIDEBAR (Base)
+   ============================================================ */
+.sidebar {
+    width: 280px;
+    background-color: var(--cor-fundo-cards);
+    border-radius: var(--borda-raio);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.user-profile-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    margin-bottom: 30px;
+    padding: 10px;
+    border-radius: 12px;
+    transition: background 0.2s;
+}
+
+/* Destaque para quando estamos na página de perfil */
+.active-profile {
+    background-color: #f0fcfd;
+    border: 1px solid var(--cor-linhas);
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.avatar-circle {
+    width: 50px;
+    height: 50px;
+    background-color: #ddd;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.user-info-text h3 {
+    font-size: 1rem;
+    color: var(--cor-texto);
+}
+
+.user-role {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.sidebar nav ul {
+    list-style: none;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+    color: var(--cor-texto);
+    font-weight: 600;
+    padding: 12px;
+    border-radius: 10px;
+    transition: 0.2s;
+}
+
+.nav-btn:hover {
+    background-color: #f5f5f5;
+}
+
+.icon-dot {
+    width: 30px;
+    height: 30px;
+    background-color: var(--cor-linhas);
+    border-radius: 50%;
+}
+
+.logout-btn {
+    padding: 12px;
+    background-color: var(--cor-botao-sair);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* ============================================================
+   3. ÁREA PRINCIPAL
+   ============================================================ */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-padrao);
+}
+
+.header-banner {
+    background-color: var(--cor-fundo-cards);
+    padding: 30px 40px;
+    border-radius: var(--borda-raio);
+}
+
+.header-banner h1 {
+    font-size: 2rem;
+    color: #777;
+}
+
+.subtitle {
+    color: #999;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+/* Área branca central */
+.content-area {
+    background-color: var(--cor-fundo-cards);
+    border-radius: var(--borda-raio);
+    padding: 40px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* ============================================================
+   4. ESTILOS ESPECÍFICOS DO PERFIL
+   ============================================================ */
+.profile-wrapper {
+    display: flex;
+    justify-content: center; /* Centrar o cartão */
+    align-items: flex-start;
+}
+/*MUDA SE FICAR MALLLLLL*/
+.profile-card {
+    width: 100%;
+    max-width: 600px; /* Largura máxima para não ficar esticado */
+    background-color: white;
+    /*TIRA SE FICAR MALLLLLL*/
+    border: 1px solid #eee; 
+    padding: 20px; 
+    border-radius: 20px; 
+}
+
+.profile-header-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.big-avatar {
+    width: 120px;
+    height: 120px;
+    background-color: var(--cor-linhas);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+    border: 4px solid white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.initials {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--cor-secundaria);
+}
+
+.profile-header-section h2 {
+    color: var(--cor-primaria);
+    margin-bottom: 5px;
+}
+
+.badge-prof {
+    background-color: var(--cor-secundaria);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.divider {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 20px 0 30px 0;
+}
+
+/* Grelha do Formulário */
+.profile-info-grid {
+    display: grid;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #888;
+    margin-bottom: 8px;
+}
+
+.input-readonly {
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+    background-color: #f9f9f9;
+    color: #555;
+    font-size: 1rem;
+    font-weight: 500;
+    outline: none;
+    cursor: default;
+}
+
+.input-readonly:hover {
+    background-color: #f0f0f0;
+}
+.avatar-circle {
+    width: 50px;
+    height: 50px;
+    background-color: #ddd;
+    border-radius: 50%;
+    /* Adicionado para centrar as letras: */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Estilo da letra: */
+    font-weight: bold;
+    color: var(--cor-primaria); /* Ou usa #555 se preferires cinza */
+    font-size: 1.2rem;
+}

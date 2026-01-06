@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Meu Perfil - Clínica Dr. Machado Lemos</title>
+    <link rel="stylesheet" href="css/perfil.css">  
+</head>
+<body>
+    <div class="dashboard-container">
+
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <a href="perfil.html" class="user-profile-link active-profile">
+                    <div class="user-profile">
+                        <div class="avatar-circle" id="sidebar-avatar"></div>
+                        <div class="user-info-text">
+                            <h3 id="sidebar-nome">A carregar...</h3> 
+                            <span class="user-role">Médico(a)</span>
+                        </div>
+                    </div>
+                </a>
+
+                <nav>
+                    <ul>
+                        <li><a href="consultas.html" class="nav-btn"><span class="icon-dot"></span> Consultas</a></li>
+                        <li><a href="prescricoes.html" class="nav-btn"><span class="icon-dot"></span> Prescrições</a></li>
+                        <li><a href="utentes.html" class="nav-btn"><span class="icon-dot"></span> Utentes</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <button class="logout-btn" onclick="terminarSessao()">Terminar Sessão</button>
+        </aside>
+
+        <main class="main-content">
+            <header class="header-banner">
+                <div class="header-wrapper">
+                    <div class="titulo-e-acao">
+                        <h1>Meu Perfil</h1>
+                        <p class="subtitle">Gerir informações da conta</p>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-area profile-wrapper">
+                
+                <div class="profile-card">
+                    
+                    <div class="profile-header-section">
+                        <div class="big-avatar">
+                            <span class="initials" id="profile-initials">--</span>
+                        </div>
+                        <h2 id="profile-name-display">--</h2>
+                        <span class="badge-prof">Especialista</span>
+                    </div>
+
+                    <hr class="divider">
+
+                    <div class="profile-info-grid">
+                        
+                        <div class="form-group">
+                            <label>Nome Completo</label>
+                            <input type="text" id="input-nome" readonly class="input-readonly">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email Corporativo</label>
+                            <input type="email" id="input-email" readonly class="input-readonly">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nº Cédula Profissional</label>
+                            <input type="text" id="input-licenca" readonly class="input-readonly">
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="js/perfil.js"></script>
+</body> 
+</html>
