@@ -9,24 +9,23 @@
     --gap-padrao: 20px;
 }
 
-
-
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box; /* Garante que padding não quebre o tamanho */
+    box-sizing: border-box; 
      font-family: 'Segoe UI', sans-serif;
 }
-
+/* CORPO DA PÁGINA (FUNDO GERAL) */
 body, html {
     width: 100%;
     height: 100%;
     font-family: 'Inter', 'Gantari', sans-serif;
     background-color: var(--cor-primaria);
-    overflow: hidden; /* Evita barras de rolagem desnecessárias no corpo */
+    overflow: hidden; 
 }
 
-
+/*-----------------------------------------------------------
+2. LAYOUT PRINCIPAL (DIVISÃO ESQUERDA / DIREITA)*/
 .dashboard-container {
     display: flex;
     width: 100vw;
@@ -35,89 +34,19 @@ body, html {
     gap: var(--gap-padrao);
 }
 
-.main {
-    flex: 1; /* ocupa todo o espaço à direita */
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-padrao);
-    height: 100%;
-}
-
-
-/* 3. Sidebar (Lado Esquerdo) */
-.sidebar {
-    width: 260px;
-    height: 100%;
-    background-color: #ffffff;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    flex-shrink: 0; /* Impede que a sidebar encolha */
-    justify-content: space-between;
-}
-
-/* Header */
-.header-banner {
-    width: 100%;
-    height: 120px;
-    background-color: #ffffff;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    padding: 0 40px;
-    flex-shrink: 0; /* não encolhe */
-}
-
-
-/* Área de Conteúdo (Tabela/Cards) */
-.content {
-    flex: 1; /* ocupa o resto da altura */
-    background-color: #ffffff;
-    border-radius: 12px;
-    padding: 30px;
-    overflow-y: auto;
-}
-
-/* ============================================================
-   1. VARIÁVEIS E RESET (Igual ao Prescrições)
-   ============================================================ */
-
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', sans-serif;
-}
-
-body {
-    background-color: var(--cor-primaria);
-    height: 100vh;
-    overflow: hidden;
-}
-
-.dashboard-container {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    padding: var(--gap-padrao);
-    gap: var(--gap-padrao);
-}
-
-/* ============================================================
-   2. SIDEBAR (Base)
-   ============================================================ */
+/* ---------------------------------------------
+3. Sidebar (Lado Esquerdo) */
 .sidebar {
     width: 280px;
-    background-color: var(--cor-fundo-cards);
-    border-radius: var(--borda-raio);
+    background-color: #ffffff;
+    border-radius: 12px;
     padding: 30px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    flex-shrink: 0; 
 }
-
+/* Link do perfil no topo da Sidebar */
 .user-profile-link {
     text-decoration: none;
     color: inherit;
@@ -127,37 +56,45 @@ body {
     border-radius: 12px;
     transition: background 0.2s;
 }
-
-/* Destaque para quando estamos na página de perfil */
+/* ESTADO ATIVO NA SIDEBAR: O fundo azul claro quando estás na página Perfil */
 .active-profile {
     background-color: #f0fcfd;
     border: 1px solid var(--cor-linhas);
 }
-
+/* Grupo do utilizador (Foto pequena + Nome) na Sidebar */
 .user-profile {
     display: flex;
     align-items: center;
     gap: 15px;
 }
-
+/* ICONE PEQUENO "ML" NA SIDEBAR */
 .avatar-circle {
     width: 50px;
     height: 50px;
-    background-color: #ddd;
+    background-color: #e0f7fa;
     border-radius: 50%;
+    color: #00bcd4;
+    font-size: 1.2rem;
+    border: 3px solid #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 188, 212, 0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
     flex-shrink: 0;
 }
-
+/* Texto do Nome na Sidebar */
 .user-info-text h3 {
     font-size: 1rem;
     color: var(--cor-texto);
 }
 
+/* Texto "Médico(a)" na Sidebar */
 .user-role {
     font-size: 0.8rem;
     color: #888;
 }
 
+/* Lista de Links (Consultas, Prescrições, Utentes) */
 .sidebar nav ul {
     list-style: none;
     margin-top: 20px;
@@ -165,7 +102,7 @@ body {
     flex-direction: column;
     gap: 10px;
 }
-
+/* Botões do Menu de Navegação */
 .nav-btn {
     display: flex;
     align-items: center;
@@ -177,18 +114,18 @@ body {
     border-radius: 10px;
     transition: 0.2s;
 }
-
+/* Efeito ao passar o rato nos botões do menu */
 .nav-btn:hover {
     background-color: #f5f5f5;
 }
-
+/* Bolinha azul ao lado dos nomes dos menus */
 .icon-dot {
     width: 30px;
     height: 30px;
     background-color: var(--cor-linhas);
     border-radius: 50%;
 }
-
+/* BOTÃO DE TERMINAR SESSÃO (Fundo da Sidebar) */
 .logout-btn {
     padding: 12px;
     background-color: var(--cor-botao-sair);
@@ -199,34 +136,44 @@ body {
     cursor: pointer;
 }
 
-/* ============================================================
-   3. ÁREA PRINCIPAL
-   ============================================================ */
+/* --------------------------------------------------
+4. ÁREA PRINCIPAL (LADO DIREITO)*/
+
 .main-content {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: var(--gap-padrao);
 }
-
+/* CABEÇALHO (TOPO DO LADO DIREITO) */
 .header-banner {
     background-color: var(--cor-fundo-cards);
     padding: 30px 40px;
     border-radius: var(--borda-raio);
 }
-
+/* Título "Meu Perfil" no cabeçalho */
 .header-banner h1 {
     font-size: 2rem;
     color: #777;
 }
 
+/*.header-banner {
+    width: 100%;
+    height: 120px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+    flex-shrink: 0; /* não encolhe 
+}*/
+/* Subtítulo "Gerir informações..." no cabeçalho */
 .subtitle {
     color: #999;
     font-size: 0.9rem;
     margin-top: 5px;
 }
-
-/* Área branca central */
+/* ÁREA DE CONTEÚDO (O GRANDE ESPAÇO BRANCO EM BAIXO) */
 .content-area {
     background-color: var(--cor-fundo-cards);
     border-radius: var(--borda-raio);
@@ -235,32 +182,29 @@ body {
     overflow-y: auto;
 }
 
-/* ============================================================
-   4. ESTILOS ESPECÍFICOS DO PERFIL
-   ============================================================ */
+/* --------------------------------------------------
+5. CARTÃO DO PERFIL (DENTRO DA ÁREA DE CONTEÚDO)*/
+
+/* Centraliza o cartão no meio da tela branca */
 .profile-wrapper {
     display: flex;
-    justify-content: center; /* Centrar o cartão */
+    justify-content: center; 
     align-items: flex-start;
 }
-/*MUDA SE FICAR MALLLLLL*/
+/* O cartão propriamente dito (onde estão os inputs) */
 .profile-card {
     width: 100%;
-    max-width: 600px; /* Largura máxima para não ficar esticado */
+    max-width: 600px; 
     background-color: white;
-    /*TIRA SE FICAR MALLLLLL*/
-    border: 1px solid #eee; 
-    padding: 20px; 
-    border-radius: 20px; 
 }
-
+/* Secção da Foto Grande no topo do cartão */
 .profile-header-section {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-bottom: 30px;
 }
-
+/* CÍRCULO GRANDE DA FOTO (NO CENTRO DA TELA) */
 .big-avatar {
     width: 120px;
     height: 120px;
@@ -273,18 +217,18 @@ body {
     border: 4px solid white;
     box-shadow: 0 5px 15px rgba(0,0,0,0.05);
 }
-
+/* INICIAIS do médico dentro do avatar grande */
 .initials {
     font-size: 2.5rem;
     font-weight: bold;
     color: var(--cor-secundaria);
 }
-
+/* Nome do médico por baixo da foto grande */
 .profile-header-section h2 {
     color: var(--cor-primaria);
     margin-bottom: 5px;
 }
-
+/* Etiqueta "Especialista" por baixo do nome */
 .badge-prof {
     background-color: var(--cor-secundaria);
     color: white;
@@ -293,14 +237,13 @@ body {
     font-size: 0.85rem;
     font-weight: 600;
 }
-
+/* Linha divisória cinzenta */
 .divider {
     border: 0;
     border-top: 1px solid #eee;
     margin: 20px 0 30px 0;
 }
-
-/* Grelha do Formulário */
+/* Organização dos Inputs (Nome, Email, Cédula) */
 .profile-info-grid {
     display: grid;
     gap: 20px;
@@ -310,7 +253,7 @@ body {
     display: flex;
     flex-direction: column;
 }
-
+/* Etiquetas "Nome Completo", "Email", etc. */
 .form-group label {
     font-size: 0.85rem;
     font-weight: 600;
@@ -318,6 +261,9 @@ body {
     margin-bottom: 8px;
 }
 
+
+
+/* AS CAIXAS DE TEXTO (INPUTS) */
 .input-readonly {
     padding: 14px;
     border-radius: 10px;
@@ -330,20 +276,7 @@ body {
     cursor: default;
 }
 
+/* Efeito ao passar o rato nos inputs */
 .input-readonly:hover {
     background-color: #f0f0f0;
-}
-.avatar-circle {
-    width: 50px;
-    height: 50px;
-    background-color: #ddd;
-    border-radius: 50%;
-    /* Adicionado para centrar as letras: */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* Estilo da letra: */
-    font-weight: bold;
-    color: var(--cor-primaria); /* Ou usa #555 se preferires cinza */
-    font-size: 1.2rem;
 }
