@@ -16,8 +16,7 @@
     box-sizing: border-box;
     font-family: 'Segoe UI', sans-serif;
 }
-
-/* 2. BODY & LAYOUT*/
+/* CORPO DA PÁGINA (FUNDO GERAL) */
 body {
     width: 100%;
     height: 100%;
@@ -25,7 +24,8 @@ body {
     background-color: var(--cor-primaria);
     overflow: hidden;
 }
-
+/*-----------------------------------------------------------
+2. LAYOUT PRINCIPAL (DIVISÃO ESQUERDA / DIREITA)*/
 .dashboard-container {
     display: flex;
     width: 100%;
@@ -34,25 +34,34 @@ body {
     gap: var(--gap-padrao);
 }
 
-/*3. SIDEBAR*/
+/* ---------------------------------------------
+3. Sidebar (Lado Esquerdo) */
 .sidebar {
     width: 280px;
-    height: 100%;
     background-color: #ffffff;
     border-radius: 12px;
+    padding: 30px;
     display: flex;
     flex-direction: column;
-    padding: 20px;
-    flex-shrink: 0; 
     justify-content: space-between;
+    flex-shrink: 0; 
 }
-
+/* --- Topo da Sidebar (Perfil + Nav) --- */
+.sidebar-top {
+    display: flex;
+    flex-direction: column;
+}
+/* Link do perfil no topo da Sidebar */
 .user-profile-link {
     text-decoration: none;
     color: inherit;
     display: block;
     margin-bottom: 30px;
+    padding: 10px;
+    border-radius: 12px;
+    transition: background 0.2s;
 }
+/* ESTADO ATIVO NA SIDEBAR: O fundo azul claro quando estás na página */
 
 .user-profile {
     display: flex;
@@ -67,6 +76,12 @@ body {
     height: 50px;
     background-color: #ddd;
     border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: var(--cor-primaria); 
+    font-size: 1.2rem;
 }
 
 .user-profile h3 {
@@ -104,12 +119,16 @@ body {
 }
 
 .icon-dot {
-    width: 30px;
-    height: 30px;
+    width: 10px;
+    height: 10px;
     background-color: var(--cor-linhas);
     border-radius: 50%;
 }
+.nav-btn.active .icon-dot {
+    background-color: var(--cor-secundaria); /* Cor ativa */
+}
 
+/* --- Botão Sair --- */
 .logout-btn {
     padding: 12px;
     background-color: var(--cor-botao-sair);
@@ -118,17 +137,24 @@ body {
     border-radius: 8px;
     font-weight: bold;
     cursor: pointer;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
 }
-
-/* 4. MAIN CONTENT*/
+.logout-btn:hover {
+    opacity: 0.9;
+}
+/* =========================================
+   4. CONTEÚDO PRINCIPAL (Main Content)*/
 .main-content {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: var(--gap-padrao);
     height: 100%;
+    min-width: 0;
 }
-
+/* --- Header Banner --- */
 .header-banner {
     width: 100%;
     height: 120px;
@@ -141,6 +167,7 @@ body {
 }
 
 .header-wrapper {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -150,15 +177,19 @@ body {
     font-size: 2rem;
     color: #777;
 }
-
+/* --- Filtro --- */
 .filter-box select {
     padding: 10px 15px;
     border-radius: 10px;
     border: 1px solid #ddd;
     cursor: pointer;
+    background-color: #fff;
+    color: var(--cor-texto);
+    outline: none;
 }
 
-/* 5. TABELA*/
+/* =========================================
+   5. TABELA DE PRESCRIÇÕES*/
 .content-area {
     flex: 1;
     background-color: #ffffff;
@@ -177,7 +208,7 @@ body {
     position: sticky;
     top: 0;
     background-color: var(--cor-fundo-cards);
-    padding: 25px 20px 15px;
+    padding: 0 20px 15px;
     text-align: left;
     font-weight: bold;
     color: var(--cor-primaria);
@@ -186,16 +217,18 @@ body {
 
 .prescricoes-table tbody tr {
     background-color: var(--cor-linhas);
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .prescricoes-table tbody tr:hover {
     transform: scale(1.01);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .prescricoes-table td {
     padding: 20px;
     color: var(--cor-texto);
+    vertical-align: middle;
 }
 
 .prescricoes-table td:first-child {
@@ -212,9 +245,17 @@ body {
     padding: 8px 16px;
     border-radius: 8px;
     cursor: pointer;
+    font-weight: 600;
+    color: var(--cor-texto);
+    transition: all 0.2s;
+}
+.btn-detalhes:hover {
+    border-color: var(--cor-secundaria);
+    color: var(--cor-secundaria);
 }
 
-/* 6. MODAL DETALHES*/
+/* =========================================
+   6. MODAL (Estrutura Geral)*/
 .modal-overlay {
     display: none;
     position: fixed;
@@ -223,6 +264,7 @@ body {
     z-index: 1000;
     justify-content: center;
     align-items: center;
+    backdrop-filter: blur(2px);
 }
 
 .modal-content {
@@ -234,6 +276,7 @@ body {
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
 .close-btn {
@@ -243,66 +286,140 @@ body {
     font-size: 26px;
     cursor: pointer;
     color: #aaa;
+    transition: color 0.2s;
 }
-
+.close-btn:hover {
+    color: var(--cor-primaria);
+}
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
-
+.modal-header h2 {
+    color: var(--cor-primaria);
+}
 .status-badge {
     background-color: var(--cor-linhas);
     padding: 6px 14px;
     border-radius: 15px;
     font-size: 0.8rem;
+    color: var(--cor-texto);
+    font-weight: bold;
 }
-
-/* 7. INFO & MEDICAÇÃO*/
+/* Separador visual dentro do modal */
+.modal-divider {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 20px 0;
+}
+/* =========================================
+   7. CONTEÚDO DO MODAL DETALHES*/
 .info-row {
     display: flex;
     gap: 30px;
     width: 100%;
+    margin-bottom: 10px;
 }
 
 .info-group {
     display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
+    gap: 5px;
+    margin-bottom: 15px;
+    flex-direction: column;
 }
-
-.info-group label {
+/* Estilo para label e valor inline (ex: Detalhes) */
+.modal-body .info-group label {
     font-weight: 600;
-    color: #888;
+    color: var(--cor-texto-claro);
+    font-size: 0.9rem;
 }
 
 .texto-destaque {
     color: var(--cor-primaria);
     font-weight: 700;
+    font-size: 1.1rem;
 }
 
 .medication-box {
     background-color: #f9f9f9;
     border-left: 5px solid var(--cor-secundaria);
-    padding: 15px;
-    border-radius: 12px;
-    margin-top: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 15px;
 }
-
+.medication-box h4 {
+    margin-bottom: 15px;
+    color: var(--cor-primaria);
+    font-size: 1.1rem;
+}
 .med-details-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    gap: 20px;
 }
 
-/* 8. BOTÕES MODAL*/
+/*---------------------------------------------------
+ 8. FORMULÁRIOS (Modal Renovação)*/
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--cor-texto);
+    margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 0.95rem;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+    background-color: white;
+    font-family: var(--fonte-principal);
+}
+
+.form-group textarea {
+    resize: vertical; 
+    min-height: 80px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--cor-secundaria);
+    box-shadow: 0 0 0 2px rgba(0, 188, 212, 0.1);
+}
+
+.input-readonly {
+    background-color: #e9ecef !important;
+    color: #6c757d;
+    cursor: not-allowed;
+    border: 1px solid #dee2e6;
+}
+
+
+/* =========================================
+   9. BOTÕES DE AÇÃO (Modais)*/
+
 .modal-actions {
     display: flex;
     justify-content: flex-end;
-    margin-top: 20px;
+    margin-top: 30px;
+    gap: 15px;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
 }
-
+/* Botão Renovar (no modal de detalhes) */
 .btn-renovar {
     background-color: var(--cor-secundaria);
     color: white;
@@ -310,83 +427,17 @@ body {
     padding: 10px 20px;
     border-radius: 8px;
     cursor: pointer;
-}
-
-/* 9. MODAL RENOVAÇÃO*/
-.modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background-color: rgba(13, 26, 38, 0.6);
-    z-index: 1200;
-    justify-content: center;
+    font-weight: bold;
+    display: flex;
     align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s;
+}
+.btn-renovar:hover {
+    background-color: var(--cor-secundaria-hover);
 }
 
-.modal .modal-content {
-    width: 500px;
-    padding: 30px;
-}
-
-.modal .close {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 26px;
-    cursor: pointer;
-}
-
-/* 10. FORMULÁRIOS */
-.form-group {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 15px;
-    
-}
-
-.form-group label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    margin-bottom: 5px;
-}
-
-.form-group input,
-.form-group textarea,
-
-.form-group select {
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    font-size: 0.95rem;
-    width: 100%;
-    outline: none; /* Remove a linha azul padrão do browser */
-    transition: border-color 0.2s;
-    background-color: white;
-}
-.form-group textarea {
-    resize: vertical; 
-    min-height: 80px;
-}
-.form-group input:focus,
-.form-group textarea:focus {
-    border-color: var(--cor-secundaria);
-}
-.input-readonly {
-    background-color: #e9ecef !important;
-    color: #6c757d;
-    cursor: not-allowed;
-    border: 1px solid #dee2e6;
-}
-/* 4. Botões do fundo do formulário */
-.modal-actions {
-    display: flex;
-    justify-content: flex-end; /* Encosta à direita */
-    gap: 15px;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid #f0f0f0;
-}
-
+/* Botões do Formulário de Renovação */
 .btn-confirm {
     background-color: var(--cor-secundaria);
     color: white;
@@ -399,7 +450,7 @@ body {
 }
 
 .btn-confirm:hover {
-    background-color: #00acc1; /* Um pouco mais escuro ao passar o rato */
+    background-color: var(--cor-secundaria-hover);
 }
 
 .btn-cancel {
@@ -417,17 +468,4 @@ body {
     background-color: #f1f1f1;
     color: #333;
 }
-.avatar-circle {
-    width: 50px;
-    height: 50px;
-    background-color: #ddd;
-    border-radius: 50%;
-    /* Adicionado para centrar as letras: */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* Estilo da letra: */
-    font-weight: bold;
-    color: var(--cor-primaria); 
-    font-size: 1.2rem;
-}
+
