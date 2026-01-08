@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Utente - Clínica Dr. Machado Lemos</title>
+    <link rel="stylesheet" href="css/utente.css">  
+</head>
+<body>
+    <div class="dashboard-container">
+
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <a href="perfil.html" class="user-profile-link active-profile">
+                    <div class="user-profile">
+                        <div class="avatar-circle" id="sidebar-avatar"></div>
+                        <div class="user-info-text">
+                            <h3 id="sidebar-nome">A carregar...</h3> 
+                            
+                        </div>
+                    </div>
+                </a>
+
+                <nav>
+                    <ul>
+                        <li><a href="consultas.html" class="nav-btn"><span class="icon-dot"></span> Consultas</a></li>
+                        <li><a href="prescricoes.html" class="nav-btn"><span class="icon-dot"></span> Prescrições</a></li>
+                        <li><a href="utentes.html" class="nav-btn active"><span class="icon-dot"></span> Utentes</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <button class="logout-btn" onclick="terminarSessao()">Terminar Sessão</button>
+        </aside>
+
+
+        <main class="main-content">
+            <header class="header-banner">
+                <div class="header-left">
+                    <h1>Lista de Utentes</h1> 
+                </div>
+                
+                <div class="header-right">
+                        <div class="search-wrapper">
+                            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <input type="text" id="inputPesquisa" placeholder="Pesquisar por Nome, SNS ou Data...">
+                        </div>
+                    </div>   
+                </header>
+            <div class="utentes-container">
+                <div id="utentesList" class="lista-scroll">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="modalUtente">
+        <div class="modal-card modal-large"> 
+           <<button class="close-btn" onclick="fecharModal()">&times;</button> 
+            
+            <div class="modal-header">
+                <div class="header-profile">
+                    <div class="avatar-xl" id="m-avatar">AS</div>
+                    <div>
+                        <h2 id="m-nome">Nome do Utente</h2>
+                        <span class="badge-sns" id="m-sns-badge">SNS: 000000000</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-novaPrescricao">Nova Prescrição</button>
+                </div>
+            </div>
+
+            <div class="modal-body scrollable-body">
+                
+                <h4 class="section-title">Dados Pessoais</h4>
+                <div class="info-grid">
+                    <div class="info-box">
+                        <label>Data de Nascimento</label>
+                        <p id="m-dataNasc">--/--/----</p>
+                    </div>
+                    <div class="info-box">
+                        <label>Sexo</label>
+                        <p id="m-sexo">--</p>
+                    </div>
+                    <div class="info-box">
+                        <label>Tipo Sanguíneo</label>
+                        <p id="m-tipoSangu">--</p>
+                    </div>
+                    <div class="info-box">
+                        <label>Peso</label>
+                        <p id="m-peso">--</p>
+                    </div>
+                    <div class="info-box">
+                        <label>Altura</label>
+                        <p id="m-altura">--</p>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <h4 class="section-title">Contactos </h4>
+                <div class="info-grid">
+                    <div class="info-box">
+                        <label>Telemóvel</label>
+                        <p id="m-telemovel">--</p>
+                    </div>
+                    <div class="info-box">
+                        <label>Email</label>
+                        <p id="m-email">--</p>
+                    </div>
+                    <div class="info-box">
+                        <label>Contacto de Emergência</label>
+                        <p id="m-contactoEmergencia">--</p>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <h4 class="section-title">Alergias</h4>
+                 <div class="info-grid">
+                <div class="notes-box full-width">
+                     <label>Observações</label>
+                    <p id="m-obsAlergias">Sem Observações registadas.</p>
+                </div>
+                 <div class="info-box">
+                        <label>Gravidade</label>
+                        <p id="m-gravidade">--</p>
+                    </div>
+                </div>
+
+                 <hr class="divider">
+
+                <h4 class="section-title">Problema Clínico</h4>
+                <div class="info-grid">
+                    <div class="notes-box full-width">
+                        <label>Descrição</label>
+                        <p id="m-descricaoProblema">--</p>
+                    </div>
+                    <div class="info-box">
+                        <label>Codigo da Doença</label>
+                        <p id="m-codigodoenca">--</p>
+                    </div>
+                    <div class="info-box">
+                        <label>Snomed CT</label>
+                        <p id="m-snomedct">--</p>
+                    </div>
+                     <div class="info-box">
+                        <label>Tipo de problema</label>
+                        <p id="m-tipoProblema">--</p>
+                    </div>
+                </div>
+
+                 <hr class="divider">
+
+                <h4 class="section-title">Prescrições</h4>
+                <div class="info-grid">
+                    <div class="info-box">
+                         <label>Médico</label>
+                        <p id="m-médico">--</p>
+                    </div>
+                    <div class="info-box">
+                        <label>Medicamento</label>
+                        <p id="m-medicamento">--</p>
+                    </div>
+                    <div class="info-box">
+                        <label>Data de emissão</label>
+                        <p id="m-dataEmissao">--</p>
+                    </div>
+                    <div class="info-box">
+                        <label>Validade</label>
+                        <p id="m-Validade">--</p>
+                    </div>
+                    <div class="info-box">
+                        <label>Source</label>
+                        <p id="m-Source">--</p>
+                    </div>
+                     <div class="notes-box full-width">
+                        <label>Observações</label>
+                        <p id="m-obsPrescricao">--</p>
+                    </div>
+                </div>
+            </div>
+          
+        </div>
+        <div id="meuModalNovaPrescricao" class="modal-overlay" role="dialog" aria-hidden="true" style="z-index: 1200;">
+            <div class="modal-content" style="width: 500px;"> <span class="close-btn" onclick="fecharModalNovaPrescricao()">&times;</span>
+
+                <div class="modal-header">
+                    <h2>Nova Prescrição</h2>
+                    <span class="status-badge" style="background-color: var(--cor-secundaria); color: white;"></span>
+                </div>
+
+                <div class="modal-body">
+                    <form id="formRenovacao">
+                    
+                        <div class="form-group">
+                            <label>Utente:</label>
+                            <input type="text" id="renew-utente" name="utente" readonly class="input-readonly">
+                        </div>
+
+                        <div class="info-row">
+                            <div class="form-group" style="flex: 1;">
+                                <label>Local:</label>
+                                <input type="text" id="renew-local" name="local" readonly class="input-readonly">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Prescritor:</label>
+                                <input type="text" id="renew-prescritor" name="prescritor" readonly class="input-readonly">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Data de Emissão:</label>
+                            <input type="date" id="renew-data" name="dataEmissao" readonly class="input-readonly">
+                        </div>
+
+                        <hr class="modal-divider" style="margin: 20px 0; border: 0; border-top: 1px solid #eee;"> 
+
+                        <div class="form-group">
+                            <label>Medicamento:</label>
+                            <input type="text" id="medicamento" name="medicamento">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Validade:</label>
+                            <input type="text" id="validade" name="validade">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Qtd Dispensa:</label>
+                            <input type="text" id="qtd-dispensa" name="qtdDispensa">
+                        </div>
+
+                        <div class="form-group">    
+                            <label>Forma Farmacêutica:</label>
+                            <input type="text" id="forma-farma" name="formaFarmaceutica">
+                        </div>
+
+                        <div class="form-group">    
+                            <label>Dosagem e Frequência:</label>
+                            <textarea id="dosagem-frequencia" name="dosagemFrequencia" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">    
+                            <label>Observações:</label>
+                            <textarea id="observacoes" name="observacoes" rows="4"></textarea>
+                        </div>
+                        <div class="modal-actions">
+                            <button type="submit" class="btn-confirm">Confirmar</button>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="js/utentes.js"></script>
+</body> 
+</html>
