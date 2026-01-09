@@ -17,8 +17,8 @@
 }
 /* CORPO DA PÁGINA (FUNDO GERAL) */
 body, html {
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     font-family: 'Inter', 'Gantari', sans-serif;
     background-color: var(--cor-primaria);
     overflow: hidden; 
@@ -33,6 +33,7 @@ body, html {
     padding: var(--gap-padrao);
     gap: var(--gap-padrao);
 }
+
 
 /* ---------------------------------------------
 3. Sidebar (Lado Esquerdo) */
