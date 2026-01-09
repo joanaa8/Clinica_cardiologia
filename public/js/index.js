@@ -57,9 +57,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (response.ok) {
-
+                    localStorage.setItem('medico_token', data.token); //guardar o token RN1
                     console.log('Login com sucesso:', data);
-                    window.location.href = data.is_professional ? '/profissional.html' : '/utente.html'; //RN3
+                    window.location.href = data.is_professional ? '/profissional.html' : '/adicional.html'; //RN3
                 
                 } else {
 

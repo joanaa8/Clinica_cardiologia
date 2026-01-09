@@ -1,51 +1,78 @@
 <!DOCTYPE html>
 <html lang="pt-pt">
-        
     <head>
-        <meta charset="UTF-8">                                                                  <!--serve para permitir acentos-->
-        <meta http-equiv="X-UA-Compatible" content="IE-edge">                                   <!--compatibilidade com dispositivos de telemovel-->
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">  <!--controlo da tela, tag responsiva-->
-        <title>dashboard Profissional</title>
-        <link rel="stylesheet" href="css\dashboard.css">  
- 
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Dashboard Profissional - Clínica Dr. Machado Lemos</title>
+        <link rel="stylesheet" href="css/perfil.css">
     </head>
+
     <body>
         <div class="dashboard-container">
 
-            <div class="sidebar">
-                <h2>Menu Profissional</h2>
-                <ul>
-                    <li><a href="#">Início</a></li>
-                    <li><a href="#">Pacientes</a></li>
-                    <li><a href="#">Consultas</a></li>
-                    <li><a href="#">Relatórios</a></li>
-                    <li><a href="#">Configurações</a></li>
-                </ul>
-            </div>
+      
+            <aside class="sidebar">
+                <div class="sidebar-top">
 
-            <div class="main">
+                    <a href="perfil.html" class="user-profile-link active-profile">
+                        <div class="user-profile">
+                            <div class="avatar-circle" id="sidebar-avatar"></div>
+                            <div class="user-info-text">
+                                <h3 id="nome-medico">A carregar...</h3>
+                                <span class="user-role">Profissional de Saúde</span>
+                            </div>
+                        </div>
+                    </a>
 
-                <div class="header-banner">
-                    <!-- Header -->
+                    <nav>
+                        <ul>
+                            <li><a href="consultas.html" class="nav-btn"><span class="icon-dot"></span> Consultas</a></li>
+                            <li><a href="prescricoes.html" class="nav-btn"><span class="icon-dot"></span> Prescrições</a></li>
+                            <li><a href="utentes.html" class="nav-btn"><span class="icon-dot"></span> Utentes</a></li>
+                        </ul>
+                    </nav>
                 </div>
 
-                <div class="content">
-                    <!-- Conteúdo -->
+                <button class="logout-btn" onclick="terminarSessao()">Terminar Sessão</button>
+            </aside>
+
+
+            <main class="main-content">
+
+                <header class="header-banner">
+                    <div class="header-wrapper">
+                        <div class="titulo-e-acao">
+                            <h1>Dashboard</h1>
+                            <p class="subtitle">Resumo da atividade profissional</p>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="content-area">
+
+                   
+                    <div class="cards-grid">
+
+                        <div class="info-card">
+                            <h3>Consultas Hoje</h3>
+                            <p class="card-number">5</p>
+                        </div>
+
+                        <div class="info-card">
+                            <h3>Utentes Ativos</h3>
+                            <p class="card-number">42</p>
+                        </div>
+
+                        <div class="info-card">
+                            <h3>Prescrições Ativas</h3>
+                            <p class="card-number">18</p>
+                        </div>
+
+                    </div>
+
                 </div>
-
-            </div>
-
+            </main>
         </div>
-        
-    </body> 
+        <script src="js/auth.js"></script>
+    </body>
 </html>
-
-/* Ellipse 3 */
-
-position: absolute;
-width: 64px;
-height: 64px;
-left: 18px;
-top: 178px;
-
-background: #E0F7FA;

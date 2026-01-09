@@ -1,138 +1,139 @@
 <!DOCTYPE html>
 <html lang="pt-pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Consultas - Clínica Dr. Machado Lemos</title>
-    <link rel="stylesheet" href="css/consultas.css">  
-    
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
-</head>
-<body>
-    <div class="dashboard-container">
-        <aside class="sidebar">
-            <div class="sidebar-top">
-                <a href="perfil.html" class="user-profile-link">
-                    <div class="user-profile">
-                        <div class="avatar-circle" id="sidebar-avatar"></div>
-                        <div class="user-info-text"><
-                            <h3 id="nome-medico">A carregar...</h3> 
-                     </div>
-                    </div>
-                </a>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Consultas - Clínica Dr. Machado Lemos</title>
+        <link rel="stylesheet" href="css/consultas.css">  
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+        <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
+    </head>
+    <body>
+            <div class="dashboard-container">
+                <aside class="sidebar">
+                    <div class="sidebar-top">
+                        <a href="perfil.html" class="user-profile-link">
+                            <div class="user-profile">
+                                <div class="avatar-circle" id="sidebar-avatar"></div>
+                                    <div class="user-info-text">
+                                        <h3 id="nome-medico">A carregar...</h3>
+                                        <span class="user-role">Profissional de Saúde</span> 
+                                    </div>
+                            </div>
+                        </a>
 
-                <nav>
-                    <ul>
-                        <li><a href="consultas.html" class="nav-btn active"><span class="icon-dot"></span> Consultas</a></li>
-                        <li><a href="prescricoes.html" class="nav-btn"><span class="icon-dot"></span> Prescrições</a></li>
-                        <li><a href="utentes.html" class="nav-btn"><span class="icon-dot"></span> Utentes</a></li>
-                    </ul>
-                </nav>
+                        <nav>
+                            <ul>
+                                <li><a href="consultas.html" class="nav-btn active"><span class="icon-dot"></span> Consultas</a></li>
+                                <li><a href="prescricoes.html" class="nav-btn"><span class="icon-dot"></span> Prescrições</a></li>
+                                <li><a href="utentes.html" class="nav-btn"><span class="icon-dot"></span> Utentes</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+
+                    <button class="logout-btn" onclick="terminarSessao()">Terminar Sessão</button>
+                </aside>
+
+                <main class="main-content">
+                    <header class="header-banner">
+                        <div class="header-left">
+                                    <h1>Consultas:</h1>
+                        </div>
+                            
+                        <div class="header-right">
+                            <div class="sort-wrapper">
+                            <label>Ordenar por</label> <div class="custom-dropdown" id="dropdownTrigger">
+                                <span id="sortSelected">Consultas Próximas</span>
+                                    <svg class="chevron-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </div>
+
+                                <div class="dropdown-menu" id="dropdownMenu">
+                                    <div class="dropdown-option active" data-value="proximas">Consultas Próximas</div>
+                                    <div class="dropdown-option" data-value="distantes">Consultas Distantes</div>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+                    <div class="consultas-container">
+                            <div id="consultasList" class="lista-scroll">
+                            </div>
+                        </div> 
+                </main>
             </div>
 
-            <button class="logout-btn" onclick="terminarSessao()">Terminar Sessão</button>
-        </aside>
-
-        <main class="main-content">
-            <header class="header-banner">
-                 <div class="header-left">
-                            <h1>Consultas:</h1>
-                </div>
+            <div class="modal-overlay" id="modalOverlay">
+                <div class="modal-card">
+                    <button class="close-btn" onclick="fecharModal()">&times;</button>
                     
-                <div class="header-right">
-                    <div class="sort-wrapper">
-                       <label>Ordenar por</label> <div class="custom-dropdown" id="dropdownTrigger">
-                           <span id="sortSelected">Consultas Próximas</span>
-                            <svg class="chevron-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
+                    <div class="modal-header">
+                        <div class="avatar-large" id="m-avatar">AS</div>
+                        <div>
+                            <h2 id="m-paciente">Nome do Paciente</h2>
+                            <span class="status-badge" id="m-status">Confirmada</span>
+                        </div>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="info-group">
+                            <label>Data e Hora</label>
+                            <p id="m-data"></p>
                         </div>
 
-                        <div class="dropdown-menu" id="dropdownMenu">
-                            <div class="dropdown-option active" data-value="proximas">Consultas Próximas</div>
-                            <div class="dropdown-option" data-value="distantes">Consultas Distantes</div>
+                        <div class="info-group">
+                            <label>Sintomas / Notas</label>
+                            <p id="m-notas" class="notas-text"></p>
                         </div>
                     </div>
-                </div>
-            </header>
-               <div class="consultas-container">
-                    <div id="consultasList" class="lista-scroll">
+                    <div class="modal-actions">
+                        <div class="action-left" >
+                        <button class="btn-reagendar" id="btnreagendarConsulta"> 📅 Reagendar Data</button>
+                        <button class="btn-submit" id="btnConfirmarData" style="display: none;">Confirmar</button>
+                    </div> 
+                
+                        <button class="btn-secondary" onclick="fecharModal()">Fechar</button>
+                        
                     </div>
-                </div> 
-        </main>
-    </div>
-
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal-card">
-            <button class="close-btn" onclick="fecharModal()">&times;</button>
-            
-            <div class="modal-header">
-                <div class="avatar-large" id="m-avatar">AS</div>
-                <div>
-                    <h2 id="m-paciente">Nome do Paciente</h2>
-                    <span class="status-badge" id="m-status">Confirmada</span>
                 </div>
             </div>
 
-            <div class="modal-body">
-                <div class="info-group">
-                    <label>Data e Hora</label>
-                    <p id="m-data"></p>
-                </div>
+            <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+            <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
+            <script src="js/auth.js"></script>
+        <script>
+            flatpickr("#btnreagendarConsulta", {
+                    enableTime: true,
+                    dateFormat: "d-m-Y H:i", // Formato português
+                    locale: "pt",
+                    disableMobile: "true",
+                    onChange: function(selectedDates, dateStr, instance) {
+                        // 1. Muda texto do botão reagendar
+                        document.getElementById('btnreagendarConsulta').innerText = dateStr;
+                        
+                        // 2. MOSTRA O BOTÃO CONFIRMAR
+                        const btnConfirmar = document.getElementById('btnConfirmarData');
+                        btnConfirmar.style.display = "block";
+                        
+                        // Animação simples de entrada
+                        btnConfirmar.style.opacity = 0;
+                        setTimeout(() => btnConfirmar.style.opacity = 1, 50);
 
-                <div class="info-group">
-                    <label>Sintomas / Notas</label>
-                    <p id="m-notas" class="notas-text"></p>
-                </div>
-            </div>
-            <div class="modal-actions">
-                <div class="action-left" >
-                <button class="btn-reagendar" id="btnreagendarConsulta"> 📅 Reagendar Data</button>
-                <button class="btn-submit" id="btnConfirmarData" style="display: none;">Confirmar</button>
-            </div> 
-          
-                <button class="btn-secondary" onclick="fecharModal()">Fechar</button>
-                
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
-    <script src="js/consultas.js"></script>
-<script>
-    flatpickr("#btnreagendarConsulta", {
-            enableTime: true,
-            dateFormat: "d-m-Y H:i", // Formato português
-            locale: "pt",
-            disableMobile: "true",
-            onChange: function(selectedDates, dateStr, instance) {
-                // 1. Muda texto do botão reagendar
-                document.getElementById('btnreagendarConsulta').innerText = dateStr;
-                
-                // 2. MOSTRA O BOTÃO CONFIRMAR
-                const btnConfirmar = document.getElementById('btnConfirmarData');
-                btnConfirmar.style.display = "block";
-                
-                // Animação simples de entrada
-                btnConfirmar.style.opacity = 0;
-                setTimeout(() => btnConfirmar.style.opacity = 1, 50);
-
-                // Configurar o clique do botão confirmar
-                btnConfirmar.onclick = function() {
-                    alert("Data reagendada com sucesso para: " + dateStr);
-                    // Aqui chamarias a função para salvar na base de dados
-                    
-                    // Resetar visual
-                    btnConfirmar.style.display = "none";
-                    document.getElementById('m-data').innerText = dateStr + " (Atualizado)";
-                };
-            }
-        });
-</script>
+                        // Configurar o clique do botão confirmar
+                        btnConfirmar.onclick = function() {
+                            alert("Data reagendada com sucesso para: " + dateStr);
+                            // Aqui chamarias a função para salvar na base de dados
+                            
+                            // Resetar visual
+                            btnConfirmar.style.display = "none";
+                            document.getElementById('m-data').innerText = dateStr + " (Atualizado)";
+                        };
+                    }
+                });
+        </script>
 
 
-</body> 
+    </body> 
 </html>
 

@@ -21,11 +21,6 @@ app.use('/api/account', accountRoutes);
 app.use('/api/prescricoes', prescriptionRoutes);
 
 
-app.get(/.*/, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-
 app.use((err, req, res, next) => {
     console.error(' Ocorreu um erro no Servidor:', err.stack);
     res.status(500).json({ status: 500, message: 'Erro interno no servidor' });

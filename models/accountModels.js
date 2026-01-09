@@ -1,11 +1,14 @@
 const db = require('../config/db.js');
 
 const Account = {
-    getById: async (id) => {
+    getByUserId: async (id_user) => {
         try {
-            // Vai buscar o nome e a licença à tabela Account
-            const query = 'SELECT name, email, professional_license FROM Account WHERE id = $1';
-            const result = await db.query(query, [id]);
+            const query = `
+                SELECT name, email, professional_license
+                FROM Account
+                WHERE id_user = $1
+            `;
+            const result = await db.query(query, [id_user]);
             return result.rows[0];
         } catch (error) {
             throw error;

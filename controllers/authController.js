@@ -50,7 +50,7 @@ const login = async (req, res) => {
         const token = jwt.sign(
                 {
                     id_user: user.id_user,
-                    is_professional: is_professional
+                    is_professional: true
                 },
                 process.env.JWT_SECRET,
                 { expiresIn: '1h' }
@@ -58,7 +58,8 @@ const login = async (req, res) => {
 
             res.status(200).json({
                 message: 'Login bem-sucedido',
-                token: token
+                token: token,
+                is_professional: is_professional
             });
 
 
