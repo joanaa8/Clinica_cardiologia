@@ -1,8 +1,8 @@
 const PrescriptionModel = require('../models/prescriptionModels');
 
-exports.getMyPrescriptions = async (req, res) => {
+const getMyPrescriptions = async (req, res) => {
     try {
-        // O ID do médico (req.user)
+        // Garantir que usamos o ID que vem do Token (id ou id_user)
         const doctorId = req.user.id || req.user.id_user;
         const prescricoes = await PrescriptionModel.getAllByDoctorId(doctorId);
 
@@ -11,4 +11,9 @@ exports.getMyPrescriptions = async (req, res) => {
         console.error("Erro ao buscar prescrições:", error);
         res.status(500).json({ message: "Erro ao carregar prescrições." });
     }
+};
+
+
+module.exports = { 
+    getMyPrescriptions 
 };

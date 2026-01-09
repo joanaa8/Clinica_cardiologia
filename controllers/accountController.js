@@ -1,9 +1,9 @@
 const AccountModel = require('../models/accountModels');
 
-exports.getMe = async (req, res) => {
+const getMe = async (req, res) => {
     try {
-        // O ID vem do middleware de autenticação (req.user.id)
-        const userId = req.user.id || req.user.id_user; // caso o nome do campo varie
+        // Garantimos que usamos o ID que vem do Token
+        const userId = req.user.id_user; 
         const medico = await AccountModel.getById(userId);
 
         if (!medico) {
@@ -15,4 +15,9 @@ exports.getMe = async (req, res) => {
         console.error("Erro ao buscar perfil:", error);
         res.status(500).json({ message: "Erro interno." });
     }
+};
+
+
+module.exports = { 
+    getMe 
 };
