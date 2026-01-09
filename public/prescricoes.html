@@ -134,6 +134,9 @@
                 </div>
 
                 <div class="modal-actions">
+                    <button id="btn-desativar" class="btn-desativar" onclick="desativarPrescricao()" style="display: none;">
+                        &#x21bb; Desativar Prescrição
+                    </button>
                     <button id="btn-renovar" class="btn-renovar" onclick="renovarPrescricao()" style="display: none;">
                         &#x21bb; Renovar Prescrição
                     </button>
@@ -141,6 +144,28 @@
             </div>
         </div>
     </div>
+
+<div id="meuModalDesativar" class="modal-overlay" role="dialog" aria-hidden="true" style="z-index: 1200;">
+    <div class="modal-content" style="width: 500px;"> <span class="close-btn" onclick="fecharModalDesativar()">&times;</span>
+        
+        <div class="modal-header">
+            <h2>Desativar Prescrição</h2>
+            <span class="status-badge" style="background-color: var(--cor-secundaria); color: white;"></span>
+        </div>
+         <div class="modal-body">
+            <form id="formdesativar">
+                 <div class="form-group">
+                    <label>Observação:</label>
+                    <input type="text" id="obs-desativar" name="observacao">
+                </div>
+                 <div class="modal-actions">
+                    <button type="submit" class="btn-confirm-desativar">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div id="meuModalRenovacao" class="modal-overlay" role="dialog" aria-hidden="true" style="z-index: 1200;">
     <div class="modal-content" style="width: 500px;"> <span class="close-btn" onclick="fecharModalRenovacao()">&times;</span>
 
