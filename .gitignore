@@ -8,3 +8,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .DS_Store
+
+# Ignorar um ficheiro específico
+etl_migracao.py
+importar_interacoes.py
+interacao_medicamentosa.csv
+lista_infomed.csv
+popular.py

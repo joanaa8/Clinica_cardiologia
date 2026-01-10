@@ -4,7 +4,8 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <title>Consultas - Clínica Dr. Machado Lemos</title>
-        <link rel="stylesheet" href="css/consultas.css">  
+        <link rel="stylesheet" href="css/consultas.css"> 
+          
         
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
         <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
@@ -13,28 +14,27 @@
             <div class="dashboard-container">
                 <aside class="sidebar">
                     <div class="sidebar-top">
-                        <a href="perfil.html" class="user-profile-link">
+                        <a href="profissional.html" class="user-profile-link">
                             <div class="user-profile">
                                 <div class="avatar-circle" id="sidebar-avatar"></div>
-                                    <div class="user-info-text">
-                                        <h3 id="nome-medico">A carregar...</h3>
-                                        <span class="user-role">Profissional de Saúde</span> 
-                                    </div>
+                                <h3 id="nome-medico">A carregar...</h3>
+                                <span class="user-role">Profissional de Saúde</span>
                             </div>
                         </a>
 
                         <nav>
                             <ul>
                                 <li><a href="consultas.html" class="nav-btn active"><span class="icon-dot"></span> Consultas</a></li>
-                                <li><a href="prescricoes.html" class="nav-btn"><span class="icon-dot"></span> Prescrições</a></li>
-                                <li><a href="utentes.html" class="nav-btn"><span class="icon-dot"></span> Utentes</a></li>
+                                <li><a href="prescricoes.html" class="nav-btn active"><span class="icon-dot"></span> Prescrições</a></li>
+                                <li><a href="utente.html" class="nav-btn active"><span class="icon-dot"></span> Utentes</a></li>
+                                <li><a href="perfil.html" class="nav-btn"><span class="icon-dot"></span> Perfil</a></li>
+
                             </ul>
                         </nav>
                     </div>
 
                     <button class="logout-btn" onclick="terminarSessao()">Terminar Sessão</button>
                 </aside>
-
                 <main class="main-content">
                     <header class="header-banner">
                         <div class="header-left">

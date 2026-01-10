@@ -61,27 +61,31 @@ body {
     border-radius: 12px;
     transition: background 0.2s;
 }
-/* ESTADO ATIVO NA SIDEBAR: O fundo azul claro quando estás na página */
-
+/* ESTADO ATIVO NA SIDEBAR: O fundo azul claro quando estás na página Perfil */
+.active-profile {
+    background-color: #f0fcfd;
+    border: 1px solid var(--cor-linhas);
+}
+/* Grupo do utilizador (Foto pequena + Nome) na Sidebar */
 .user-profile {
     display: flex;
     align-items: center;
     gap: 15px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #eee;
 }
 
 .avatar-circle {
     width: 50px;
     height: 50px;
-    background-color: #ddd;
+    background-color: #e0f7fa;
     border-radius: 50%;
+    color: #00bcd4;
+    font-size: 1.2rem;
+    border: 3px solid #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 188, 212, 0.15);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-weight: bold;
-    color: var(--cor-primaria); 
-    font-size: 1.2rem;
+    flex-shrink: 0;
 }
 
 .user-profile h3 {
@@ -119,8 +123,8 @@ body {
 }
 
 .icon-dot {
-    width: 10px;
-    height: 10px;
+    width: 30px;
+    height: 30px;
     background-color: var(--cor-linhas);
     border-radius: 50%;
 }
