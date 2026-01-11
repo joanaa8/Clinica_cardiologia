@@ -4,17 +4,14 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <title>Dashboard Profissional - Clínica Dr. Machado Lemos</title>
-        <link rel="stylesheet" href="css/perfil.css">
-         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-        <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
+        <link rel="stylesheet" href="css/prof.css">
     </head>
 
     <body>
         <div class="dashboard-container">
-
-      
             <aside class="sidebar">
                 <div class="sidebar-top">
+                    <a href="profissional.html" class="user-profile-link">
                         <div class="user-profile">
                             <div class="avatar-circle" id="sidebar-avatar"></div>
                             <div class="user-info-text">
@@ -23,57 +20,40 @@
                             </div>
                         </div>
                     </a>
-
                     <nav>
                         <ul>
-                            <li><a href="consultas.html" class="nav-btn"><span class="icon-dot"></span> Consultas</a></li>
-                            <li><a href="prescricoes.html" class="nav-btn"><span class="icon-dot"></span> Prescrições</a></li>
-                            <li><a href="utente.html" class="nav-btn"><span class="icon-dot"></span> Utentes</a></li>
-                            <li><a href="perfil.html" class="nav-btn"><span class="icon-dot"></span> Perfil</a></li>
+                            <li><a href="consultas.html" class="nav-btn">Consultas</a></li>
+                            <li><a href="prescricoes.html" class="nav-btn">Prescrições</a></li>
+                            <li><a href="utente.html" class="nav-btn">Utentes</a></li>
+                            <li><a href="perfil.html" class="nav-btn">Perfil</a></li>
                         </ul>
                     </nav>
                 </div>
-
                 <button class="logout-btn" onclick="terminarSessao()">Terminar Sessão</button>
             </aside>
 
-
             <main class="main-content">
-
-                <header class="header-banner">
-                    <div class="header-wrapper">
+                    <header class="header-banner">
                         <div class="titulo-e-acao">
-                            <h1>Dashboard</h1>
-                            <p class="subtitle">Resumo da atividade profissional</p>
+                            <h1 id="page-title">Bem-vindo</h1> 
+                            <p class="subtitle" id="boas-vindas"></p>
                         </div>
-                    </div>
-                </header>
+                        <div class="header-actions">
+                            </div>
+                    </header>
 
-                <div class="content-area">
-
-                   
-                    <div class="cards-grid">
-
-                        <div class="info-card">
-                            <h3>Consultas Hoje</h3>
-                            <p class="card-number">5</p>
+                    <section class="content-area">
+                        <div class="calendar-column">
+                            <div class="calendar-card">
+                                <div id="calendar"></div>
+                            </div>
                         </div>
-
-                        <div class="info-card">
-                            <h3>Utentes Ativos</h3>
-                            <p class="card-number">42</p>
-                        </div>
-
-                        <div class="info-card">
-                            <h3>Prescrições Ativas</h3>
-                            <p class="card-number">18</p>
-                        </div>
-
-                    </div>
-
-                </div>
+                    </section>
             </main>
+           
         </div>
-        <script src="js/auth.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+            <script src="js/auth.js"></script>
+            <script src="js/prof.js"></script>
     </body>
 </html>

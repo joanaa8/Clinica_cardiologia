@@ -19,8 +19,8 @@
 body, html {
     width: 100%;
     height: 100%;
+    overflow: hidden; /* O scroll será apenas dentro da content-area */
     background-color: var(--cor-primaria);
-    overflow: hidden;
 }
 
 /* LAYOUT PRINCIPAL */
@@ -28,12 +28,13 @@ body, html {
     display: flex;
     width: 100vw;
     height: 100vh;
-    gap: var(--gap-padrao);
+    padding: 0; /* Remova o gap externo se quiser a sidebar colada ao topo/fundo */
 }
 
 /* SIDEBAR  */
 .sidebar {
     width: 320px;
+    min-width: 320px;
     background-color: #ffffff;
     border-radius: 12px;
     padding: 30px;
@@ -41,7 +42,7 @@ body, html {
     flex-direction: column;
     justify-content: space-between;
     flex-shrink: 0;
-    margin-left: 20px;
+    margin: 20px 0 20px 20px;
 }
 
 .user-profile-link {
@@ -146,8 +147,9 @@ body, html {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: var(--gap-padrao);
-    padding: var(--gap-padrao);
+    gap: 20px;
+    padding: 20px;
+    height: 100vh;
 }
 
 .header-banner {
@@ -157,6 +159,8 @@ body, html {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    min-height: 100px;
+    padding: 20px 30px;
 }
 
 
@@ -174,7 +178,7 @@ body, html {
 .content-area {
     background-color: var(--cor-fundo-cards);
     border-radius: var(--borda-raio);
-    padding: 40px;
+    padding: 30px;
     flex: 1;
     overflow-y: auto;
     display: flex;
@@ -182,10 +186,69 @@ body, html {
     align-items: flex-start;
 }
 
-/* CARTÃO DO PERFIL */
+.stats-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.calendar-column {
+    flex: 2;
+    height: 100%; /* Ocupa a altura da coluna */
+}
+
+.info-card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    border-left: 5px solid var(--cor-secundaria);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.card-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--cor-primaria);
+}
+
+/* FULLCALENDAR - ESTILO BARRA LATERAL */
+.calendar-card {
+    background: white;
+    padding: 15px; /* Reduzimos ligeiramente o padding interno */
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    
+    /* A MUDANÇA CHAVE: */
+    height: 500px; /* Define uma altura fixa para o calendário não transbordar */
+    display: flex;
+    flex-direction: column;
+}
+
+.fc-daygrid-event {
+    border: none !important;
+    border-left: 4px solid var(--cor-secundaria) !important;
+    background: transparent !important;
+    color: #333 !important;
+    border-radius: 0 !important;
+    margin-bottom: 2px !important;
+}
+.fc .fc-daygrid-day-frame {
+    min-height: 40px !important; 
+}
+
+.fc-toolbar-title {
+    font-size: 1.1rem !important;
+}
+
+.event-completed { border-left-color: #4caf50 !important; }
+.event-cancelled { border-left-color: #f44336 !important; text-decoration: line-through; opacity: 0.6; }
+
 .profile-card {
     width: 100%;
-    max-width: 600px;
+    max-width: 650px; /* Impede que o formulário fique demasiado largo e desajeitado */
+    background-color: var(--cor-fundo-cards);
+    padding: 20px; /* Padding interno do cartão */
 }
 
 .profile-header-section {
@@ -195,44 +258,10 @@ body, html {
     margin-bottom: 30px;
 }
 
-.big-avatar {
-    width: 120px;
-    height: 120px;
-    background-color: var(--cor-linhas);
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 15px;
-    border: 4px solid white;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-}
-
-.initials {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: var(--cor-secundaria);
-}
-
-.badge-prof {
-    background-color: var(--cor-secundaria);
-    color: white;
-    padding: 5px 15px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    margin-top: 10px;
-}
-
-.divider {
-    border: 0;
-    border-top: 1px solid #f0f0f0;
-    margin: 25px 0;
-}
-
 .profile-info-grid {
     display: grid;
-    gap: 20px;
+    grid-template-columns: 1fr; /* Coluna única para manter o aspeto limpo */
+    gap: 25px;
 }
 
 .form-group {
@@ -245,15 +274,59 @@ body, html {
     font-size: 0.85rem;
     font-weight: 700;
     color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
+/* Estilo para campos que são apenas de leitura */
 .input-readonly {
-    padding: 14px;
+    padding: 15px;
     border-radius: 12px;
-    border: 1px solid #f0f0f0;
+    border: 1px solid #eee;
     background-color: #fcfcfc;
     color: var(--cor-texto);
     font-size: 1rem;
-    font-weight: 500;
     outline: none;
+    cursor: default; /* Mostra que não é clicável/editável */
+}
+
+/* Ajuste para garantir que o título do perfil não herda o display flex do dashboard */
+.profile-card h2 {
+    color: var(--cor-primaria);
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+}
+
+.initials {
+    font-size: 2.8rem;
+    font-weight: bold;
+    color: var(--cor-secundaria);
+}
+
+.badge-prof {
+    background-color: var(--cor-secundaria);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-top: 5px;
+}
+.divider {
+    border: 0;
+    border-top: 1px solid #f0f0f0;
+    margin: 25px 0;
+}
+
+.big-avatar {
+    width: 120px;
+    height: 120px;
+    background-color: var(--cor-linhas);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 4px solid white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    margin-bottom: 15px;
 }

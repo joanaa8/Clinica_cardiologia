@@ -29,12 +29,13 @@ body, html {
     display: flex;
     width: 100vw;
     height: 100vh;
-    gap: var(--gap-padrao);
+    padding: 0; /* Remova o gap externo se quiser a sidebar colada ao topo/fundo */
 }
 
 /*SIDEBAR */
 .sidebar {
     width: 320px;
+    min-width: 320px;
     background-color: #ffffff;
     border-radius: 12px;
     padding: 30px;
@@ -42,9 +43,8 @@ body, html {
     flex-direction: column;
     justify-content: space-between;
     flex-shrink: 0;
-    margin-left: 20px;
+    margin: 20px 0 20px 20px;
 }
-
 .user-profile-link {
     text-decoration: none;
     color: inherit;
@@ -149,9 +149,11 @@ body, html {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: var(--gap-padrao);
-    padding: var(--gap-padrao);
+    gap: 20px;
+    padding: 20px;
+    height: 100vh;
 }
+
 
 .header-banner {
     background-color: var(--cor-fundo-cards);
@@ -160,6 +162,8 @@ body, html {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    min-height: 100px;
+    padding: 20px 30px;
 }
 
 .header-banner h1 {

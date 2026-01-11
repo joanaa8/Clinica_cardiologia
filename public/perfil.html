@@ -13,8 +13,11 @@
                     <a href="profissional.html" class="user-profile-link">
                         <div class="user-profile">
                             <div class="avatar-circle" id="sidebar-avatar"></div>
+                            <div class="user-info-text">
                             <h3 id="nome-medico">A carregar...</h3>
-                            <span class="user-role">Profissional de Saúde</span>
+                            <span class="user-role">Profissional de Saúde</span>   
+                            </div>
+                            
                         </div>
                     </a>
 
@@ -33,11 +36,13 @@
 
             <main class="main-content">
                 <header class="header-banner">
-                    <h1>Meu Perfil</h1>
-                    <p class="subtitle">Gerir informações da conta</p>
+                    <div class="titulo-e-acao">
+                        <h1 id="page-title">Meu Perfil</h1>
+                        <p class="subtitle" id="boas-vindas">Informações da conta</p>
+                    </div>
                 </header>
 
-                <div class="content-area">
+                <section class="content-area">
                     <div class="profile-card">
                         <div class="profile-header-section">
                             <div class="big-avatar">
@@ -54,19 +59,17 @@
                                 <label>Nome Completo</label>
                                 <input type="text" id="input-nome" readonly class="input-readonly">
                             </div>
-
                             <div class="form-group">
                                 <label>Email Corporativo</label>
                                 <input type="email" id="input-email" readonly class="input-readonly">
                             </div>
-
                             <div class="form-group">
                                 <label>Nº Cédula Profissional</label>
                                 <input type="text" id="input-licenca" readonly class="input-readonly">
                             </div>
                         </div>
                     </div>
-                </div>
+                </section>
             </main>
         </div>
         <script src="js/auth.js" defer></script>
