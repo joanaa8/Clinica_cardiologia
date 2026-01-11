@@ -1,9 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM carregado');
-    carregarDadosMedico();
+    carregarSidebarMedico();
 });
 
-async function carregarDadosMedico() {
+// Função responsável por carregar e atualizar a sidebar do médico autenticado
+async function carregarSidebarMedico() {
     const token = localStorage.getItem('medico_token');
 
     if (!token) {
@@ -13,6 +14,7 @@ async function carregarDadosMedico() {
     }
 
     try {
+        // Pedido à API para obter os dados do médico autenticado
         const response = await fetch('/api/account/me', {
             method: 'GET',
             headers: {
@@ -20,7 +22,8 @@ async function carregarDadosMedico() {
                 'Authorization': `Bearer ${token}`
             }
         });
-
+        
+        // Verifica se a sessão expirou ou se o acesso foi negado
         if (response.status === 401 || response.status === 403) {
             console.error("Sessão expirada ou acesso proibido.");
             terminarSessao();
@@ -35,11 +38,16 @@ async function carregarDadosMedico() {
         const account = await response.json();
         console.log('Médico recebido:', account);
 
+        // Guarda o ID da conta do médico para uso em futuras consultas
+        localStorage.setItem('medico_account_id', account.id);
+
         // Atualizar sidebar
         const elementoNome = document.getElementById('nome-medico');
         const elementoAvatar = document.getElementById('sidebar-avatar');
 
         if (elementoNome) elementoNome.textContent = account.name;
+
+        // Gera e atualiza o avatar com as iniciais do nome
         if (elementoAvatar) {
             const iniciais = account.name
                 .split(' ')
@@ -49,19 +57,15 @@ async function carregarDadosMedico() {
                 .substring(0, 2);
             elementoAvatar.textContent = iniciais;
         }
-        // Atualizar perfil
-        document.getElementById('profile-name-display').textContent = account.name;
-        document.getElementById('input-nome').value = account.name;
-        document.getElementById('input-email').value = account.email;
-        document.getElementById('input-licenca').value = account.professional_license;
 
-        
     } catch (erro) {
         console.error('Erro de ligação ao servidor:', erro);
     }
 }
 
+// Termina a sessão do médico, limpando os dados armazenados
 function terminarSessao() {
     localStorage.removeItem('medico_token');
+    localStorage.removeItem('medico_account_id');
     window.location.href = 'index.html';
 }

@@ -2,138 +2,105 @@
 <html lang="pt-pt">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Consultas - Clínica Dr. Machado Lemos</title>
-        <link rel="stylesheet" href="css/consultas.css"> 
-          
-        
+        <link rel="stylesheet" href="css/consultas.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-        <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
+        <link rel="stylesheet" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
     </head>
     <body>
-            <div class="dashboard-container">
-                <aside class="sidebar">
-                    <div class="sidebar-top">
-                        <a href="profissional.html" class="user-profile-link">
-                            <div class="user-profile">
-                                <div class="avatar-circle" id="sidebar-avatar"></div>
-                                <h3 id="nome-medico">A carregar...</h3>
-                                <span class="user-role">Profissional de Saúde</span>
-                            </div>
-                        </a>
 
-                        <nav>
-                            <ul>
-                                <li><a href="consultas.html" class="nav-btn active"><span class="icon-dot"></span> Consultas</a></li>
-                                <li><a href="prescricoes.html" class="nav-btn active"><span class="icon-dot"></span> Prescrições</a></li>
-                                <li><a href="utente.html" class="nav-btn active"><span class="icon-dot"></span> Utentes</a></li>
-                                <li><a href="perfil.html" class="nav-btn"><span class="icon-dot"></span> Perfil</a></li>
-
-                            </ul>
-                        </nav>
-                    </div>
-
-                    <button class="logout-btn" onclick="terminarSessao()">Terminar Sessão</button>
-                </aside>
-                <main class="main-content">
-                    <header class="header-banner">
-                        <div class="header-left">
-                                    <h1>Consultas:</h1>
+        <div class="dashboard-container">
+            <aside class="sidebar">
+                <div class="sidebar-top">
+                    <a href="profissional.html" class="user-profile-link">
+                        <div class="user-profile">
+                            <div class="avatar-circle" id="sidebar-avatar"></div>
+                            <h3 id="nome-medico">A carregar...</h3>
+                            <span class="user-role">Profissional de Saúde</span>
                         </div>
-                            
-                        <div class="header-right">
-                            <div class="sort-wrapper">
-                            <label>Ordenar por</label> <div class="custom-dropdown" id="dropdownTrigger">
-                                <span id="sortSelected">Consultas Próximas</span>
-                                    <svg class="chevron-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polyline points="6 9 12 15 18 9"></polyline>
-                                    </svg>
-                                </div>
+                    </a>
 
-                                <div class="dropdown-menu" id="dropdownMenu">
-                                    <div class="dropdown-option active" data-value="proximas">Consultas Próximas</div>
-                                    <div class="dropdown-option" data-value="distantes">Consultas Distantes</div>
-                                </div>
-                            </div>
-                        </div>
-                    </header>
-                    <div class="consultas-container">
-                            <div id="consultasList" class="lista-scroll">
-                            </div>
-                        </div> 
-                </main>
-            </div>
+                    <nav>
+                        <ul>
+                            <li><a href="consultas.html" class="nav-btn active">Consultas</a></li>
+                            <li><a href="prescricoes.html" class="nav-btn">Prescrições</a></li>
+                            <li><a href="utente.html" class="nav-btn">Utentes</a></li>
+                            <li><a href="perfil.html" class="nav-btn">Perfil</a></li>
+                        </ul>
+                    </nav>
+                </div>
 
-            <div class="modal-overlay" id="modalOverlay">
-                <div class="modal-card">
-                    <button class="close-btn" onclick="fecharModal()">&times;</button>
-                    
-                    <div class="modal-header">
-                        <div class="avatar-large" id="m-avatar">AS</div>
-                        <div>
-                            <h2 id="m-paciente">Nome do Paciente</h2>
-                            <span class="status-badge" id="m-status">Confirmada</span>
-                        </div>
-                    </div>
+                <button class="logout-btn" onclick="terminarSessao()">Terminar Sessão</button>
+            </aside>
 
-                    <div class="modal-body">
-                        <div class="info-group">
-                            <label>Data e Hora</label>
-                            <p id="m-data"></p>
-                        </div>
-
-                        <div class="info-group">
-                            <label>Sintomas / Notas</label>
-                            <p id="m-notas" class="notas-text"></p>
-                        </div>
-                    </div>
-                    <div class="modal-actions">
-                        <div class="action-left" >
-                        <button class="btn-reagendar" id="btnreagendarConsulta"> 📅 Reagendar Data</button>
-                        <button class="btn-submit" id="btnConfirmarData" style="display: none;">Confirmar</button>
-                    </div> 
-                
-                        <button class="btn-secondary" onclick="fecharModal()">Fechar</button>
-                        
+            <div class="main-content">
+                <div class="header-banner">
+                    <h1>Consultas</h1>
+                    <div class="sort-wrapper">
+                        <label for="statusDropdown">Filtrar:</label>
+                        <select id="statusDropdown" name="filtro_consultas" onchange="carregarConsultas()">
+                            <option value="proximas" selected>Próximas</option>
+                            <option value="passadas">Passadas</option>
+                            <option value="canceladas">Canceladas</option>
+                        </select>
                     </div>
                 </div>
+
+                <div class="consultas-container">
+                    <div id="consultasList" class="lista-scroll"></div>
+                </div>
             </div>
+        </div>
 
-            <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-            <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
-            <script src="js/auth.js"></script>
-        <script>
-            flatpickr("#btnreagendarConsulta", {
-                    enableTime: true,
-                    dateFormat: "d-m-Y H:i", // Formato português
-                    locale: "pt",
-                    disableMobile: "true",
-                    onChange: function(selectedDates, dateStr, instance) {
-                        // 1. Muda texto do botão reagendar
-                        document.getElementById('btnreagendarConsulta').innerText = dateStr;
-                        
-                        // 2. MOSTRA O BOTÃO CONFIRMAR
-                        const btnConfirmar = document.getElementById('btnConfirmarData');
-                        btnConfirmar.style.display = "block";
-                        
-                        // Animação simples de entrada
-                        btnConfirmar.style.opacity = 0;
-                        setTimeout(() => btnConfirmar.style.opacity = 1, 50);
+        <!-- Modal -->
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal-card modal-large">
+                <button class="close-btn" onclick="fecharModal()">&times;</button>
+                
+                <div class="header-modal">
+                    <div class="avatar-circle" id="m-avatar">--</div>
+                    <div class="header-info">
+                        <div class="name-row">
+                            <h2 id="m-paciente">Nome do Paciente</h2>
+                            <span class="status-badge" id="m-status">--</span>
+                        </div>
+                    </div>
+                </div>
 
-                        // Configurar o clique do botão confirmar
-                        btnConfirmar.onclick = function() {
-                            alert("Data reagendada com sucesso para: " + dateStr);
-                            // Aqui chamarias a função para salvar na base de dados
-                            
-                            // Resetar visual
-                            btnConfirmar.style.display = "none";
-                            document.getElementById('m-data').innerText = dateStr + " (Atualizado)";
-                        };
-                    }
-                });
-        </script>
+                <hr class="divider">
 
+                <div class="info-grid two-columns">
+                    <div class="info-box">
+                        <strong>Data</strong>
+                        <p id="m-data-so">--/--/----</p>
+                    </div>
+                    <div class="info-box">
+                        <strong>Hora</strong>
+                        <p id="m-hora">--:--</p>
+                    </div>
+                    <div class="info-box">
+                        <strong>SNS</strong>
+                        <p id="m-sns">--</p>
+                    </div>
+                    <div class="info-box">
+                        <strong>Telemóvel</strong>
+                        <p id="m-telemovel">--</p>
+                    </div>
+                </div>
 
-    </body> 
+                <div class="modal-footer-centered">
+                    <div id="calendar-inline-container"></div>
+                    <button class="btn-reagendar" id="btnreagendarConsulta">Reagendar Consulta</button>
+                    
+                    <button class="btn-confirm" id="btnConfirmarData" style="display: none;">Confirmar Nova Data</button>
+                </div>
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
+        <script src="js/auth.js" defer></script>
+        <script src="js/appointment.js" defer></script>
+
+    </body>
 </html>
-

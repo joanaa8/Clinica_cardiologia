@@ -1,5 +1,6 @@
 const AccountModel = require('../models/accountModels');
 
+//Controller para obter o perfil do médico autenticado
 const getMe = async (req, res) => {
     try {
         const userId = req.user.id_user; // UUID do token

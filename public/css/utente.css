@@ -1,6 +1,5 @@
-/*1. VARIÁVEIS E RESET*/
 :root {
-    --cor-primaria: #0d1a26;
+    --cor-primaria: #0d1a26; 
     --cor-secundaria: #00bcd4;
     --cor-fundo-cards: #ffffff;
     --cor-linhas: #e0f7fa;
@@ -10,6 +9,7 @@
     --gap-padrao: 20px;
 }
 
+/* Reset básico */
 * {
     margin: 0;
     padding: 0;
@@ -17,484 +17,376 @@
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* CORPO DA PÁGINA (FUNDO GERAL) */
-body {
+body, html {
     width: 100%;
     height: 100%;
-    font-family: 'Inter', 'Gantari', sans-serif;
     background-color: var(--cor-primaria);
     overflow: hidden;
 }
 
-/*-----------------------------------------------------------
-2. LAYOUT PRINCIPAL (DIVISÃO ESQUERDA / DIREITA)*/
+/* LAYOUT PRINCIPAL */
 .dashboard-container {
     display: flex;
     width: 100vw;
     height: 100vh;
-    padding: var(--gap-padrao);
     gap: var(--gap-padrao);
 }
 
-/*3. Sidebar (Lado Esquerdo) */
+/*SIDEBAR */
 .sidebar {
-    width: 280px;
+    width: 320px;
     background-color: #ffffff;
     border-radius: 12px;
     padding: 30px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    flex-shrink: 0; 
+    flex-shrink: 0;
+    margin-left: 20px;
 }
-/* Link do perfil no topo da Sidebar */
+
 .user-profile-link {
     text-decoration: none;
     color: inherit;
     display: block;
     margin-bottom: 30px;
-    padding: 10px;
-    border-radius: 12px;
-    transition: background 0.2s;
 }
-/* ESTADO ATIVO NA SIDEBAR: O fundo azul claro quando estás na página Perfil */
-.active-profile {
-    background-color: #f0fcfd;
-    border: 1px solid var(--cor-linhas);
-}
-/* Grupo do utilizador (Foto pequena + Nome) na Sidebar */
+
 .user-profile {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 15px;
+    gap: 8px;
 }
-/* ICONE PEQUENO "ML" NA SIDEBAR */
+
 .avatar-circle {
-    width: 50px;
-    height: 50px;
+    width: 70px;
+    height: 70px;
     background-color: #e0f7fa;
     border-radius: 50%;
-    color: #00bcd4;
-    font-size: 1.2rem;
+    color: var(--cor-secundaria);
+    font-size: 1.5rem;
     border: 3px solid #ffffff;
-    box-shadow: 0 4px 10px rgba(0, 188, 212, 0.15);
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-shrink: 0;
-}
-/* Texto do Nome na Sidebar */
-.user-info-text h3 {
-    font-size: 1rem;
-    color: var(--cor-texto);
+    box-shadow: 0 4px 10px rgba(0, 188, 212, 0.2);
 }
 
-/* Texto "Médico(a)" na Sidebar */
+#nome-medico {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--cor-primaria);
+    text-align: center;
+}
+
 .user-role {
-    font-size: 0.8rem;
-    color: #888;
+    font-size: 0.9rem;
+    color: #000;
+    text-align: center;
 }
 
-/* Lista de Links (Consultas, Prescrições, Utentes) */
 .sidebar nav ul {
     list-style: none;
-    margin-top: 20px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+    margin-top: 20px;
 }
-/* Botões do Menu de Navegação */
+
 .nav-btn {
     display: flex;
     align-items: center;
     gap: 15px;
+    padding: 12px 20px;
     text-decoration: none;
-    color: var(--cor-texto);
     font-weight: 600;
-    padding: 12px;
-    border-radius: 10px;
-    transition: 0.2s;
+    border-radius: 12px;
+    color: #555;
+    transition: 0.3s;
+    position: relative;
 }
-/* Efeito ao passar o rato nos botões do menu */
+
+.nav-btn::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background-color: var(--cor-secundaria);
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
 .nav-btn:hover {
     background-color: #f5f5f5;
 }
-/* Bolinha azul ao lado dos nomes dos menus */
-.icon-dot {
-    width: 30px;
-    height: 30px;
-    background-color: var(--cor-linhas);
-    border-radius: 50%;
+
+.nav-btn.active {
+    border-left: 4px solid var(--cor-secundaria);
+    background: linear-gradient(90deg, #eaf9fc, #ffffff);
+    color: var(--cor-primaria);
+    font-weight: 700;
 }
-/* BOTÃO DE TERMINAR SESSÃO (Fundo da Sidebar) */
+
+/* Botão terminar sessão */
 .logout-btn {
     padding: 12px;
     background-color: var(--cor-botao-sair);
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     font-weight: bold;
     cursor: pointer;
+    transition: 0.2s;
 }
 
-/* =========================================
-   4. CONTEÚDO PRINCIPAL (Main Content)*/
+.logout-btn:hover {
+    background-color: #4f6675;
+}
+
+/* MAIN CONTENT*/
 .main-content {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: var(--gap-padrao);
-    height: 100%;
-    min-width: 0;
+    padding: var(--gap-padrao);
 }
 
-/* --- Header Banner --- */
 .header-banner {
-    width: 100%;
-    background-color: #ffffff;
-    border-radius: 12px;
+    background-color: var(--cor-fundo-cards);
+    padding: 20px 30px;
+    border-radius: var(--borda-raio);
     display: flex;
-    align-items: center;
-    padding: 20px 40px;
-    flex-shrink: 0;
     justify-content: space-between;
+    align-items: center;
 }
 
 .header-banner h1 {
     font-size: 1.8rem;
-    color: #777;
+    color: var(--cor-primaria);
 }
-
-/* Barra de Pesquisa */
-.header-right { display: flex; align-items: center; }
 
 .search-wrapper {
     position: relative;
-    width: 350px;
 }
 
 .search-wrapper input {
-    width: 100%;
-    padding: 12px 15px 12px 45px;
-    border-radius: 10px;
-    border: 1px solid #eee;
-    background-color: #f9f9f9;
-    font-size: 0.9rem;
-    color: var(--cor-texto);
-    outline: none;
-    transition: all 0.2s ease;
+    padding: 6px 10px 6px 30px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    width: 250px;
 }
 
-.search-wrapper input:focus {
-    border-color: var(--cor-secundaria);
-    background-color: white;
-    box-shadow: 0 4px 12px rgba(0, 188, 212, 0.1);
-}
-
-.search-icon {
+.search-wrapper svg {
     position: absolute;
-    left: 15px;
     top: 50%;
+    left: 8px;
     transform: translateY(-50%);
-    color: #bbb;
-    pointer-events: none;
+    color: #9ca3af;
 }
 
-/* ============================================================
-   3. LISTA DE UTENTES (RETÂNGULOS FINOS)
-   ============================================================ */
+/*LISTA DE UTENTES*/
 .utentes-container {
     flex: 1;
     background-color: var(--cor-fundo-cards);
     border-radius: var(--borda-raio);
     padding: 20px;
-    overflow: hidden; 
-}
-
-.lista-scroll {
-    height: 100%;
     overflow-y: auto;
-    padding: 10px;
-    display: flex; flex-direction: column; gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
-/* O Cartão do Utente */
 .utente-card {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    background-color: white;
-    border: 1px solid var(--cor-linhas);
-    border-radius: 10px;
-    padding: 12px 20px;
-    transition: all 0.2s ease;
+    align-items: center;
+    background-color: #f9fcff;
+    border: 1px solid #e0f7fa;
+    border-radius: 12px;
+    padding: 20px 28px;
     cursor: pointer;
+    transition: 0.2s;
 }
 
 .utente-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,188,212,0.15);
     border-color: var(--cor-secundaria);
-    transform: translateX(5px);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
-/* Lado Esquerdo: Avatar + Nome */
-.card-left { display: flex; align-items: center; gap: 15px; flex: 1; }
-
-.mini-avatar {
-    width: 35px; height: 35px;
-    background-color: var(--cor-secundaria);
-    color: white; font-weight: bold; font-size: 0.9rem;
-    border-radius: 50%;
-    display: flex; justify-content: center; align-items: center;
-}
-
-.utente-nome {
+.card-info h3 {
+    font-size: 1rem;
     font-weight: 600;
     color: #333;
-    font-size: 1rem;
+    margin-bottom: 4px;
 }
 
-/* Lado Direito: Dados (SNS, Data) + Seta */
-.card-right { display: flex; align-items: center; gap: 30px; }
-
-.info-item {
-    display: flex; flex-direction: column; align-items: flex-end;
-}
-.info-label { font-size: 0.7rem; color: #aaa; text-transform: uppercase; }
-.info-value { font-size: 0.9rem; color: #555; font-weight: 500; }
-
-/* Botão "Ver Ficha" dentro do cartão */
-.btn-ver-ficha {
-    background-color: var(--cor-secundaria); color: white; border: none;
-    padding: 8px 16px; border-radius: 6px; font-size: 0.85rem;
-    font-weight: 600; cursor: pointer; transition: 0.2s; margin-left: 20px;
-}
-.btn-ver-ficha:hover { background-color: #0097a7; transform: translateY(-1px); }
-
-
-/* ============================================================
-   5. ESTILOS DA MODAL GRANDE (CORRIGIDO)
-   ============================================================ */
-
-/* Fundo Escuro */
-.modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(13, 26, 38, 0.85);
-    backdrop-filter: blur(4px);
-    display: none; justify-content: center; align-items: center;
-    z-index: 2000; opacity: 0; transition: opacity 0.3s;
-}
-.modal-overlay.open { display: flex; opacity: 1; }
-
-/* O Cartão Pop-up */
-.modal-card {
-    background: white; border-radius: 20px;
-    padding: 30px; position: relative;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    transform: translateY(30px);
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    display: flex; flex-direction: column;
-}
-.modal-overlay.open .modal-card { transform: translateY(0); }
-
-/* Tamanho Grande (XL) */
-.modal-large {
-    width: 90%; 
-    max-width: 900px; 
-    height: 90vh;
+.card-info p {
+    font-size: 0.9rem;
+    color: #777;
 }
 
-/* Cabeçalho da Modal */
-.modal-header {
-    display: flex; justify-content: space-between; align-items: center;
-    border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px;
-}
-.header-profile { display: flex; align-items: center; gap: 20px; }
-
-.avatar-xl {
-    width: 70px; height: 70px;
-    background-color: var(--cor-secundaria); color: white;
-    font-size: 1.8rem; font-weight: bold; border-radius: 50%;
-    display: flex; justify-content: center; align-items: center;
-    box-shadow: 0 5px 15px rgba(0, 188, 212, 0.3);
-}
-
-.modal-header h2 { font-size: 1.5rem; color: #333; margin-bottom: 5px; }
-.badge-sns {
-    background: #e0f7fa; color: var(--cor-secundaria);
-    padding: 5px 10px; border-radius: 6px; font-weight: 600; font-size: 0.85rem;
-}
-
-/* AQUI ESTAVA O ERRO - AGORA CORRIGIDO */
-.btn-novaPrescricao {
-    padding: 10px 20px;
-    background: var(--cor-secundaria); 
-    border: none; 
-    border-radius: 8px;
-    font-size: 0.9rem; /* Tamanho normal */
-    color: white; 
-    cursor: pointer;
+/* Botão detalhes */
+.btn-detalhes {
+    padding: 10px 18px;
+    border-radius: 12px;
+    border: 1px solid var(--cor-secundaria);
+    background-color: #f0fcfd;
+    color: var(--cor-primaria);
     font-weight: 600;
-    transition: 0.2s;
-    margin-right: 40px; /* Dá espaço para o botão X */
+    cursor: pointer;
+    transition: 0.3s;
 }
 
-.btn-novaPrescricao:hover { 
-    background-color: #0097a7; /* Escurece um pouco */
-}
- 
-/* Botão de Fechar */
-.close-btn {
-    position: absolute; top: 20px; right: 20px;
-    background: none; border: none; font-size: 1.8rem; color: #aaa; cursor: pointer;
-}
-.close-btn:hover { color: var(--cor-secundaria); }
-
-/* Corpo com Scroll */
-.scrollable-body {
-    flex: 1; overflow-y: auto; padding-right: 15px;
+.btn-detalhes:hover {
+    background-color: var(--cor-secundaria);
+    color: white;
+    box-shadow: 0 5px 15px rgba(0,188,212,0.2);
 }
 
-/* Títulos das Secções */
-.section-title {
-    font-size: 0.9rem; color: #888; text-transform: uppercase;
-    letter-spacing: 1px; margin-bottom: 15px; margin-top: 10px;
-    border-left: 3px solid var(--cor-secundaria); padding-left: 10px;
+/* MODAL */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(13,26,38,0.85);
+    backdrop-filter: blur(4px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: 0.3s;
 }
 
-/* GRID SYSTEM (Grelha de Informação) */
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 20px; margin-bottom: 20px;
+.modal-overlay.open {
+    display: flex !important; /* Garante que sobrepõe o 'display: none' anterior */
+    opacity: 1;
 }
 
-.info-box label { display: block; font-size: 0.75rem; color: #aaa; margin-bottom: 4px; text-transform: uppercase;}
-.info-box p { font-size: 1rem; color: #333; font-weight: 500; }
-
-.full-width { grid-column: 1 / -1; }
-
-.divider { border: 0; border-top: 1px solid #f0f0f0; margin: 25px 0; }
-
-.notes-box {
-    background: #e0f7fa; border-left: 4px solid #00bcd4;
-    padding: 15px; border-radius: 6px; color: #555;
-}
-.notes-box p { font-size: 0.95rem; line-height: 1.5; }
-
-/* ============================================================
-   6. ESTILOS DO MODAL NOVA PRESCRIÇÃO (IMPORTADOS DO PRESCRICOES.CSS)
-   ============================================================ */
-
-/* Contentor do Modal de Prescrição (diferente do .modal-card) */
-.modal-content {
-    background-color: white;
-    width: 70%;
-    max-width: 600px; /* Ajustei um pouco para não ser demasiado largo */
-    padding: 40px;
-    border-radius: var(--borda-raio);
+/* No utente.css, certifique-se de que o modal-large permite scroll se o conteúdo for grande */
+.modal-large {
+    max-width: 800px; /* Ajuste para ser largo como o nome sugere */
+    width: 90%;
     max-height: 90vh;
     overflow-y: auto;
+}
+
+.modal-card {
+    background: white;
+    width: 90%;
+    max-width: 500px;
+    border-radius: var(--borda-raio);
+    padding: 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    transform: translateY(20px);
+    transition: transform 0.3s;
     position: relative;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    display: flex; 
-    flex-direction: column;
 }
 
-/* Badge de Status no Header */
-.status-badge {
-    background-color: var(--cor-linhas);
-    padding: 6px 14px;
-    border-radius: 15px;
-    font-size: 0.8rem;
-    color: var(--cor-texto);
-    font-weight: bold;
+.modal-overlay.open .modal-card {
+    transform: translateY(0);
 }
 
-/* Separador visual */
-.modal-divider {
-    border: 0;
-    border-top: 1px solid #eee;
-    margin: 20px 0;
+.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #aaa;
+    cursor: pointer;
 }
 
-/* Layout de Linha (Lado a Lado) */
-.info-row {
-    display: flex;
-    gap: 20px;
-    width: 100%;
+.close-btn:hover {
+    color: var(--cor-secundaria);
+}
+
+/* Grid de informações do modal */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.info-box, .notes-box {
+    background-color: #f9fcff;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #e0f7fa;
+}
+
+.notes-box {
+    grid-column: span 2;
+}
+
+/* Seções do modal */
+.section-title {
+    margin-top: 20px;
     margin-bottom: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--cor-primaria);
 }
 
-/* --- ESTILOS DO FORMULÁRIO --- */
+/* Botões dentro do modal */
+.btn-novaPrescricao {
+    background-color: var(--cor-secundaria);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-novaPrescricao:hover {
+    background-color: #0097a7;
+}
+
+/* Inputs e formulários */
+.input-readonly {
+    background-color: #f9fcff;
+    border: 1px solid #e0f7fa;
+    padding: 8px 12px;
+    border-radius: 12px;
+    width: 100%;
+}
+
 .form-group {
-    display: flex;
-    flex-direction: column;
     margin-bottom: 15px;
 }
 
-.form-group label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--cor-texto);
-    margin-bottom: 6px;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    font-size: 0.95rem;
+textarea {
     width: 100%;
-    outline: none;
-    transition: border-color 0.2s;
-    background-color: white;
-    font-family: 'Segoe UI', sans-serif;
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid #e0f7fa;
+    resize: vertical;
 }
 
-.form-group textarea {
-    resize: vertical; 
-    min-height: 80px;
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-    border-color: var(--cor-secundaria);
-    box-shadow: 0 0 0 2px rgba(0, 188, 212, 0.1);
-}
-
-/* Campos de Leitura (Cinza) */
-.input-readonly {
-    background-color: #e9ecef !important;
-    color: #6c757d;
-    cursor: not-allowed;
-    border: 1px solid #dee2e6;
-}
-
-/* Ações do Modal de Prescrição */
 .modal-actions {
     display: flex;
     justify-content: flex-end;
-    margin-top: 30px;
-    gap: 15px;
-    padding-top: 20px;
-    border-top: 1px solid #f0f0f0;
+    margin-top: 15px;
 }
 
-/* Botão Confirmar */
 .btn-confirm {
     background-color: var(--cor-secundaria);
     color: white;
     border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: bold;
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s;
 }
 
 .btn-confirm:hover {
-    background-color: #0097a7; /* Tom mais escuro */
+    background-color: #0097a7;
 }

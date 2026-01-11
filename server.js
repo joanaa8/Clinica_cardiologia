@@ -1,30 +1,43 @@
-require('dotenv').config(); 
+require('dotenv').config();
 
 const express = require('express');
 const path = require('path');
+
 const authRoutes = require('./routes/authRoutes');
-const accountRoutes = require('./routes/accountRoutes')
+const accountRoutes = require('./routes/accountRoutes');
 const prescriptionRoutes = require('./routes/prescriptionRoutes');
+const appointmentRoutes = require('./routes/appointmentRoutes');
+const utentesRoutes = require('./routes/utentesRoutes');
+
+const { verifyToken } = require('./middlewares/authMiddlewares');
 
 const app = express();
 
 
-app.use(express.json()); 
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Frontend
 app.use(express.static(path.join(__dirname, 'public')));
 
 
+
+// Autenticação (SEM token)
 app.use('/api/auth', authRoutes);
-app.use('/api/account', accountRoutes);
-app.use('/api/prescricoes', prescriptionRoutes);
+
+// Rotas protegidas
+app.use('/api/account', verifyToken, accountRoutes);
+app.use('/api/prescricoes', verifyToken, prescriptionRoutes);
+app.use('/api', verifyToken, appointmentRoutes); 
+app.use('/api/utentes', verifyToken, utentesRoutes);
 
 
 app.use((err, req, res, next) => {
-    console.error(' Ocorreu um erro no Servidor:', err.stack);
-    res.status(500).json({ status: 500, message: 'Erro interno no servidor' });
+    console.error('Ocorreu um erro no Servidor:', err.stack);
+    res.status(500).json({
+        status: 500,
+        message: 'Erro interno no servidor'
+    });
 });
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
