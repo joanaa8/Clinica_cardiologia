@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt"> 
+
+    <head>
+        <meta charset="UTF-8">                                                                  <!--serve para permitir acentos-->
+        <meta http-equiv="X-UA-Compatible" content="IE-edge">                                   <!--compatibilidade com dispositivos de telemovel-->
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">  <!--controlo da tela, tag responsiva-->
+        <title>Sistema de Prescição SNS - Simulador</title>
+        <link rel="stylesheet" href="css\sns_entrada.css"> 
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> 
+        
+    </head>
+    <body>
+
+        <div id="splash-screen">
+            <div class="splash-logo">
+                <i class="fa-solid fa-file-medical"></i>
+            </div>
+            <div class="splash-name"> Sistema Nacional de Saúde </div>
+            <p style="margin-top: 20px; opacity: 0.8;">A abrir o portal...</p>
+        </div>
+
+        <div id="login-screen">
+            <div class="login-card">
+                
+                <h2>SNS 24</h2>
+
+                <form id="loginForm">
+                    <div class="input-group">
+                        <label for="username">Número de Utente de Saúde</label>
+                        <input type="text" id="username" name="username" autocomplete="username" required placeholder="Digite o seu número">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="password">telemovel</label>
+                        <input type="password" id="password" name="password" required placeholder="Digite o seu número">
+                    </div>
+
+                    <button  type="submit" class="login-button">ENTRAR</button>
+                    
+                </form>
+
+                <p class="role-hint">
+                    Portal do Utente - SNS
+                </p>
+            </div>
+        </div>
+
+     <script src="js\sns_entrada.js"></script>
+    </body>
+</html>
+ 
