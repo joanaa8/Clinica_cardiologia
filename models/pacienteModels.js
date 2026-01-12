@@ -26,8 +26,8 @@ const getMyAllergys = async (personId) => {
 const getMyClinicalProblem = async (personId) => {
     const query = `
         SELECT cp.description, cp.cid_code, cp.snomed_ct, cp.problem_type, cp.status
-        FROM Clinical_Problem cp
-        JOIN Person p ON cp.person_id = p.id
+        FROM projeto.Clinical_Problem cp
+        JOIN projeto.Person p ON cp.person_id = p.id
         WHERE p.id = $1
     `;
     const result = await db.query(query, [personId]);
@@ -37,9 +37,9 @@ const getMyClinicalProblem = async (personId) => {
 const getMyAppointments = async (personId) => {
     const query = `
         SELECT a.id, a.appointment_date, ac.name as nome_medico, a.status
-        FROM Appointment a
-        JOIN Account ac ON a.doctor_id = ac.id       
-        JOIN Person p ON a.patient_id = p.id        
+        FROM projeto.Appointment a
+        JOIN projeto.Account ac ON a.doctor_id = ac.id       
+        JOIN projeto.Person p ON a.patient_id = p.id        
         WHERE p.id = $1                                   
         ORDER BY a.appointment_date DESC
     `;
@@ -50,9 +50,9 @@ const getMyAppointments = async (personId) => {
 const getMyPrescriptions = async (personId) => {
     const query = `
         SELECT pr.id, pr.patient_id, pr.doctor_id, pr.status, pr.prescription_date, pr.notes, pr.justificacao
-        FROM Prescription pr
-        JOIN Account m ON pr.doctor_id = m.id
-        JOIN Person p ON pr.patient_id = p.id
+        FROM projeto.Prescription pr
+        JOIN projeto.Account m ON pr.doctor_id = m.id
+        JOIN projeto.Person p ON pr.patient_id = p.id
         WHERE p.id = $1
         ORDER BY pr.prescription_date DESC
     `;
@@ -60,11 +60,30 @@ const getMyPrescriptions = async (personId) => {
     const result = await db.query(query, [personId]); 
     return result.rows;
 };
+const findPatientByHealthNumber = async (healthNumber) => {
+    // 1. Log para ver o que estamos a procurar (Ajuda a ver se há espaços em branco)
+    console.log(`[MODEL] A procurar paciente na BD com Health Number: '${healthNumber}'`);
 
+    // 2. CORREÇÃO: Adicionei 'projeto.' antes de Person
+    const query = `SELECT * FROM projeto.Person WHERE health_number = $1`;
+    
+    try {
+        const result = await db.query(query, [healthNumber]);
+        
+        // 3. Log para ver o que a BD respondeu
+        console.log(`[MODEL] Resultado encontrado:`, result.rows.length > 0 ? 'Sim' : 'Zero');
+        
+        return result.rows[0];
+    } catch (error) {
+        console.error("[MODEL] Erro ao procurar paciente:", error);
+        throw error;
+    }
+};
 module.exports = {
     getMyProfile,
     getMyAllergys,
     getMyClinicalProblem,
     getMyAppointments,
-    getMyPrescriptions
+    getMyPrescriptions,
+    findPatientByHealthNumber
 };

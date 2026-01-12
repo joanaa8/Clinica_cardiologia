@@ -40,7 +40,42 @@ document.addEventListener('DOMContentLoaded', () => {
     // Vou omitir a parte da Navegação (Alternar Aba) pois está correta no teu original
     // Basta manteres o código das abas aqui.
 
-    // ...
+   const setupNavigation = () => {
+        const links = [
+            { id: 'link-perfil', view: 'view-perfil' },
+            { id: 'link-consultas', view: 'view-consultas', loadFunc: carregarConsultas },
+            { id: 'link-prescricoes', view: 'view-prescricoes', loadFunc: carregarPrescricoes }
+        ];
+
+        links.forEach(linkObj => {
+            const linkElement = document.getElementById(linkObj.id);
+            
+            if (linkElement) {
+                linkElement.addEventListener('click', (e) => {
+                    e.preventDefault();
+
+                    // 1. Remover classe 'active' de todos os links
+                    document.querySelectorAll('.sidebar nav ul li a').forEach(a => a.classList.remove('active'));
+                    // 2. Adicionar 'active' ao clicado
+                    linkElement.classList.add('active');
+
+                    // 3. Esconder todas as views
+                    document.getElementById('view-perfil').classList.add('hidden');
+                    document.getElementById('view-consultas').classList.add('hidden');
+                    document.getElementById('view-prescricoes').classList.add('hidden');
+
+                    // 4. Mostrar a view desejada
+                    const viewAlvo = document.getElementById(linkObj.view);
+                    viewAlvo.classList.remove('hidden');
+
+                    // 5. Carregar dados específicos se necessário (para não carregar tudo no início)
+                    if (linkObj.loadFunc) {
+                        linkObj.loadFunc();
+                    }
+                });
+            }
+        });
+    };
 
     // =========================================================
     // 3. CARREGAMENTO DE DADOS
@@ -51,6 +86,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return text + suffix;
     };
 
+    const getIniciais = (nomeCompleto) => {
+        if (!nomeCompleto) return "EU";
+        const nomes = nomeCompleto.trim().split(/\s+/); // Divide por espaços
+        if (nomes.length === 1) return nomes[0].charAt(0).toUpperCase();
+        
+        const primeiraLetra = nomes[0].charAt(0);
+        const ultimaLetra = nomes[nomes.length - 1].charAt(0);
+        return (primeiraLetra + ultimaLetra).toUpperCase();
+    };
     // --- A. PERFIL COMPLETO ---
     const carregarPerfil = async () => {
         const dados = await fetchAPI('/api/paciente/perfil');
@@ -59,17 +103,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('nomeUtente').textContent = safeText(dados.name);
         document.getElementById('nome-lateral').textContent = safeText(dados.name);
+
+        document.getElementById('sidebar-avatar').textContent = getIniciais(dados.name);
+
         document.getElementById('numUtente').textContent = safeText(dados.health_number);
-        
         document.getElementById('emailUtente').textContent = safeText(dados.email);
-        // NOTA: A query SQL já faz "p.phone as telefone", por isso isto funciona:
         document.getElementById('telUtente').textContent = safeText(dados.telefone); 
 
         if (dados.date_of_birth) {
             const data = new Date(dados.date_of_birth).toLocaleDateString('pt-PT');
             document.getElementById('dataNasc').textContent = data;
-        } else {
-            document.getElementById('dataNasc').textContent = "--";
         }
         
         document.getElementById('sexoUtente').textContent = safeText(dados.sex);
@@ -94,13 +137,29 @@ document.addEventListener('DOMContentLoaded', () => {
         listaProblemas.innerHTML = '';
         if (dados.problemas && dados.problemas.length > 0) {
             dados.problemas.forEach(prob => {
-                const li = document.createElement('li');
-                li.textContent = prob.description;
-                listaProblemas.appendChild(li);
-            });
-        } else {
-            listaProblemas.innerHTML = '<li>Nenhum problema ativo.</li>';
-        }
+             const li = document.createElement('li');
+            li.className = "problem-item"; // Adicionei uma classe para estilizar
+            const cid = prob.cid_code || 'N/A';
+            const snomed = prob.snomed_ct || 'N/A';
+                
+            li.innerHTML = `
+                <div class="prob-header">
+                    <strong>${prob.description}</strong>
+                    <div class="prob-badges">
+                        <span class="status-badge ${prob.problem_type}">${prob.problem_type}</span>
+                        <span class="status-badge ${prob.status}">${prob.status}</span>
+                    </div>
+                </div>
+                <div class="prob-codes">
+                    <small><strong>CID:</strong> ${cid}</small>
+                    <small><strong>SNOMED:</strong> ${snomed}</small>
+                </div>
+            `;
+            listaProblemas.appendChild(li);   
+        });
+    } else {
+         listaProblemas.innerHTML = '<li>Nenhum problema ativo.</li>';
+    }
     };
 
     // --- B. CONSULTAS ---
@@ -115,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         consultas.forEach(c => {
-            // CORREÇÃO: Usar 'appointment_date' (conforme corrigido na query)
             const dataF = c.appointment_date 
                 ? new Date(c.appointment_date).toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute:'2-digit' }) 
                 : '--/--/----';
@@ -137,40 +195,87 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // --- C. PRESCRIÇÕES (Mantém-se quase igual) ---
-    const carregarPrescricoes = async () => {
-        const receitas = await fetchAPI('/api/paciente/prescricoes');
-        const tbody = document.getElementById('tabelaPrescricoes');
-        tbody.innerHTML = ''; 
 
-        if (!receitas || receitas.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px;">Sem prescrições registadas.</td></tr>';
-            return;
-        }
+    // --- C. PRESCRIÇÕES ---
+const carregarPrescricoes = async () => {
+    // A tua API tem de devolver: start_date, end_date, quantity, regularidade, instructions, etc.
+    const receitas = await fetchAPI('/api/paciente/prescricoes'); 
+    const container = document.getElementById('listaPrescricoes');
+    container.innerHTML = ''; 
 
-        receitas.forEach(r => {
-            const dataF = r.prescription_date 
-                ? new Date(r.prescription_date).toLocaleDateString('pt-PT') 
-                : '--/--/----';
+    if (!receitas || receitas.length === 0) {
+        container.innerHTML = '<p style="padding: 20px; text-align: center;">Sem prescrições registadas.</p>';
+        return;
+    }
+
+    receitas.forEach(r => {
+        // --- AQUI ESTÁ A CORRESPONDÊNCIA QUE PEDISTE ---
+        // start_date -> Data de Emissão
+        const dataEmissao = r.start_date 
+            ? new Date(r.start_date).toLocaleDateString('pt-PT') 
+            : '--/--/----';
             
-            // ENUM SQL: 'active', 'expired', 'cancelled', 'completed'
-            let statusClass = 'ativo';
-            if (r.status === 'expired') statusClass = 'expirado';
-            if (r.status === 'cancelled') statusClass = 'cancelada';
-            
-            // Tentei usar r.justificacao se existir, senão notes, senão genérico
-            const detalhes = r.justificacao || r.notes || "Ver detalhes";
+        // end_date -> Data de Validade
+        const dataValidade = r.end_date 
+            ? new Date(r.end_date).toLocaleDateString('pt-PT') 
+            : '--/--/----';
+        // ------------------------------------------------
 
-            const row = `
-                <tr>
-                    <td>${dataF}</td>
-                    <td>${detalhes}</td>
-                    <td><span class="status-badge ${statusClass}">${r.status}</span></td>
-                </tr>
-            `;
-            tbody.innerHTML += row;
-        });
-    };
+        // Define a cor do status
+        let statusClass = 'ativo';
+        if (r.status === 'expired') statusClass = 'expirado';
+        if (r.status === 'cancelled') statusClass = 'cancelada';
+        if (r.status === 'completed') statusClass = 'completa';
+
+        const cardHTML = `
+            <div class="presc-card">
+                <div class="presc-top">
+                    <div class="med-info">
+                        <h3>${r.medication_name || 'Medicamento'}</h3>
+                        <span class="dose-badge">${r.dose || ''}</span>
+                    </div>
+                    <span class="status-badge ${statusClass}">${r.status}</span>
+                </div>
+
+                <div class="presc-details">
+                    <div class="detail-group">
+                        <small>Médico</small>
+                        <strong>${r.doctor_name || 'N/A'}</strong>
+                    </div>
+
+                    <div class="detail-group">
+                        <small>Data de Emissão</small>
+                        <strong>${dataEmissao}</strong>
+                    </div>
+
+                    <div class="detail-group">
+                        <small>Data de Validade</small>
+                        <strong>${dataValidade}</strong>
+                    </div>
+
+                    <div class="detail-group">
+                        <small>Quantidade</small>
+                        <strong>${r.quantity || '1'} Emb.</strong>
+                    </div>
+
+                    <div class="detail-group">
+                        <small>Regularidade</small>
+                        <strong style="text-transform: capitalize;">${r.regularidade || 'N/A'}</strong>
+                    </div>
+                </div>
+
+                <div class="presc-notes">
+                    <strong>Instruções:</strong>
+                    <p>${r.instructions || 'Seguir indicações médicas.'}</p>
+                    
+                    ${r.notes ? `<p style="margin-top:5px; font-size:0.9em; color:#666"><em>Nota: ${r.notes}</em></p>` : ''}
+                </div>
+            </div>
+        `;
+
+        container.innerHTML += cardHTML;
+    });
+};
 
     const btnLogout = document.getElementById('logoutBtn');
     if (btnLogout) {
@@ -179,6 +284,6 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'index.html';
         });
     }
-
+    setupNavigation();
     carregarPerfil();
 });

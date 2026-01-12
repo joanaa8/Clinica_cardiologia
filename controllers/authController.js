@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 
 
 const { findByUsername, increaseAttempts, resetAttempts, updatePassword, findByEmail, setResetToken, findByResetToken } = require("../models/userModels.js");
+const { findPatientByHealthNumber } = require("../models/pacienteModels.js");
 const { enviarEmail } = require('../services/emailService');
 
 //validar utilizador, aplicação de regras de negócio, verificação do utilizador
@@ -22,48 +23,70 @@ const login = async (req, res) => {
     
     try {
         const user = await findByUsername(username);
-        console.log('Utilizador encontrado:', user ? 'sim' : 'não');
 
-        if (!user) {
-            return res.status(401).json({ message: 'Utilizador não encontrado' });
-        }
-
+        if (user) {
+           console.log('Médico encontrado.');
         // RN 2: Bloqueio de 5 minutos
-        if (user.lockout_until && new Date(user.lockout_until) > new Date()) {
-            return res.status(403).json({ message: 'Conta bloqueada. Tente mais tarde.' });
-        }
+           if (user.lockout_until && new Date(user.lockout_until) > new Date()) {
+                return res.status(403).json({ message: 'Conta bloqueada. Tente mais tarde.' });
+            }
 
-        console.log('Verificar password...');
-        const validPassword = await argon2.verify(user.password, password);
-        console.log('Password valida:', validPassword);
+            console.log('Verificar password...');
+            const validPassword = await argon2.verify(user.password, password);
+            console.log('Password valida:', validPassword);
         
-        if (!validPassword) {
-            await increaseAttempts(user.id_user);
-            return res.status(401).json({ message: 'Credenciais inválidas' });
-        }
+            if (!validPassword) {
+                await increaseAttempts(user.id_user);
+                return res.status(401).json({ message: 'Credenciais inválidas' });
+            }
 
-        await resetAttempts(user.id_user);// reset das tentativas falhadas, quando o login é efetuado corretamente
+            await resetAttempts(user.id_user);// reset das tentativas falhadas, quando o login é efetuado corretamente
 
-        const is_professional = !!user.professional_license;// verificação da categoria
-        
-        //criar token JWT
-        const token = jwt.sign(
-                {
-                    id_user: user.id_user,
-                    is_professional: true
-                },
-                process.env.JWT_SECRET,
-                { expiresIn: '1h' }
-            );
+            const is_professional = !!user.professional_license;// verificação da categoria
+            
+            //criar token JWT
+            const token = jwt.sign(
+                    {
+                        id_user: user.id_user,
+                        is_professional: true
+                    },
+                    process.env.JWT_SECRET,
+                    { expiresIn: '1h' }
+                );
 
-            res.status(200).json({
+            return res.status(200).json({
                 message: 'Login bem-sucedido',
                 token: token,
                 is_professional: is_professional
             });
+        }   
+        const userPaciente = await findPatientByHealthNumber(username);
 
+        if (userPaciente) {
+            console.log('Paciente encontrado.');
 
-    } catch (err) {
+            // Comparação direta (telemóvel = password)
+            if (userPaciente.phone === password) {
+                
+                const token = jwt.sign(
+                    { id: userPaciente.id, is_professional: false }, // Token com ID numérico
+                    process.env.JWT_SECRET,
+                    { expiresIn: '1h' }
+                );
+
+                return res.status(200).json({
+                    message: 'Login de Paciente bem-sucedido',
+                    token: token,
+                    is_professional: false
+                });
+            } else {
+                return res.status(401).json({ message: 'Credenciais inválidas.' });
+            }
+        }
+        return res.status(401).json({ message: 'Utilizador não encontrado' });
+        
+
+    }catch (err) {
         console.error('Erro ao efetuar login:', err);
         res.status(500).json({ message: 'Erro no servidor' });
     }   

@@ -9,7 +9,9 @@ const verifyToken = (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = { 
-            id_user: decoded.id_user,       // UUID da tabela Users
+           
+            id: decoded.id || decoded.id_user, // Unifica tudo numa propriedade 'id'
+            id_user: decoded.id_user,          // Mantém para compatibilidade (médicos)
             is_professional: decoded.is_professional 
         };
         next();

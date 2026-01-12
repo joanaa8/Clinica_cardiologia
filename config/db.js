@@ -1,6 +1,12 @@
 require('dotenv').config();
 const { Pool } = require('pg');
 
+console.log("=== DIAGNÓSTICO DA CONEXÃO ===");
+console.log("Base de dados alvo:", process.env.DB_NAME);
+console.log("Porta:", process.env.DB_PORT || 5432);
+console.log("Host:", process.env.DB_HOST || 'localhost');
+console.log("===============================");
+
 const pool = new Pool({
 
   user: process.env.DB_USER,
