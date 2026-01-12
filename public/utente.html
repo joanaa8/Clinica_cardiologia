@@ -1,133 +1,92 @@
 <!DOCTYPE html>
 <html lang="pt-pt">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Consultas - Clínica Dr. Machado Lemos</title>
-        <link rel="stylesheet" href="css/utente.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-        <link rel="stylesheet" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
-    </head>
-    <body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utentes - Clínica Dr. Machado Lemos</title>
+    <link rel="stylesheet" href="css/utente.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
 
     <div class="dashboard-container">
-        <aside class="sidebar">
-            <div class="sidebar-top">
-                <a href="profissional.html" class="user-profile-link">
-                    <div class="user-profile">
-                        <div class="avatar-circle" id="sidebar-avatar"></div>
-                        <h3 id="nome-medico">A carregar...</h3>
-                        <span class="user-role">Profissional de Saúde</span>
-                    </div>
-                </a>
-
+            <aside class="sidebar">
+                <div class="user-profile">
+                    <div class="avatar-circle" id="sidebar-avatar">--</div>
+                    <h3 id="nome-medico">A carregar...</h3>
+                    <span class="user-role">Profissional de Saúde</span>
+                </div>
+        
                 <nav>
                     <ul>
-                        <li><a href="consultas.html" class="nav-btn">Consultas</a></li>
-                        <li><a href="prescricoes.html" class="nav-btn">Prescrições</a></li>
-                        <li><a href="utente.html" class="nav-btn active">Utentes</a></li>
-                        <li><a href="perfil.html" class="nav-btn">Perfil</a></li>
+                        <li>
+                            <a href="consultas.html" class="nav-btn">
+                                <i class="fa-solid fa-calendar-check"></i> Consultas
+                            </a>
+                        </li>
+                        <li>
+                            <a href="lista_prescricoes.html" class="nav-btn">
+                                <i class="fa-solid fa-file-prescription"></i> Prescrições
+                            </a>
+                        </li>
+                        <li>
+                            <a href="utente.html" class="nav-btn active">
+                                <i class="fa-solid fa-users"></i> Utentes
+                            </a>
+                        </li>
+                        <li>
+                            <a href="perfil.html" class="nav-btn">
+                                <i class="fa-solid fa-user-doctor"></i> Perfil
+                            </a>
+                        </li>
                     </ul>
                 </nav>
-            </div>
-
+        
             <button class="logout-btn" onclick="terminarSessao()">Terminar Sessão</button>
         </aside>
 
-        <div class="main-content">
-                <div class="header-banner">
-                    <h2>Lista de Utentes</h2>
-                    <div class="search-wrapper">
-                        <input type="text" id="inputPesquisa" placeholder="Pesquisar utentes...">
-                    </div>
+        <main class="main-content">
+            <header class="header-banner">
+                <h1>Lista de Utentes</h1>
+                <div class="search-wrapper">
+                    <input type="text" id="inputPesquisa" placeholder="Pesquisar utentes...">
                 </div>
+            </header>
 
-                <div id="utentesList" class="utentes-container">
-                </div>
+            <div id="utentesList" class="utentes-container">
+                <p style="text-align:center; margin-top:20px;">A carregar lista...</p>
             </div>
-        </div>
+        </main>
+    </div>
 
-        <div class="modal-overlay" id="modalUtente">
-            <div class="modal-card modal-large">
-                <button class="close-btn" onclick="fecharModal()">×</button>
-                <div class="header-modal">
-                    <div class="avatar-circle" id="m-avatar">AB</div>
-                    <h3 id="m-nome">Nome do Utente</h3>
-                </div>
-
-                <hr class="divider">
-
-                <div class="info-grid">
-                    <div class="info-box">
-                        <strong>Data Nascimento:</strong>
-                        <p id="m-dataNasc">--/--/----</p>
-                    </div>
-                    <div class="info-box">
-                        <strong>Sexo:</strong>
-                        <p id="m-sexo">--</p>
-                    </div>
-                    <div class="info-box">
-                        <strong>Tipo Sanguíneo:</strong>
-                        <p id="m-tipoSangu">--</p>
-                    </div>
-                    <div class="info-box">
-                        <strong>Telemóvel:</strong>
-                        <p id="m-telemovel">--</p>
-                    </div>
-                    <div class="info-box">
-                        <strong>Email:</strong>
-                        <p id="m-email">--</p>
-                    </div>
-                    <div class="info-box">
-                        <strong>Contacto Emergência:</strong>
-                        <p id="m-contactoEmergencia">--</p>
-                    </div>
-                    <div class="info-box">
-                        <strong>N.º Saúde (SNS):</strong>
-                        <p id="m-sns">--</p>
-                    </div>
-                </div>
-
-                <hr class="divider">
-
-                <h4 class="section-title">Alergias</h4>
-                <div class="notes-box">
-                    <p id="m-obsAlergias">Sem observações registadas</p>
-                    <p><strong>Gravidade:</strong> <span id="m-gravidade">--</span></p>
-                </div>
-
-                <h4 class="section-title">Problemas Clínicos</h4>
-                <div class="notes-box">
-                    <p id="m-descricaoProblema">--</p>
-                    <p><strong>Código Doença:</strong> <span id="m-codigodoenca">--</span></p>
-                    <p><strong>Snomed CT:</strong> <span id="m-snomedct">--</span></p>
-                    <p><strong>Tipo Problema:</strong> <span id="m-tipoProblema">--</span></p>
-                </div>
-
-                <h4 class="section-title">Medicação</h4>
-                <div class="notes-box">
-                    <p id="m-medicamento">--</p>
-                    <p><strong>Fonte:</strong> <span id="m-Source">--</span></p>
-                    <p><strong>Validade:</strong> <span id="m-Validade">--/--/----</span></p>
-                </div>
-
-                <h4 class="section-title">Consultas</h4>
-                <div class="notes-box">
-                    <p><strong>Data Última Consulta:</strong> <span id="m-dataEmissao">--/--/----</span></p>
-                </div>
-
-                <h4 class="section-title">Prescrições</h4>
-                <div class="notes-box">
-                    <p><strong>Médico:</strong> <span id="m-médico">--</span></p>
-                    <p id="m-obsPrescricao">--</p>
-                </div>
+    <div class="modal-overlay" id="modalUtente">
+        <div class="modal-card">
+            <button class="close-btn" onclick="fecharModal()">&times;</button>
+            
+            <div class="header-modal">
+                <div class="avatar-circle" id="m-avatar">--</div>
+                <h3 id="m-nome">--</h3>
             </div>
-        </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-        <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
-        <script src="js/auth.js" defer></script>
-        <script src="js/utentes.js" defer></script>
+            <hr class="divider">
 
-    </body>
+            <div class="info-grid">
+                <div class="info-box"><strong>SNS:</strong> <p id="m-sns">--</p></div>
+                <div class="info-box"><strong>Nascimento:</strong> <p id="m-dataNasc">--</p></div>
+                <div class="info-box"><strong>Sexo:</strong> <p id="m-sexo">--</p></div>
+                <div class="info-box"><strong>Telemóvel:</strong> <p id="m-telemovel">--</p></div>
+            </div>
+
+            <h4 class="section-title">Alergias</h4>
+            <div class="notes-box">
+                <p id="m-obsAlergias">--</p>
+            </div>
+            
+            </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/utentes.js"></script>
+
+</body>
 </html>
