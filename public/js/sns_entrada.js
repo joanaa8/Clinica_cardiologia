@@ -33,8 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if(response.ok){
                 //login correto 
+                const data = await response.json();
+                //guardar dados
+
                 window.location.href= '/sns_simulacao.html'; 
-        
                 //redireciona para a pagina do ficheiro html 
             }else {
                 alert('Credenciais inválidas. Tente de novo.');

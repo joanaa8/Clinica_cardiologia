@@ -4,7 +4,7 @@ const ValidarUtente = async( healthNumber, phoneNumber) =>{
     const query = `
     SELECT id, name, health_number, phone
     from Person
-    Where health_number = $1 AND phone =$2 AND deleted_at IS NULL `;
+    Where health_number = $1 AND phone =$2; `;
 
     try {
         const { rows } = await pool.query(query, [healthNumber, phoneNumber]);

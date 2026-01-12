@@ -10,6 +10,10 @@ const appointmentRoutes = require('./routes/appointmentRoutes');
 const utentesRoutes = require('./routes/utentesRoutes');
 const pacienteRoutes = require('./routes/pacienteRoutes');
 const authsnsRoutes =require('./routes/authsnsRoutes.js');
+
+const sns_simulacaoRoutes = require('./routes/sns_simulacaoRoutes.js');
+
+
 const jwt = require('jsonwebtoken'); 
 const connection = require('./config/db'); 
 const JWT_SECRET = process.env.JWT_SECRET || 'a_tua_chave_secreta'; 
@@ -26,7 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Autenticação (SEM token)
 app.use('/api/sns', authsnsRoutes);
 app.use('/api/auth', authRoutes);
-
+app.use('/api/simulacao', sns_simulacaoRoutes); 
 
 
 // Rotas protegidas
