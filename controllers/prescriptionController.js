@@ -17,7 +17,7 @@ exports.searchMeds = async (req, res) => {
     try {
         const query = `
             SELECT id, commercial_name, dosage, form_factor 
-            FROM projeto.Medication_catalog 
+            FROM Medication_catalog 
             WHERE commercial_name ILIKE $1 
             LIMIT 10
         `;
@@ -37,7 +37,7 @@ exports.getVariations = async (req, res) => {
     try {
         const query = `
             SELECT id, commercial_name, dosage, form_factor 
-            FROM projeto.Medication_catalog 
+            FROM Medication_catalog 
             WHERE commercial_name = $1 
             ORDER BY form_factor, dosage
         `;
@@ -66,7 +66,7 @@ exports.createPrescription = async (req, res) => {
         await client.query('BEGIN');
 
         // 1. Obter ID do médico
-        const queryDoctor = `SELECT id FROM projeto.Account WHERE id_user = $1`;
+        const queryDoctor = `SELECT id FROM Account WHERE id_user = $1`;
         const resDoctor = await client.query(queryDoctor, [authUserId]);
 
         if (resDoctor.rows.length === 0) {
@@ -82,7 +82,7 @@ exports.createPrescription = async (req, res) => {
 
         // 2. Inserir Cabeçalho (Com Justificação e Códigos Gerados)
         const queryHeader = `
-            INSERT INTO projeto.Prescription 
+            INSERT INTO Prescription 
             (patient_id, doctor_id, prescription_date, notes, status, prescription_number, access_code, justificacao) 
             VALUES ($1, $2, NOW(), $3, 'active', $4, $5, $6) 
             RETURNING id, prescription_number, access_code
@@ -101,7 +101,7 @@ exports.createPrescription = async (req, res) => {
 
         // 3. Inserir Itens
         const queryItem = `
-            INSERT INTO projeto.Prescription_item 
+            INSERT INTO Prescription_item 
             (prescription_id, medication_id, dose, instructions, quantity, start_date, end_date, regularidade, form_factor) 
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         `;
@@ -139,6 +139,114 @@ exports.createPrescription = async (req, res) => {
     } finally {
         client.release();
     }
+
+
+
+
+};// 3. Criar Prescrição 
+exports.createPrescription = async (req, res) => {
+    // Recebe justificacao do frontend
+    const { patient_id, items, notes, justificacao } = req.body;
+    
+    const authUserId = req.user.id_user; 
+
+    if (!items || items.length === 0) {
+        return res.status(400).json({ message: "Sem itens na prescrição." });
+    }
+
+    const client = await db.connect();
+
+    try {
+        await client.query('BEGIN');
+
+        // 1. Obter ID do médico
+        const queryDoctor = `SELECT id FROM Account WHERE id_user = $1`;
+        const resDoctor = await client.query(queryDoctor, [authUserId]);
+
+        if (resDoctor.rows.length === 0) {
+            throw new Error("Perfil de médico não encontrado para este utilizador.");
+        }
+        const doctor_id = resDoctor.rows[0].id; 
+        
+        const novoNumeroReceita = gerarNumeroReceita();
+        const novoCodigoAcesso = gerarCodigoAcesso();
+
+        // 2. Inserir Cabeçalho
+        const queryHeader = `
+            INSERT INTO Prescription 
+            (patient_id, doctor_id, prescription_date, notes, status, prescription_number, access_code, justificacao) 
+            VALUES ($1, $2, NOW(), $3, 'active', $4, $5, $6) 
+            RETURNING id, prescription_number, access_code
+        `;
+        
+        const resHeader = await client.query(queryHeader, [
+            patient_id, 
+            doctor_id, 
+            notes, 
+            novoNumeroReceita,
+            novoCodigoAcesso,
+            justificacao || null
+        ]);
+
+        const { id: prescricaoId, prescription_number, access_code } = resHeader.rows[0];
+
+        // 3. Inserir Itens E Atualizar Histórico
+        const queryItem = `
+            INSERT INTO Prescription_item 
+            (prescription_id, medication_id, dose, instructions, quantity, start_date, end_date, regularidade, form_factor) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        `;
+
+        // Query para adicionar ao Histórico de Medicação do Utente
+        const queryHistory = `
+            INSERT INTO Patient_Medication_History
+            (person_id, medication_name, start_date, end_date, status, source, notes)
+            VALUES ($1, $2, CURRENT_DATE, $3, 'active', 'prescrito', $4)
+        `;
+
+        for (const item of items) {
+            // A. Insere na Prescrição
+            await client.query(queryItem, [
+                prescricaoId,
+                item.medication_id || null, 
+                item.dose,
+                item.instructions,
+                item.quantity,
+                item.start_date || new Date(),
+                item.end_date,
+                item.regularidade,
+                item.forma
+            ]);
+
+            // B. Insere no Histórico (Sincronização Automática)
+            // Assumindo que item.medication_name vem do frontend, ou usamos um fallback
+            await client.query(queryHistory, [
+                patient_id,
+                item.medication_name || "Medicamento ID " + item.medication_id, // Nome do medicamento
+                item.end_date, // Data fim
+                `Prescrito via receita nº ${novoNumeroReceita}. ${item.instructions || ''}` // Notas
+            ]);
+        }
+
+        await client.query('COMMIT');
+
+        res.status(201).json({
+            message: "Criado com sucesso",
+            data: { prescription_number, access_code }
+        });
+
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.error("Erro Prescrição:", error);
+        
+        if (error.message.includes("Perfil de médico")) {
+            return res.status(403).json({ message: error.message });
+        }
+        
+        res.status(500).json({ message: "Erro ao processar prescrição." });
+    } finally {
+        client.release();
+    }
 };
 
 // 4. Pesquisar Utentes
@@ -147,7 +255,7 @@ exports.searchPatients = async (req, res) => {
     try {
         const query = `
             SELECT id, name, health_number 
-            FROM projeto.Person 
+            FROM Person 
             WHERE name ILIKE $1 OR health_number ILIKE $1 
             LIMIT 5
         `;
@@ -163,7 +271,7 @@ exports.searchPatients = async (req, res) => {
 exports.getPatientById = async (req, res) => {
     const { id } = req.params;
     try {
-        const query = `SELECT id, name, health_number FROM projeto.Person WHERE id = $1`;
+        const query = `SELECT id, name, health_number FROM Person WHERE id = $1`;
         const { rows } = await db.query(query, [id]);
         if (rows.length === 0) return res.status(404).json({ message: "Utente não encontrado" });
         res.json(rows[0]);
@@ -179,7 +287,7 @@ exports.getMyPrescriptions = async (req, res) => {
 
     try {
         const client = await db.connect();
-        const queryDoctor = `SELECT id FROM projeto.Account WHERE id_user = $1`;
+        const queryDoctor = `SELECT id FROM Account WHERE id_user = $1`;
         const resDoctor = await client.query(queryDoctor, [authUserId]);
         
         if (resDoctor.rows.length === 0) {
@@ -197,10 +305,10 @@ exports.getMyPrescriptions = async (req, res) => {
                 per.name as nome_paciente,
                 p.access_code,
                 STRING_AGG(mc.commercial_name, ', ') as lista_medicamentos
-            FROM projeto.Prescription p
-            JOIN projeto.Person per ON p.patient_id = per.id
-            LEFT JOIN projeto.Prescription_item pi ON p.id = pi.prescription_id
-            LEFT JOIN projeto.Medication_catalog mc ON pi.medication_id = mc.id
+            FROM Prescription p
+            JOIN Person per ON p.patient_id = per.id
+            LEFT JOIN Prescription_item pi ON p.id = pi.prescription_id
+            LEFT JOIN Medication_catalog mc ON pi.medication_id = mc.id
             WHERE p.doctor_id = $1
             GROUP BY p.id, per.name, p.prescription_date, p.status, p.prescription_number, p.access_code
             ORDER BY p.created_at DESC
@@ -222,8 +330,8 @@ exports.getPrescriptionDetails = async (req, res) => {
     try {
         const queryHeader = `
             SELECT p.*, per.name as nome_paciente, per.health_number 
-            FROM projeto.Prescription p
-            JOIN projeto.Person per ON p.patient_id = per.id
+            FROM Prescription p
+            JOIN Person per ON p.patient_id = per.id
             WHERE p.id = $1
         `;
         const headerRes = await db.query(queryHeader, [id]);
@@ -232,8 +340,8 @@ exports.getPrescriptionDetails = async (req, res) => {
 
         const queryItems = `
             SELECT pi.*, mc.commercial_name 
-            FROM projeto.Prescription_item pi
-            LEFT JOIN projeto.Medication_catalog mc ON pi.medication_id = mc.id
+            FROM Prescription_item pi
+            LEFT JOIN Medication_catalog mc ON pi.medication_id = mc.id
             WHERE pi.prescription_id = $1
         `;
         const itemsRes = await db.query(queryItems, [id]);
@@ -256,7 +364,7 @@ exports.cancelPrescription = async (req, res) => {
 
     try {
         const query = `
-            UPDATE projeto.Prescription 
+            UPDATE Prescription 
             SET status = 'cancelled', justificacao = $2
             WHERE id = $1 
             RETURNING id, status
@@ -286,8 +394,8 @@ exports.checkInteractions = async (req, res) => {
         // 1. Medicamentos Ativos do Paciente
         const queryActive = `
             SELECT pi.medication_id
-            FROM projeto.Prescription p
-            JOIN projeto.Prescription_item pi ON p.id = pi.prescription_id
+            FROM Prescription p
+            JOIN Prescription_item pi ON p.id = pi.prescription_id
             WHERE p.patient_id = $1 
               AND p.status = 'active'
               AND pi.end_date >= CURRENT_DATE
@@ -307,8 +415,8 @@ exports.checkInteractions = async (req, res) => {
         const queryInteractions = `
             WITH MedsIngredients AS (
                 SELECT c.id_medication, c.id_active_ingredient, m.commercial_name
-                FROM projeto.Composition c
-                JOIN projeto.Medication_catalog m ON c.id_medication = m.id
+                FROM Composition c
+                JOIN Medication_catalog m ON c.id_medication = m.id
                 WHERE c.id_medication = ANY($1::int[])
             )
             SELECT DISTINCT
@@ -316,8 +424,8 @@ exports.checkInteractions = async (req, res) => {
                 r.message,
                 m1.commercial_name as medicamento_1,
                 m2.commercial_name as medicamento_2
-            FROM projeto.Interaction_component ic
-            JOIN projeto.Interaction_Rule r ON ic.rule_id = r.id
+            FROM Interaction_component ic
+            JOIN Interaction_Rule r ON ic.rule_id = r.id
             JOIN MedsIngredients m1 ON m1.id_active_ingredient = ic.pa_id_1
             JOIN MedsIngredients m2 ON m2.id_active_ingredient = ic.pa_id_2
             WHERE m1.id_medication != m2.id_medication

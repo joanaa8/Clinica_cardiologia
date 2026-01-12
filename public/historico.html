@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Adicionar ao Histórico</title>
+    <link rel="stylesheet" href="css/prescricoes.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="user-profile">
+                <div class="avatar-circle" id="sidebar-avatar">--</div>
+                <h3 id="nome-medico">A carregar...</h3>
+                <span class="user-role">Profissional de Saúde</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="consultas.html" class="nav-btn"><i class="fa-solid fa-calendar-check"></i> Consultas</a></li>
+                    <li><a href="lista_prescricoes.html" class="nav-btn"><i class="fa-solid fa-file-prescription"></i> Prescrições</a></li>
+                    <li><a href="utente.html" class="nav-btn active"><i class="fa-solid fa-users"></i> Utentes</a></li>
+                    <li><a href="perfil.html" class="nav-btn"><i class="fa-solid fa-user-doctor"></i> Perfil</a></li>
+                </ul>
+            </nav>
+            <button class="logout-btn" onclick="terminarSessao()">Terminar Sessão</button>
+        </aside>
+
+        <main class="main-content">
+            <header class="header-banner">
+                <h1>Adicionar ao Histórico</h1>
+                <a href="utente.html" class="btn-primary" style="background-color: var(--cor-botao-sair);">
+                    <i class="fa-solid fa-arrow-left"></i> Voltar
+                </a>
+            </header>
+
+            <div class="content-card">
+                
+                <div class="form-group" style="position:relative;">
+                    <label>Utente</label>
+                    <input type="text" id="input-patient-search" placeholder="Pesquisar por nome ou número de utente..." autocomplete="off">
+                    <input type="hidden" id="patient_id_input">
+                    <ul id="lista-sugestoes-pacientes" class="dropdown-list"></ul>
+                </div>
+
+                <h3 style="margin-top:10px; color:var(--cor-primaria);">Medicação em Toma / Anterior</h3>
+                <div class="form-grid">
+                    <div class="form-group" style="position:relative;">
+                        <label>Medicamento</label>
+                        <input type="text" id="input-med-search" placeholder="Pesquisar..." autocomplete="off">
+                        <ul id="lista-sugestoes" class="dropdown-list"></ul>
+                    </div>
+                    <div class="form-group">
+                        <label>Forma</label>
+                        <select id="input-form" disabled><option>Selecione medicamento...</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Dose</label>
+                        <div style="display:flex; gap:10px;">
+                            <select id="input-dose" disabled style="flex:1;">
+                                <option>Selecione forma...</option>
+                            </select>
+                            
+                        
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Qtd.</label>
+                        <input type="number" id="input-qty" value="1" min="1">
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Data Início (Estimada)</label>
+                        <input type="date" id="input-start-date">
+                    </div>
+                    <div class="form-group">
+                        <label>Data Fim (Opcional)</label>
+                        <input type="date" id="input-end-date">
+                    </div>
+                    <div class="form-group">
+                        <label>Regularidade</label>
+                        <select id="input-regularidade">
+                            <option value="diaria">Diária</option>
+                            <option value="semanal">Semanal</option>
+                            <option value="sos">SOS (Se necessário)</option>
+                        </select>
+                    </div>
+                     <div class="form-group">
+                        <label>Instruções / Notas</label>
+                        <input type="text" id="input-instruction" placeholder="Ex: Toma habitual...">
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; margin-bottom:20px;">
+                    <button id="btn-add-med" class="btn-primary">
+                        <i class="fa-solid fa-plus"></i> Adicionar à Lista
+                    </button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Medicamento</th>
+                            <th>Detalhes</th>
+                            <th>Dose</th>
+                            <th style="text-align:center;">Remover</th>
+                        </tr>
+                    </thead>
+                    <tbody id="medication-tbody"></tbody>
+                </table>
+                <p id="empty-msg" style="text-align:center; color:#999; padding:20px;">Nenhum medicamento adicionado.</p>
+
+                <div id="interaction-alert-box" class="interaction-box">
+                    <div class="interaction-title">
+                        <i class="fa-solid fa-triangle-exclamation"></i> ALERTA DE INTERAÇÃO
+                    </div>
+                    <div id="interaction-list" class="interaction-list"></div>
+                    <div class="form-group justificativa-area">
+                        <label>Observação de Segurança:</label>
+                        <textarea id="input-justificacao-clinica" rows="2" placeholder="Notas sobre a interação..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top:20px;">
+                    <label>Notas Gerais do Histórico</label>
+                    <textarea id="justification-box" rows="2" placeholder="Observações gerais..."></textarea>
+                </div>
+
+                <button id="btn-submit-history" class="btn-primary" style="width:100%; justify-content:center; padding:15px; font-size:1.1rem; background-color: #607d8b;" disabled>
+                     <i class="fa-solid fa-save"></i> Guardar no Histórico
+                </button>
+
+            </div>
+        </main>
+    </div>
+
+    <div id="modal-calculadora" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header-clean">
+                <h2>Calculadora de Dosagem</h2>
+                <button class="close-btn-clean" onclick="fecharCalculadora()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Medicamento Selecionado</label>
+                    <input type="text" id="calc-med-name" readonly style="background:#eee; color:#555;">
+                </div>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Peso (kg)</label>
+                    <input type="number" id="calc-peso" placeholder="Ex: 70">
+                </div>
+                <div class="form-group">
+                    <label>Idade (anos)</label>
+                    <input type="number" id="calc-idade" placeholder="Ex: 35">
+                </div>
+            </div>
+
+            <button onclick="calcularDoseAPI()" class="btn-primary" style="width:100%; justify-content:center; margin-top:10px;">
+                <i class="fa-solid fa-gears"></i> Calcular
+            </button>
+
+            <div id="calc-resultado-area" style="margin-top:25px; display:none; border-top:1px solid #eee; padding-top:20px;">
+                <h3 style="font-size:1rem; color:#00bcd4; margin-bottom:15px;">Resultados</h3>
+                
+                <div class="data-box" style="background:#e0f7fa; border:1px solid #b2ebf2; margin-bottom:15px;">
+                    <span class="data-label">Dose Recomendada</span>
+                    <span class="data-value" id="res-dose" style="color:#006064; font-size:1.3rem;">--</span>
+                    <small id="res-detalhe" style="display:block; margin-top:5px; color:#00838f;">--</small>
+                </div>
+
+                <div id="res-alertas-lista" style="display:flex; flex-direction:column; gap:10px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/historico.js"></script> 
+</body>
+</html>

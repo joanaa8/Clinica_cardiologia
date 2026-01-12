@@ -3,25 +3,42 @@ let medSelecionado = null;
 let variacoesAtuais = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Configurar Data de Hoje
     const dateInput = document.getElementById('input-start-date');
     if (dateInput) dateInput.valueAsDate = new Date();
     
+    // 2. Configurar Listeners
     configurarEventos();
 
+    // 3. Verificar se viemos da página de Utentes (Redirecionamento)
     const params = new URLSearchParams(window.location.search);
-    const idPacienteURL = params.get('id');
+    const pId = params.get('patient_id') || params.get('id'); // Aceita ambos
 
-    if (idPacienteURL) {
-        await carregarUtentePorId(idPacienteURL);
+    if (pId) {
+        await carregarUtentePorId(pId);
     }
 });
 
+// --- FUNÇÃO CORRIGIDA COM TOKEN ---
 async function carregarUtentePorId(id) {
+    const token = localStorage.getItem('medico_token');
+    if (!token) return;
+
     try {
-        const res = await fetch(`/api/prescricoes/patient/${id}`);
+        // Usa a rota de utentes que sabemos que funciona
+        const res = await fetch(`/api/utentes/${id}`, {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        
         if (res.ok) {
             const utente = await res.json();
             selecionarUtente(utente); 
+            // Bloqueio visual opcional para indicar que veio pré-selecionado
+            const inputSearch = document.getElementById('input-patient-search');
+            if(inputSearch) {
+                inputSearch.style.backgroundColor = "#e0f7fa";
+                inputSearch.title = "Utente pré-selecionado";
+            }
         }
     } catch (err) {
         console.error("Erro ao carregar utente inicial:", err);
@@ -84,9 +101,8 @@ function selecionarUtente(u) {
     const inputHidden = document.getElementById('patient_id_input');
     const lista = document.getElementById('lista-sugestoes-pacientes');
 
-    inputSearch.value = u.name;
-    inputHidden.value = u.id;
-
+    if(inputSearch) inputSearch.value = u.name;
+    if(inputHidden) inputHidden.value = u.id;
     if(lista) lista.style.display = 'none';
 }
 
@@ -269,10 +285,8 @@ function renderizarTabela() {
             <td><strong>${item.nome_medicamento}</strong></td>
             <td>${item.forma}</td>
             <td>${item.dose}</td>
-            <td>${item.end_date}</td>
-            <td>${item.instructions}</td>
             <td style="text-align:center;">
-                <button class="btn-remove" onclick="removerItem(${index})">&times;</button>
+                <button class="btn-remove" onclick="removerItem(${index})"><i class="fa-solid fa-trash"></i></button>
             </td>
         `;
         tbody.appendChild(tr);
@@ -301,7 +315,7 @@ function limparFormularioMedicamento() {
 }
 
 
-// --- FUNÇÃO SUBMETER  ---
+// --- FUNÇÃO SUBMETER BLINDADA ---
 async function submeterPrescricao() {
     const patientId = document.getElementById('patient_id_input').value;
     const notes = document.getElementById('justification-box').value;
@@ -319,21 +333,17 @@ async function submeterPrescricao() {
     const token = localStorage.getItem('medico_token');
     if (!token) { window.location.href = 'index.html'; return; }
 
-    // BLOQUEIA O BOTÃO PARA EVITAR DUPLO CLIQUE
+    // BLOQUEIA O BOTÃO
     btn.disabled = true;
     btn.textContent = "A verificar...";
 
-    // 1. PASSO CRÍTICO: RESETAR O ALERTA (ESCONDER TUDO)
-    // Se não fizermos isto, a caixa fica lá para sempre
+    // RESETAR O ALERTA
     alertBox.style.display = 'none'; 
     alertList.innerHTML = '';
     
-    // Verifica se já temos uma justificação escrita (significa que é a 2ª tentativa)
-    // Verificamos se a caixa ESTAVA visível antes de a escondermos acima, ou se o campo tem texto
     const temTextoJustificativo = inputJustificacao.value.trim().length > 0;
     
     try {
-        // Se ainda não justificou, vamos verificar ao servidor
         if (!temTextoJustificativo) {
             const novosMedsIds = listaMedicamentos.map(m => m.medication_id).filter(id => id !== null);
             
@@ -345,16 +355,12 @@ async function submeterPrescricao() {
             
             const interacoes = await resCheck.json();
 
-            // AQUI É QUE DECIDIMOS SE MOSTRAMOS A CAIXA OU NÃO
             if (interacoes && interacoes.length > 0) {
-                
-                // TEM INTERAÇÕES -> MOSTRAR CAIXA VERMELHA
                 alertBox.style.display = 'block'; 
                 
                 interacoes.forEach(i => {
                     const div = document.createElement('div');
                     div.className = 'interaction-item';
-                    // Adicionei um ícone de aviso em cada linha
                     div.innerHTML = `<i class="fa-solid fa-circle-exclamation" style="margin-top:3px;"></i> 
                                      <div><strong>${i.severity}:</strong> ${i.medicamento_1} + ${i.medicamento_2}<br>
                                      <small>${i.message}</small></div>`;
@@ -363,22 +369,16 @@ async function submeterPrescricao() {
 
                 btn.textContent = "⚠️ Confirmar com Justificação";
                 btn.disabled = false;
-                btn.style.backgroundColor = "#d32f2f"; // Mudar botão para vermelho para avisar
-
-                // Scroll suave até ao alerta para o médico ver
+                btn.style.backgroundColor = "#d32f2f"; 
                 alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 
-                return; // PARA AQUI. NÃO ENVIA A PRESCRIÇÃO.
+                return;
             }
         }
 
-        // 2. ENVIAR A PRESCRIÇÃO (Só chega aqui se não houver interações OU se já justificou)
-        
-        // Se a caixa estava aberta (agora escondida) e não escreveu nada:
-        // Nota: Como escondemos a caixa no início da função, usamos a lógica do texto
         if (alertList.children.length > 0 && !inputJustificacao.value.trim()) {
              alert("É obrigatório preencher a justificação clínica.");
-             alertBox.style.display = 'block'; // Mostra de novo
+             alertBox.style.display = 'block';
              btn.disabled = false;
              return;
         }
@@ -392,7 +392,7 @@ async function submeterPrescricao() {
                 patient_id: patientId,
                 notes: notes,
                 items: listaMedicamentos,
-                justificacao: inputJustificacao.value // Envia o texto (ou vazio se não houve alerta)
+                justificacao: inputJustificacao.value 
             })
         });
 
@@ -405,7 +405,7 @@ async function submeterPrescricao() {
             alert("Erro: " + result.message);
             btn.disabled = false;
             btn.textContent = "✅ Emitir Prescrição";
-            btn.style.backgroundColor = ""; // Reset cor
+            btn.style.backgroundColor = ""; 
         }
 
     } catch (err) {
@@ -414,3 +414,106 @@ async function submeterPrescricao() {
         btn.disabled = false;
     }
 }
+
+
+// --- LÓGICA DA CALCULADORA (GLOBAL) ---
+
+// 1. Abrir Calculadora
+window.abrirCalculadora = function() {
+    const medInput = document.getElementById('input-med-search');
+    const modal = document.getElementById('modal-calculadora');
+    const nomeCampo = document.getElementById('calc-med-name');
+    const resArea = document.getElementById('calc-resultado-area');
+
+    if (!modal) { alert("Erro HTML: Modal não encontrado."); return; }
+
+    if (!medInput || !medInput.value) {
+        alert("⚠️ Selecione primeiro um medicamento na pesquisa.");
+        return;
+    }
+    
+    if (nomeCampo) nomeCampo.value = medInput.value;
+    modal.classList.add('open');
+    if (resArea) resArea.style.display = 'none';
+};
+
+// 2. Fechar Calculadora
+window.fecharCalculadora = function() {
+    const modal = document.getElementById('modal-calculadora');
+    if (modal) modal.classList.remove('open');
+};
+
+// 3. Chamar API e Calcular
+window.calcularDoseAPI = async function() {
+    const medName = document.getElementById('calc-med-name').value;
+    const peso = document.getElementById('calc-peso').value;
+    const idade = document.getElementById('calc-idade').value;
+
+    if (!peso || !idade) {
+        alert("Por favor preencha Peso e Idade.");
+        return;
+    }
+
+    const token = localStorage.getItem('medico_token');
+
+    try {
+        const btn = document.querySelector('#modal-calculadora .btn-primary');
+        const originalText = btn.innerHTML;
+        btn.textContent = "A calcular...";
+        btn.disabled = true;
+
+        const res = await fetch('/api/prescricoes/calculate-dosage', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token 
+            },
+            body: JSON.stringify({ med_name: medName, weight: peso, age: idade })
+        });
+
+        const data = await res.json();
+        
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+
+        const areaRes = document.getElementById('calc-resultado-area');
+        const spanDose = document.getElementById('res-dose');
+        const spanDetalhe = document.getElementById('res-detalhe');
+        const listaAlertas = document.getElementById('res-alertas-lista');
+
+        areaRes.style.display = 'block';
+        listaAlertas.innerHTML = '';
+
+        if (!data.found) {
+            spanDose.textContent = "Sem dados automáticos";
+            spanDose.style.color = "#777";
+            spanDetalhe.textContent = data.message || "Tente ajustar o nome.";
+            return;
+        }
+
+        if (data.calculo) {
+            spanDose.textContent = data.calculo.dose_diaria;
+            spanDose.style.color = "#006064";
+            spanDetalhe.textContent = `${data.calculo.tipo} | ${data.calculo.detalhe}`;
+        } else {
+            spanDose.textContent = "Consultar Nota Clínica";
+            spanDose.style.color = "#555";
+            spanDetalhe.textContent = "";
+        }
+
+        if (data.alertas && data.alertas.length > 0) {
+            data.alertas.forEach(msg => {
+                const div = document.createElement('div');
+                div.style.cssText = "background:#fff3cd; color:#856404; padding:10px; border-radius:6px; border:1px solid #ffeeba; font-size:0.9rem;";
+                div.textContent = msg;
+                listaAlertas.appendChild(div);
+            });
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Erro ao calcular. Verifique se o servidor Python está a correr.");
+        const btn = document.querySelector('#modal-calculadora .btn-primary');
+        if(btn) { btn.disabled = false; btn.textContent = "Calcular"; }
+    }
+};

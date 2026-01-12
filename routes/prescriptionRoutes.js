@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const prescriptionController = require('../controllers/prescriptionController');
+const cdssController = require('../controllers/cdssController');
 // Importar o middleware com o nome correto (plural)
 const { verifyToken } = require('../middlewares/authMiddlewares'); 
 
@@ -13,6 +14,7 @@ router.get('/my-prescriptions', verifyToken, prescriptionController.getMyPrescri
 router.get('/:id/details', verifyToken, prescriptionController.getPrescriptionDetails);
 router.put('/:id/cancel', verifyToken, prescriptionController.cancelPrescription);
 router.post('/check-interactions', verifyToken, prescriptionController.checkInteractions);
+router.post('/calculate-dosage', verifyToken, cdssController.calculateDosage);
 // Rota de criar prescrição (PROTEGIDA pelo verifyToken)
 router.post('/', verifyToken, prescriptionController.createPrescription);
 

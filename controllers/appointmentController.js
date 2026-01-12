@@ -6,7 +6,7 @@ const {
     getCalendarEventsModel
 } = require('../models/appointmentModels.js');
 
-//Controller para obter todas as consultas de um médico com filtros de ordenação(próximas, passadas, canceladas)
+// Controller para obter todas as consultas de um médico com filtros de ordenação (próximas, passadas, canceladas)
 const getAppointment = async (req, res) => {
     try {
         const doctorId = req.user.id_user; 
@@ -21,7 +21,7 @@ const getAppointment = async (req, res) => {
     }
 };
 
-//Controller para obter os detalhes de uma consulta específica de um médico
+// Controller para obter os detalhes de uma consulta específica de um médico
 const getAppointmentById = async (req, res) => {
     try {
         const doctorId = req.user.id_user;
@@ -41,7 +41,7 @@ const getAppointmentById = async (req, res) => {
     }
 };
 
-//Controller para atualizar a data de uma consulta específica de um médico
+// Controller para atualizar a data de uma consulta específica de um médico
 const updateAppointment = async (req, res) => {
     try {
         const doctorId = req.user.id_user;
@@ -68,25 +68,26 @@ const updateAppointment = async (req, res) => {
     }
 };
 
-//Controller para obter estatísticas de consultas de um médico
+// Controller para obter estatísticas de consultas de um médico
 const getStats = async (req, res) => {
     try {
-        console.log("Utilizador no Token:", req.user); // Vê se o req.user existe!
+        // console.log("Utilizador no Token:", req.user); // Debugging (pode ser removido em produção)
         const stats = await getStatsModel(req.user.id_user); 
         res.json(stats);
     } catch (error) {
-        console.error("ERRO REAL NO TERMINAL:", error.message); // Isto vai dizer o que falhou no SQL
-        res.status(500).json({ message: "Erro ao carregar consulta." });
+        console.error("Erro ao carregar estatísticas:", error.message);
+        res.status(500).json({ message: "Erro ao carregar estatísticas." });
     }
 };
 
-//Controller para obter eventos do calendário de um médico
+// Controller para obter eventos do calendário de um médico
 const getCalendarEvents = async (req, res) => {
     try {
         const doctorId = req.user.id_user; // UUID vindo do token
         const eventos = await getCalendarEventsModel(doctorId);
         res.json(eventos);
     } catch (error) {
+        console.error("Erro ao carregar eventos:", error);
         res.status(500).json({ error: "Erro ao carregar eventos do calendário" });
     }
 };
