@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Portal do Utente - Clínica Dr. Machado Lemos</title>
+   
+    <link rel="stylesheet" href="css/paciente.css">  
+</head>
+<div class="dashboard-container">
+        
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="user-profile">
+                    <div class="avatar-circle" id="sidebar-avatar">EU</div>
+                    <div class="user-info-text">
+                        <h3 id="nome-lateral">A carregar...</h3>
+                        <span class="user-role">Utente</span>
+                    </div>
+                </div>
+
+                <nav>
+                    <ul>
+                        <li><a href="#" id="link-perfil" class="nav-btn active">Área do Utente</a></li>
+                        <li><a href="#" id="link-consultas" class="nav-btn">Consultas</a></li>
+                        <li><a href="#" id="link-prescricoes" class="nav-btn">Prescrições</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <button class="logout-btn" id="logoutBtn">Terminar Sessão</button>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="header-banner">
+                <div class="titulo-e-acao">
+                    <h1>Olá, <span id="nomeUtente">...</span></h1>
+                    <p class="subtitle">Bem-vindo à sua área pessoal.</p>
+                </div>
+            </header>
+
+            <section class="content-area">
+                
+                <div id="view-perfil">
+                    <div class="dashboard-grid">
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Os Meus Dados</h2>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Nº Utente:</strong> <span id="numUtente">--</span></p>
+                                <p><strong>Data Nasc.:</strong> <span id="dataNasc">--</span></p>
+                                <p><strong>Email:</strong> <span id="emailUtente">--</span></p>
+                                <p><strong>Telemóvel:</strong> <span id="telUtente">--</span></p>
+                                <p><strong>Sexo:</strong> <span id="sexoUtente">--</span></p>
+                                <p><strong>Tipo de Sangue:</strong> <span id="tipoSangue">--</span></p>
+                                <p><strong>Peso (kg):</strong> <span id="peso">--</span></p>
+                                <p><strong>Altura (cm):</strong> <span id="altura">--</span></p>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Resumo Clínico</h2>
+                            </div>
+                            <div class="card-body two-columns">
+                                <div>
+                                    <h3>Alergias</h3>
+                                    <ul id="listaAlergias" class="clinical-list alert-list">
+                                        <li>A carregar...</li>
+                                    </ul>
+                                </div>
+                                <div style="margin-top: 15px;">
+                                    <h3>Problemas Ativos</h3>
+                                    <ul id="listaProblemas" class="clinical-list">
+                                        <li>A carregar...</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-consultas" class="hidden">
+                    <div class="card table-card">
+                        <div class="card-header">
+                            <h2>As Minhas Consultas</h2>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="styled-table">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Médico</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaConsultas">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-prescricoes" class="hidden">
+                    <div class="card table-card">
+                        <div class="card-header">
+                            <h2>As Minhas Prescrições</h2>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="styled-table">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Medicamento / Notas</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaPrescricoes">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+    </div>
+    <script src="js/paciente.js"></script>
+</body>
+</html>

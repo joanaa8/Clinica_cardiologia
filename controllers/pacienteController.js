@@ -2,9 +2,10 @@ const portalModel = require('../models/pacienteModels');
 // 1. Perfil Completo (Dados Pessoais + Alergias + Problemas)
 const getMe = async (req, res) => {
     try {
-        const userId = req.user.id_user; 
+        // CORREÇÃO: O token tem 'id', não 'id_user' (porque o login é na tabela Person)
+        const userId = req.user.id; 
 
-        console.log("A buscar dados para o utilizador ID:", userId);
+        console.log("A buscar dados para o paciente ID:", userId);
 
         const [perfil, alergias, problemas] = await Promise.all([
             portalModel.getMyProfile(userId),
@@ -12,12 +13,14 @@ const getMe = async (req, res) => {
             portalModel.getMyClinicalProblem(userId)
         ]);
 
+        if (!perfil) {
+             return res.status(404).json({ message: "Paciente não encontrado." });
+        }
 
-        // Junta tudo num único objeto bonito para o Frontend
         const resposta = {
-            ...perfil,          // Espalha nome, email, data nascimento...
-            alergias: alergias, // Adiciona a lista de alergias
-            problemas: problemas // Adiciona a lista de problemas
+            ...perfil,          
+            alergias: alergias, 
+            problemas: problemas 
         };
 
         res.json(resposta);
@@ -27,28 +30,26 @@ const getMe = async (req, res) => {
         res.status(500).json({ message: "Erro interno ao carregar perfil." });
     }
 };
-
-// 2. Obter as Minhas Consultas
+    // 2. Consultas
 const getMyConsultas = async (req, res) => {
     try {
-        const userId = req.user.id_user;
+            // CORREÇÃO: req.user.id
+        const userId = req.user.id;
         const consultas = await portalModel.getMyAppointments(userId);
-        
-        // Se não tiver consultas, retorna array vazio 
-        res.json(consultas || []);
+            res.json(consultas || []);
 
-    } catch (error) {
+     } catch (error) {
         console.error("Erro ao buscar consultas:", error);
         res.status(500).json({ message: "Erro ao carregar consultas." });
     }
 };
 
-// 3. Obter as Minhas Prescrições
+// 3. Prescrições
 const getMyPrescricoes = async (req, res) => {
     try {
-        const userId = req.user.id_user;
+        // CORREÇÃO: req.user.id
+        const userId = req.user.id;
         const prescricoes = await portalModel.getMyPrescriptions(userId);
-        
         res.json(prescricoes || []);
 
     } catch (error) {

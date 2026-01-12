@@ -45,3 +45,59 @@ app.listen(PORT, () => {
     console.log(`Servidor da Clínica a correr na porta ${PORT}`);
     console.log(`Link: http://localhost:${PORT}`);
 });
+
+// Rota de LOGIN UNIFICADO
+app.post('/api/auth/login', async (req, res) => {
+
+    const { login_id, secret } = req.body; 
+
+    try {
+        // 1. TENTATIVA MÉDICO (Verifica na tabela Users/Account)
+        const queryMedico = `
+            SELECT u.id_user, u.password, ac.name 
+            FROM projeto.User u
+            LEFT JOIN projeto.Account ac ON u.id_user = ac.id
+            WHERE u.username = $1
+        `;
+        const resMedico = await connection.execute(queryMedico, [login_id]);
+        
+        if (resMedico.rows.length > 0) {
+            const medico = resMedico.rows[0];
+            if (medico.password === secret) { 
+                // É UM MÉDICO!
+                const token = jwt.sign({ id: medico.id_user, role: 'medico' }, JWT_SECRET, { expiresIn: '4h' });
+                
+                return res.json({
+                    token: token,
+                    is_professional: true, 
+                    role: 'medico',
+                    name: medico.name
+                });
+            }
+        }
+        // 2. TENTATIVA PACIENTE (Se não for médico, verifica Person)
+        const queryPaciente = `
+            SELECT id, name 
+            FROM projeto.Person p
+            WHERE health_number = $1 AND phone = $2
+        `;
+        const resPaciente = await connection.execute(queryPaciente, [login_id, secret]);
+
+        if (resPaciente.rows.length > 0) {
+            const paciente = resPaciente.rows[0];
+            const token = jwt.sign({ id: paciente.id, role: 'paciente' }, JWT_SECRET, { expiresIn: '4h' });
+            return res.json({
+                token: token,
+                is_professional: false, 
+                role: 'paciente',
+                name: paciente.name
+            });
+        }
+        // 3. SE FALHAR OS DOIS
+        return res.status(401).json({ message: "Dados de login incorretos." });
+
+    } catch (error) {
+        console.error("Erro no login unificado:", error);
+        res.status(500).json({ message: "Erro interno do servidor" });
+    }
+});

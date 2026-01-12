@@ -1,0 +1,366 @@
+/* 1. VARIÁVEIS E RESET (Copiado do teu padrão) */
+:root {
+    --cor-primaria: #0d1a26; 
+    --cor-secundaria: #00bcd4; /* Azul ciano de destaque */
+    --cor-fundo-cards: #ffffff;
+    --cor-linhas: #e0f7fa;
+    --cor-texto: #555555;
+    --cor-botao-sair: #607d8b;
+    --borda-raio: 20px;
+    --gap-padrao: 20px;
+    --cor-alerta: #ff4081; /* Para alergias ou avisos */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; 
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--cor-primaria);
+}
+
+/* 2. LAYOUT PRINCIPAL */
+.dashboard-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    padding: 0; 
+}
+
+/* 3. SIDEBAR (Estilo idêntico ao prof.css) */
+.sidebar {
+    width: 320px;
+    min-width: 320px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-shrink: 0;
+    margin: 20px 0 20px 20px; /* Margens iguais ao prof.css */
+}
+
+.sidebar-top {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 30px;
+}
+
+.avatar-circle {
+    width: 70px;
+    height: 70px;
+    background-color: #e0f7fa;
+    border-radius: 50%;
+    color: var(--cor-secundaria);
+    font-size: 1.5rem;
+    font-weight: bold;
+    border: 3px solid #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0, 188, 212, 0.2);
+}
+
+.user-info-text h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--cor-primaria);
+    text-align: center;
+}
+
+.user-role {
+    font-size: 0.9rem;
+    color: #000;
+    display: block;
+    text-align: center;
+}
+
+.sidebar nav ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 20px;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 12px;
+    color: #555;
+    transition: 0.3s;
+    position: relative;
+}
+
+/* Ponto decorativo antes do link */
+.nav-btn::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background-color: var(--cor-secundaria);
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.nav-btn:hover {
+    background-color: #f5f5f5;
+}
+
+.nav-btn.active {
+    border-left: 4px solid var(--cor-secundaria);
+    background: linear-gradient(90deg, #eaf9fc, #ffffff);
+    color: var(--cor-primaria);
+    font-weight: 700;
+}
+
+.logout-btn {
+    padding: 12px;
+    background-color: var(--cor-botao-sair);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    width: 100%;
+}
+
+.logout-btn:hover {
+    background-color: #4f6675;
+}
+
+/* 4. ÁREA PRINCIPAL E CABEÇALHO */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    height: 100vh;
+}
+
+.header-banner {
+    background-color: var(--cor-fundo-cards);
+    padding: 20px 30px;
+    border-radius: var(--borda-raio);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 100px;
+    flex-shrink: 0;
+}
+
+.header-banner h1 {
+    font-size: 1.8rem;
+    color: var(--cor-primaria);
+}
+
+.subtitle {
+    color: #999;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+/* 5. ÁREA DE CONTEÚDO (Onde ficam os cartões) */
+.content-area {
+    background-color: var(--cor-fundo-cards); /* Fundo branco igual ao prof.css */
+    border-radius: var(--borda-raio);
+    padding: 30px;
+    flex: 1;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* GRID SYSTEM PARA OS CARTÕES */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Duas colunas iguais */
+    gap: 25px;
+    width: 100%;
+}
+
+/* 6. ESTILO DOS CARTÕES (.card) */
+.card {
+    background-color: #f9fcff; /* Fundo azulado muito claro (igual info-box do utente.css) */
+    border: 1px solid var(--cor-linhas);
+    border-radius: 15px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    box-shadow: 0 5px 15px rgba(0, 188, 212, 0.1);
+    border-color: var(--cor-secundaria);
+}
+
+.card-header {
+    border-bottom: 2px solid var(--cor-linhas);
+    padding-bottom: 10px;
+    margin-bottom: 5px;
+}
+
+.card-header h2 {
+    font-size: 1.2rem;
+    color: var(--cor-primaria);
+    font-weight: 700;
+}
+
+/* Conteúdo dentro dos cartões */
+.card-body p {
+    font-size: 0.95rem;
+    color: var(--cor-texto);
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.card-body strong {
+    color: var(--cor-primaria);
+    font-weight: 600;
+}
+
+/* Cartão que ocupa duas colunas (se necessário) */
+.card.full-width {
+    grid-column: span 2;
+}
+
+/* Colunas internas para o cartão de saúde */
+.two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* Listas (Alergias e Problemas) */
+.clinical-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.clinical-list li {
+    background-color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    font-size: 0.9rem;
+    color: var(--cor-texto);
+}
+
+/* Alergias com destaque */
+.alert-list li {
+    border-left: 4px solid var(--cor-alerta);
+    color:  #607d8b;
+    background-color: #fffafa;
+}
+
+/* 7. TABELAS (Consultas e Prescrições) */
+.table-card {
+    width: 100%;
+    /* O cartão da tabela ocupa o espaço disponível */
+    background-color: #fff; 
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px; /* Espaço entre linhas */
+}
+
+.styled-table th {
+    text-align: left;
+    padding: 15px;
+    color: var(--cor-primaria);
+    font-weight: 700;
+    border-bottom: 2px solid var(--cor-linhas);
+}
+
+.styled-table tbody tr {
+    background-color: #f9fcff;
+    transition: transform 0.2s;
+}
+
+.styled-table tbody tr:hover {
+    transform: scale(1.005);
+    background-color: #f0fcfd;
+}
+
+.styled-table td {
+    padding: 15px;
+    color: var(--cor-texto);
+    border: 1px solid transparent;
+    border-top: 1px solid var(--cor-linhas);
+    border-bottom: 1px solid var(--cor-linhas);
+}
+
+.styled-table td:first-child {
+    border-left: 1px solid var(--cor-linhas);
+    border-radius: 12px 0 0 12px;
+}
+
+.styled-table td:last-child {
+    border-right: 1px solid var(--cor-linhas);
+    border-radius: 0 12px 12px 0;
+}
+
+/* Badges de Estado */
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.status-badge.agendada { background-color: #e0f7fa; color: var(--cor-secundaria); }
+.status-badge.completa { background-color: #e8f5e9; color: #4caf50; }
+.status-badge.cancelada { background-color: #ffebee; color: #f44336; }
+.status-badge.ativo { background-color: #e0f7fa; color: var(--cor-secundaria); }
+.status-badge.expirado { background-color: #fce4ec; color: #880e4f; }
+
+/* 8. CLASSE UTILITÁRIA PARA SPA (Single Page Application) */
+/* Esta classe é usada pelo JavaScript para esconder as abas não ativas */
+.hidden {
+    display: none !important;
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr; /* Passa para 1 coluna em ecrãs menores */
+    }
+    
+    .sidebar {
+        display: none; /* Em mobile podes querer esconder a sidebar ou transformá-la num menu hambúrguer */
+    }
+    
+    .main-content {
+        padding: 10px;
+    }
+}
