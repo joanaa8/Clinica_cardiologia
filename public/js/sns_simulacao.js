@@ -35,3 +35,21 @@ document.addEventListener('DOMContentLoaded', async() =>{
 });
 
 
+function renderizarReceitas(receitas) {
+    const lista = document.getElementById('lista-receitas');
+    lista.innerHTML = ''; // Limpa antes de preencher
+
+    receitas.forEach(res => {
+        const card = `
+            <div class="receita-card">
+                <div class="receita-nome">${res.commercial_name}, ${res.dosage}</div>
+                <span class="status-tag">${res.status}</span>
+                <div class="receita-detalhes">
+                    <p>Data da prescrição: <span>${new Date(res.prescription_date).toLocaleDateString()}</span></p>
+                    <p>Prescritor: <span>${res.doctor_name}</span></p>
+                </div>
+            </div>
+        `;
+        lista.innerHTML += card;
+    });
+}

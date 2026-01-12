@@ -16,13 +16,11 @@
         <div class="main-container">
         
         <div class="card-id">
-            <div class="campo-id">Nome do utente:<span id="nome-exigibido"></span></div>
-            <div class="campo-id">Número de saúde:<span id="n_saude-exibido"></span></div>
+            <div class="campo-id">Nome do utente: <span id="nome-exibido">ANDRÉ VICENTE</span></div>
+            <div class="campo-id">Número de saúde: <span id="n_saude-exibido">123 456 789</span></div>
         </div>
 
         <h2 class="titulo-pagina">Receitas</h2>
-
-        <div  id="lista-receitas"></div>
 
         <div class="filtros">
             <button class="btn-filtro ativo">Todas</button>
@@ -30,18 +28,39 @@
         </div>
 
         <div class="seccao-info">Últimos 12 meses</div>
-        <p></p>
 
-        <div class="receita-card">
-            <div class="receita-nome"></div>
-            <span class="status-tag"></span>
-            <div class="receita-detalhes">
-                
+        <div id="lista-receitas">
+
+            <div class="receita-card">
+                <div class="receita-nome">Paracetamol, 1000 mg, Comprimido, Blister - 20 unidade(s)</div>
+                <span class="status-tag">Dispensada</span>
+                <div class="receita-detalhes">
+                    <p>Data da prescrição: <span>13 dez 2025</span></p>
+                    <p>Prescritor: <span>RUI COSTA CUNHA</span></p>
+                </div>
             </div>
+
+            <div class="receita-card">
+                <div class="receita-nome">Etinilestradiol + Etonogestrel [Ornibel], 0.015 mg/24 h + 0.12 mg/24 h, Sistema de libertação vaginal, Saqueta - 3 unidade(s)</div>
+                <span class="status-tag">Dispensada</span>
+                <div class="receita-detalhes">
+                    <p>Data da prescrição: <span>27 fev 2025</span></p>
+                    <p>Prescritor: <span>F. CARDOSO RICARDO</span></p>
+                </div>
+            </div>
+
+            <div class="receita-card">
+                <div class="receita-nome">Fosfomicina, 3000 mg, Granulado para solução oral, Saqueta - 2 unidade(s)</div>
+                <span class="status-tag">Expirada</span>
+                <div class="receita-detalhes">
+                    <p>Data da prescrição: <span>19 jan 2025</span></p>
+                    <p>Prescritor: <span>CONSTANÇA LOURENÇO MONTEIRO</span></p>
+                </div>
+            </div>
+
         </div>
 
     </div>
-
 
 
     <script src="js/sns_simulacao.js"></script>
