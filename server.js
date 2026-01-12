@@ -8,6 +8,7 @@ const accountRoutes = require('./routes/accountRoutes');
 const prescriptionRoutes = require('./routes/prescriptionRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
 const utentesRoutes = require('./routes/utentesRoutes');
+const pacienteRoutes = require('./routes/pacienteRoutes');
 
 const { verifyToken } = require('./middlewares/authMiddlewares');
 
@@ -28,7 +29,7 @@ app.use('/api/account', verifyToken, accountRoutes);
 app.use('/api/prescricoes', verifyToken, prescriptionRoutes);
 app.use('/api', verifyToken, appointmentRoutes); 
 app.use('/api/utentes', verifyToken, utentesRoutes);
-
+app.use('/api/paciente', verifyToken, pacienteRoutes);
 
 app.use((err, req, res, next) => {
     console.error('Ocorreu um erro no Servidor:', err.stack);
