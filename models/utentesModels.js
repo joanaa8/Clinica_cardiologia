@@ -1,6 +1,7 @@
 const pool = require("../config/db");
+const { get } = require("../routes/prescriptionRoutes");
 
-//verificar se existe acesso ao utente
+// Verificar se existe acesso ao utente
 const checkPatientAccess = async (doctorId, patientId) => {
     const query = `
         SELECT 1
@@ -14,7 +15,7 @@ const checkPatientAccess = async (doctorId, patientId) => {
     return result.rowCount > 0;
 };
 
-// verifica e retorna todos os utentes associados ao médico
+// Verifica e retorna todos os utentes associados ao médico
 const getAllPatients = async (doctorId) => {
     const query = `
         SELECT DISTINCT
@@ -35,7 +36,7 @@ const getAllPatients = async (doctorId) => {
     return rows;
 };
 
-//obtem detalhes pessoais de um utente
+// Obtém detalhes pessoais de um utente (ADICIONEI weight_kg E height_cm)
 const getPatientDetails = async (patientId) => {
     const query = `
         SELECT
@@ -47,7 +48,9 @@ const getPatientDetails = async (patientId) => {
             emergency_contact,
             health_number,
             phone,
-            email
+            email,
+            weight_kg,  -- Adicionado
+            height_cm   -- Adicionado
         FROM Person
         WHERE id = $1
           AND deleted_at IS NULL;
@@ -56,7 +59,7 @@ const getPatientDetails = async (patientId) => {
     return rows[0];
 };
 
-//ontem as alergias de um utente
+// Obtém as alergias de um utente
 const getPatientAllergies = async (patientId) => {
     const query = `
         SELECT
@@ -71,7 +74,7 @@ const getPatientAllergies = async (patientId) => {
     return rows;
 };
 
-//obtem os problemas clinicos de um utente
+// Obtém os problemas clínicos de um utente
 const getPatientClinicalProblems = async (patientId) => {
     const query = `
         SELECT
@@ -89,7 +92,7 @@ const getPatientClinicalProblems = async (patientId) => {
     return rows;
 };
 
-//obtem o historico medicamentoso de um utente
+// Obtém o histórico medicamentoso de um utente
 const getPatientMedication = async (patientId) => {
     const query = `
         SELECT
@@ -107,7 +110,7 @@ const getPatientMedication = async (patientId) => {
     return rows;
 };
 
-//obtem as consultas de um utente
+// Obtém as consultas de um utente
 const getPatientAppointments = async (patientId, doctorId) => {
     const query = `
         SELECT
@@ -124,7 +127,7 @@ const getPatientAppointments = async (patientId, doctorId) => {
     return rows;
 };
 
-//obtem as prescrições de um utente
+// Obtém as prescrições de um utente
 const getPatientPrescriptions = async (patientId, doctorId) => {
     const query = `
         SELECT
@@ -143,6 +146,41 @@ const getPatientPrescriptions = async (patientId, doctorId) => {
     return rows;
 };
 
+
+
+const addHistoryEntry = async (patientId, name, endDate, notes) => {
+    const query = `
+        INSERT INTO Patient_Medication_History
+        (person_id, medication_name, start_date, end_date, status, source, notes)
+        VALUES ($1, $2, CURRENT_DATE, $3, 'active', 'manual', $4)
+    `;
+    await pool.query(query, [patientId, name, endDate, notes]);
+};
+
+const addMedicationHistory = async (id, medication_name, notes, start_date, end_date) => {
+    const query = `
+        INSERT INTO projeto.Patient_Medication_History 
+        (person_id, medication_name, notes, start_date, end_date, status, source) 
+        VALUES ($1, $2, $3, $4, $5, 'ativo', 'externo') 
+        RETURNING *
+    `;
+    const values = [id, medication_name, notes, start_date || null, end_date || null];
+    
+   
+    return await pool.query(query, values); 
+};
+
+// Se a função de leitura também tiver 'db', muda também:
+const getMedicationHistory = async (id) => {
+    const query = `
+        SELECT * FROM projeto.Patient_Medication_History 
+        WHERE person_id = $1 
+        ORDER BY start_date DESC
+    `;
+  
+    return await pool.query(query, [id]); 
+};
+
 module.exports = {
     checkPatientAccess,
     getAllPatients,
@@ -151,5 +189,8 @@ module.exports = {
     getPatientClinicalProblems,
     getPatientMedication,
     getPatientAppointments,
-    getPatientPrescriptions
+    getPatientPrescriptions,
+    addHistoryEntry,
+    addMedicationHistory,
+    getMedicationHistory
 };

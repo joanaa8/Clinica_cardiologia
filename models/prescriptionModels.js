@@ -8,7 +8,7 @@ const searchMedications = async (termo) => {
     
     const query = `
         SELECT id, commercial_name, dosage, form_factor, manufacturer 
-        FROM projeto.Medication_catalog
+        FROM Medication_catalog
         WHERE commercial_name ILIKE $1 
         ORDER BY commercial_name ASC
         LIMIT 20;
@@ -40,7 +40,7 @@ const createPrescriptionTransaction = async (data) => {
 
         // 1. Inserir Cabeçalho da Prescrição
         const insertPrescriptionQuery = `
-            INSERT INTO projeto.Prescription 
+            INSERT INTO Prescription 
             (patient_id, doctor_id, prescription_date, notes, status)
             VALUES ($1, $2, CURRENT_DATE, $3, 'active')
             RETURNING id, prescription_number, access_code;
@@ -55,7 +55,7 @@ const createPrescriptionTransaction = async (data) => {
 
         // 2. Inserir Itens da Prescrição
         const insertItemQuery = `
-            INSERT INTO projeto.Prescription_item
+            INSERT INTO Prescription_item
             (prescription_id, medication_id, dose, instructions, start_date, end_date, quantity, regularidade)
             VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '30 days', $5, 'diaria');
         `;

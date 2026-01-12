@@ -56,7 +56,17 @@
                     </div>
                     <div class="form-group">
                         <label>Dose</label>
-                        <select id="input-dose" disabled><option>Selecione forma...</option></select>
+                        <div style="display:flex; gap:10px;">
+                            <select id="input-dose" disabled style="flex:1;">
+                                <option>Selecione forma...</option>
+                            </select>
+                            
+                            <button id="btn-open-calc" type="button" class="btn-primary" 
+                                    style="padding: 0 15px; background-color: #607d8b;" 
+                                    title="Calculadora de Posologia"
+                                    onclick="abrirCalculadora()"> <i class="fa-solid fa-calculator"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Qtd.</label>
@@ -129,7 +139,51 @@
             </div>
         </main>
     </div>
+<div id="modal-calculadora" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-header-clean">
+            <h2>Calculadora de Dosagem</h2>
+            <button class="close-btn-clean" onclick="fecharCalculadora()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Medicamento Selecionado</label>
+                <input type="text" id="calc-med-name" readonly style="background:#eee; color:#555;">
+            </div>
+        </div>
+        
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Peso (kg)</label>
+                <input type="number" id="calc-peso" placeholder="Ex: 70">
+            </div>
+            <div class="form-group">
+                <label>Idade (anos)</label>
+                <input type="number" id="calc-idade" placeholder="Ex: 35">
+            </div>
+        </div>
 
+        <button onclick="calcularDoseAPI()" class="btn-primary" style="width:100%; justify-content:center; margin-top:10px;">
+            <i class="fa-solid fa-gears"></i> Calcular
+        </button>
+
+        <div id="calc-resultado-area" style="margin-top:25px; display:none; border-top:1px solid #eee; padding-top:20px;">
+            <h3 style="font-size:1rem; color:#00bcd4; margin-bottom:15px;">Resultados</h3>
+            
+            <div class="data-box" style="background:#e0f7fa; border:1px solid #b2ebf2; margin-bottom:15px;">
+                <span class="data-label">Dose Recomendada</span>
+                <span class="data-value" id="res-dose" style="color:#006064; font-size:1.3rem;">--</span>
+                <small id="res-detalhe" style="display:block; margin-top:5px; color:#00838f;">--</small>
+            </div>
+
+            <div id="res-alertas-lista" style="display:flex; flex-direction:column; gap:10px;">
+                </div>
+        </div>
+    </div>
+</div>
     <script src="js/auth.js"></script>
     <script src="js/prescricoes.js"></script>
 </body>

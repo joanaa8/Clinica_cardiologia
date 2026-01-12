@@ -1,154 +1,191 @@
-// public/js/utentes.js
-
-let utentes = []; // Lista local para filtro
+let todosUtentes = []; // Variável para guardar a lista completa (para a pesquisa funcionar)
+let utenteSelecionado = null; // Variável global crucial para os botões do modal
 
 document.addEventListener("DOMContentLoaded", async function() {
-    console.log("Script de Utentes iniciado...");
-    
-    // 1. Verificar Token
     const token = localStorage.getItem("medico_token");
-    if (!token) {
-        console.warn("Sem token, a redirecionar...");
-        window.location.href = "index.html";
-        return;
-    }
-
-    // 2. Carregar Lista
-    await carregarUtentes(token);
+    if (!token) { window.location.href = "index.html"; return; }
     
-    // 3. Configurar Pesquisa
-    const input = document.getElementById("inputPesquisa");
-    if (input) {
-        input.addEventListener("input", (e) => filtrarUtentes(e.target.value));
-    }
+    await carregarUtentes(token);
+    configurarPesquisa();
 });
 
-// --- FUNÇÃO DE CARREGAMENTO ---
+// --- CARREGAR DADOS ---
 async function carregarUtentes(token) {
     const container = document.getElementById("utentesList");
-    
     try {
-        console.log("A pedir utentes à API...");
-        const response = await fetch("/api/utentes", {
-            method: "GET",
-            headers: { 
-                "Authorization": "Bearer " + token,
-                "Content-Type": "application/json"
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error("Erro API: " + response.status);
-        }
-
-        utentes = await response.json();
-        console.log("Utentes recebidos:", utentes.length);
+        const res = await fetch("/api/utentes", { headers: { 'Authorization': 'Bearer ' + token } });
+        if (!res.ok) throw new Error("Erro API");
         
-        renderizarUtentes(utentes);
-
+        todosUtentes = await res.json(); // Guarda na variável global
+        renderizarUtentes(todosUtentes); // Renderiza a lista inicial
+        
     } catch (err) {
-        console.error("Erro fatal:", err);
-        container.innerHTML = `<p style="color:red; text-align:center;">Erro ao carregar dados: ${err.message}</p>`;
+        console.error(err);
+        container.innerHTML = '<p style="text-align:center; color:white;">Erro ao carregar dados.</p>';
     }
 }
 
-// --- FUNÇÃO DE RENDERIZAÇÃO (Desenha os cartões) ---
+// --- RENDERIZAR LISTA PRINCIPAL ---
 function renderizarUtentes(lista) {
     const container = document.getElementById("utentesList");
-    container.innerHTML = ""; 
+    container.innerHTML = "";
 
-    if (!lista || lista.length === 0) {
-        container.innerHTML = "<p style='text-align:center; color:#666;'>Não foram encontrados utentes.</p>";
-        return;
+    if (!lista || lista.length === 0) { 
+        container.innerHTML = "<p style='text-align:center; color:#ccc;'>Nenhum utente encontrado.</p>"; 
+        return; 
     }
 
     lista.forEach(u => {
         const card = document.createElement("div");
-        card.className = "utente-card";
-
-        const dataNasc = u.date_of_birth ? new Date(u.date_of_birth).toLocaleDateString("pt-PT") : "--/--/----";
-
-        // AQUI ESTÁ A ALTERAÇÃO NO LINK (href):
+        card.className = "utente-card"; 
+        
+        // O CSS trata do estilo, mas mantemos a estrutura limpa
         card.innerHTML = `
             <div class="card-info">
                 <h3>${u.name}</h3>
-                <p><strong>SNS:</strong> ${u.health_number || "--"}</p>
-                <p><strong>Nasc:</strong> ${dataNasc}</p>
+                <p>SNS: ${u.sns_number || u.health_number || '---'}</p>
             </div>
-            
-            <div class="card-actions">
-                <button class="btn-detalhes" onclick="abrirModalUtente(${u.id})">
-                    <i class="fa-solid fa-eye"></i> Detalhes
-                </button>
-                
-                <a href="prescricoes.html?id=${u.id}" class="btn-prescrever">
-                    <i class="fa-solid fa-file-prescription"></i> Prescrever
-                </a>
-            </div>
+            <button class="btn-detalhes" onclick="abrirModalUtente(${u.id})">
+                <i class="fa-solid fa-eye"></i> Detalhes
+            </button>
         `;
-        
         container.appendChild(card);
     });
 }
 
-// --- FILTRO DE PESQUISA ---
-function filtrarUtentes(termo) {
-    const termoLower = termo.toLowerCase();
-    const filtrados = utentes.filter(u => {
-        const nome = u.name ? u.name.toLowerCase() : "";
-        const sns = String(u.health_number || "");
-        return nome.includes(termoLower) || sns.includes(termoLower);
-    });
-    renderizarUtentes(filtrados);
-}
-
-// --- MODAL ---
-async function abrirModalUtente(id) {
+// --- ABRIR MODAL (Carrega tudo) ---
+window.abrirModalUtente = async (id) => {
     const token = localStorage.getItem("medico_token");
-    const modal = document.getElementById("modalUtente");
     
+    // 1. Reset Visual (Limpar modal antes de carregar novos dados)
+    document.getElementById('m-nome').textContent = "A carregar...";
+    document.getElementById('m-sns-badge').textContent = "SNS: ...";
+    document.getElementById('m-idade-badge').textContent = "-- Anos";
+    
+    // Limpar listas
+    document.getElementById('lista-alergias').innerHTML = "";
+    document.getElementById('lista-problemas').innerHTML = "";
+    document.getElementById('lista-medicacao').innerHTML = "";
+    
+    // Limpar grelha de dados
+    document.getElementById('m-telemovel').textContent = "--";
+    document.getElementById('m-email').textContent = "--";
+    document.getElementById('m-sexo').textContent = "--";
+    document.getElementById('m-sangue').textContent = "--";
+
+    // Mostrar modal
+    document.getElementById('modalUtente').classList.add('open'); 
+
     try {
-        // Buscar detalhes completos
-        const res = await fetch(`/api/utentes/${id}`, {
-            headers: { "Authorization": "Bearer " + token }
-        });
-        const u = await res.json();
+        // 2. Fetch de todos os dados em paralelo (Performance)
+        const [resDetalhes, resAlergias, resProblemas, resMedicacao] = await Promise.all([
+            fetch(`/api/utentes/${id}`, { headers: { 'Authorization': 'Bearer ' + token } }),
+            fetch(`/api/utentes/${id}/alergies`, { headers: { 'Authorization': 'Bearer ' + token } }),
+            fetch(`/api/utentes/${id}/problemas`, { headers: { 'Authorization': 'Bearer ' + token } }),
+            fetch(`/api/utentes/${id}/medicacao`, { headers: { 'Authorization': 'Bearer ' + token } })
+        ]);
+
+        const u = await resDetalhes.json();
+        utenteSelecionado = u; // <--- ISTO É O QUE FAZ OS BOTÕES DE AÇÃO FUNCIONAREM
+
+        // 3. Preencher Cabeçalho
+        document.getElementById('m-nome').textContent = u.name;
+        document.getElementById('m-sns-badge').textContent = `SNS: ${u.health_number || u.sns_number || '--'}`;
         
-        // Buscar Alergias (Exemplo de chamada extra)
-        const resAlergias = await fetch(`/api/utentes/${id}/alergies`, {
-            headers: { "Authorization": "Bearer " + token }
-        });
-        const alergias = await resAlergias.json();
-
-        // Preencher Modal
-        document.getElementById("m-nome").textContent = u.name;
-        document.getElementById("m-sns").textContent = u.health_number || "--";
-        document.getElementById("m-dataNasc").textContent = u.date_of_birth ? new Date(u.date_of_birth).toLocaleDateString("pt-PT") : "--";
-        document.getElementById("m-sexo").textContent = u.sex || "--";
-        document.getElementById("m-telemovel").textContent = u.phone || "--";
-
-        // Preencher Avatar
-        if(u.name) {
-            document.getElementById("m-avatar").textContent = u.name.substring(0,2).toUpperCase();
+        // Calcular Idade
+        let idade = "--";
+        if (u.date_of_birth) {
+            const diff = Date.now() - new Date(u.date_of_birth).getTime();
+            idade = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
         }
+        document.getElementById('m-idade-badge').textContent = `${idade} Anos`;
 
-        // Preencher Alergias
-        const obsAlergias = document.getElementById("m-obsAlergias");
-        if(alergias && alergias.length > 0) {
-            obsAlergias.textContent = alergias.map(a => a.allergy).join(", ");
+        // 4. Preencher Dados Pessoais
+        document.getElementById('m-telemovel').textContent = u.phone || '--';
+        document.getElementById('m-email').textContent = u.email || '--';
+        document.getElementById('m-sexo').textContent = u.gender || u.sex || '--';
+        document.getElementById('m-sangue').textContent = u.blood_type || '--';
+
+        // 5. Preencher Listas (Usando a função auxiliar corrigida)
+        preencherLista(document.getElementById('lista-alergias'), await resAlergias.json(), 'allergy', 'Sem alergias.');
+        preencherLista(document.getElementById('lista-problemas'), await resProblemas.json(), 'description', 'Sem problemas clínicos.');
+        
+        // 6. Preencher Medicação (Estrutura específica)
+        const meds = await resMedicacao.json();
+        const listaMed = document.getElementById('lista-medicacao');
+        
+        if(!meds || meds.length === 0) {
+            listaMed.innerHTML = '<p style="color:#888; font-style:italic;">Sem registos no histórico.</p>';
         } else {
-            obsAlergias.textContent = "Sem alergias registadas.";
+            meds.forEach(m => {
+                // CORREÇÃO: Usar class="list-item" para bater certo com o CSS
+                listaMed.innerHTML += `
+                <div class="list-item">
+                    <div>
+                        <strong>${m.medication_name}</strong>
+                        <small>${m.notes || m.dosage_info || ''}</small>
+                    </div>
+                    <span class="badge badge-active">Ativo</span>
+                </div>`;
+            });
         }
 
-        // Abrir
-        modal.classList.add("open");
-
-    } catch (e) {
-        console.error("Erro modal:", e);
-        alert("Erro ao abrir detalhes.");
+    } catch (err) {
+        console.error("Erro ao abrir modal:", err);
+        alert("Erro ao carregar detalhes do utente.");
     }
+};
+
+// --- FUNÇÕES DOS BOTÕES ---
+
+window.fecharModal = () => {
+    document.getElementById('modalUtente').classList.remove('open');
+};
+
+window.irParaPrescricao = () => {
+    if(!utenteSelecionado) return;
+    // Redireciona enviando ID e Nome
+    window.location.href = `prescricoes.html?patient_id=${utenteSelecionado.id}&patient_name=${encodeURIComponent(utenteSelecionado.name)}`;
+};
+
+window.irParaHistorico = () => {
+    if(!utenteSelecionado) return;
+    // Redireciona para a página nova
+    window.location.href = `historico.html?patient_id=${utenteSelecionado.id}&patient_name=${encodeURIComponent(utenteSelecionado.name)}`;
+};
+
+// --- FUNÇÕES AUXILIARES ---
+
+// Preenche listas genéricas (Alergias, Problemas)
+function preencherLista(container, dados, campoChave, msgVazio) {
+    container.innerHTML = ""; // Limpar
+    if (!dados || dados.length === 0) {
+        container.innerHTML = `<p style="color:#888; font-style:italic;">${msgVazio}</p>`;
+        return;
+    }
+    dados.forEach(item => {
+        // CORREÇÃO: Usar class="list-item" para o CSS funcionar
+        container.innerHTML += `
+            <div class="list-item">
+                <strong>${item[campoChave]}</strong>
+            </div>`;
+    });
 }
 
-function fecharModal() {
-    document.getElementById("modalUtente").classList.remove("open");
+// Lógica de Pesquisa (Filtra a lista global sem ir à API)
+function configurarPesquisa() {
+    const input = document.getElementById("inputPesquisa");
+    if(!input) return;
+
+    input.addEventListener("input", (e) => {
+        const termo = e.target.value.toLowerCase();
+        
+        const filtrados = todosUtentes.filter(u => 
+            (u.name && u.name.toLowerCase().includes(termo)) || 
+            (u.sns_number && String(u.sns_number).includes(termo)) ||
+            (u.health_number && String(u.health_number).includes(termo))
+        );
+        
+        renderizarUtentes(filtrados);
+    });
 }
