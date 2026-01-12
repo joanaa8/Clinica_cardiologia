@@ -159,7 +159,7 @@ const addHistoryEntry = async (patientId, name, endDate, notes) => {
 
 const addMedicationHistory = async (id, medication_name, notes, start_date, end_date) => {
     const query = `
-        INSERT INTO projeto.Patient_Medication_History 
+        INSERT INTO Patient_Medication_History 
         (person_id, medication_name, notes, start_date, end_date, status, source) 
         VALUES ($1, $2, $3, $4, $5, 'ativo', 'externo') 
         RETURNING *
@@ -173,7 +173,7 @@ const addMedicationHistory = async (id, medication_name, notes, start_date, end_
 // Se a função de leitura também tiver 'db', muda também:
 const getMedicationHistory = async (id) => {
     const query = `
-        SELECT * FROM projeto.Patient_Medication_History 
+        SELECT * FROM Patient_Medication_History 
         WHERE person_id = $1 
         ORDER BY start_date DESC
     `;
