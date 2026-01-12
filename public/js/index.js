@@ -55,12 +55,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 const data = await response.json();
-
+                    /*
                 if (response.ok) {
                     localStorage.setItem('medico_token', data.token); //guardar o token RN1
                     console.log('Login com sucesso:', data);
-                    window.location.href = data.is_professional ? '/profissional.html' : '/adicional.html'; //RN3
-                
+                    window.location.href = data.is_professional ? '/profissional.html' : '/paciente.html'; //RN3
+                */
+               if (response.ok) {
+                     if (data.is_professional) {
+                        localStorage.setItem('medico_token', data.token);
+                    } else {
+                        localStorage.setItem('paciente_token', data.token);
+                    }   
+                    
+                    console.log('Login com sucesso. Tipo:', data);
+            
+                    window.location.href = data.is_professional ? 'profissional.html' : 'paciente.html';
+
                 } else {
 
                     alert(data.message); //mostrar o erro RN2

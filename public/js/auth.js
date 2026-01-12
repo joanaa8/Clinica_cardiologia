@@ -69,3 +69,4 @@ function terminarSessao() {
     localStorage.removeItem('medico_account_id');
     window.location.href = 'index.html';
 }
+

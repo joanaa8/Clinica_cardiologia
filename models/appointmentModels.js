@@ -74,8 +74,47 @@ const updateAppointmentModel = async (doctorId, appointmentId, newDate) => {
     return rows[0];
 };
 
+// Função para obter estatísticas de consultas de um médico
+const getStatsModel = async (id_user) => {
+    const query = `
+        SELECT 
+            (SELECT COUNT(*) FROM Appointment a 
+             JOIN Account acc ON a.doctor_id = acc.id 
+             WHERE acc.id_user = $1 AND a.deleted_at IS NULL) as total,
+            
+            (SELECT COUNT(*) FROM Appointment a 
+             JOIN Account acc ON a.doctor_id = acc.id 
+             WHERE acc.id_user = $1 
+             AND a.deleted_at IS NULL 
+             AND EXTRACT(MONTH FROM a.appointment_date) = EXTRACT(MONTH FROM CURRENT_DATE)
+             AND EXTRACT(YEAR FROM a.appointment_date) = EXTRACT(YEAR FROM CURRENT_DATE)) as mes
+    `;
+    const { rows } = await pool.query(query, [id_user]);
+    return rows[0];
+};
+
+// Função para obter eventos do calendário de consultas de um médico
+const getCalendarEventsModel = async (doctorId) => {
+    const query = `
+        SELECT 
+            p.name AS title, 
+            a.appointment_date AS start,
+            a.id AS id,
+            a.status
+        FROM Appointment a
+        JOIN Person p ON a.patient_id = p.id
+        JOIN Account acc ON a.doctor_id = acc.id
+        WHERE acc.id_user = $1 
+          AND a.deleted_at IS NULL;
+    `;
+    const { rows } = await pool.query(query, [doctorId]);
+    return rows;
+};
+
 module.exports = {
     getAllAppointments,
     getAppointmentByIdModel,
-    updateAppointmentModel
+    updateAppointmentModel,
+    getStatsModel,
+    getCalendarEventsModel
 };

@@ -60,6 +60,7 @@ body, html { width: 100%; height: 100%; background-color: var(--cor-primaria); o
 /* --- MAIN CONTENT UTENTES --- */
 .main-content { flex: 1; display: flex; flex-direction: column; gap: 20px; padding: 20px; height: 100vh; }
 
+
 .header-banner {
     background-color: var(--cor-fundo-cards); padding: 20px 30px; border-radius: var(--borda-raio);
     display: flex; justify-content: space-between; align-items: center; min-height: 80px;
