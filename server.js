@@ -11,7 +11,7 @@ const utentesRoutes = require('./routes/utentesRoutes');
 const pacienteRoutes = require('./routes/pacienteRoutes');
 const authsnsRoutes =require('./routes/authsnsRoutes.js');
 const jwt = require('jsonwebtoken'); 
-const connection = require('./db');  
+const connection = require('./config/db'); 
 const JWT_SECRET = process.env.JWT_SECRET || 'a_tua_chave_secreta'; 
 
 
