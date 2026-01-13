@@ -26,8 +26,8 @@ const getMyAllergys = async (personId) => {
 const getMyClinicalProblem = async (personId) => {
     const query = `
         SELECT cp.description, cp.cid_code, cp.snomed_ct, cp.problem_type, cp.status
-        FROM projeto.Clinical_Problem cp
-        JOIN projeto.Person p ON cp.person_id = p.id
+        FROM Clinical_Problem cp
+        JOIN Person p ON cp.person_id = p.id
         WHERE p.id = $1
     `;
     const result = await db.query(query, [personId]);
@@ -37,9 +37,9 @@ const getMyClinicalProblem = async (personId) => {
 const getMyAppointments = async (personId) => {
     const query = `
         SELECT a.id, a.appointment_date, ac.name as nome_medico, a.status
-        FROM projeto.Appointment a
-        JOIN projeto.Account ac ON a.doctor_id = ac.id       
-        JOIN projeto.Person p ON a.patient_id = p.id        
+        FROM Appointment a
+        JOIN Account ac ON a.doctor_id = ac.id       
+        JOIN Person p ON a.patient_id = p.id        
         WHERE p.id = $1                                   
         ORDER BY a.appointment_date DESC
     `;
@@ -50,9 +50,9 @@ const getMyAppointments = async (personId) => {
 const getMyPrescriptions = async (personId) => {
     const query = `
         SELECT pr.id, pr.patient_id, pr.doctor_id, pr.status, pr.prescription_date, pr.notes, pr.justificacao
-        FROM projeto.Prescription pr
-        JOIN projeto.Account m ON pr.doctor_id = m.id
-        JOIN projeto.Person p ON pr.patient_id = p.id
+        FROM Prescription pr
+        JOIN Account m ON pr.doctor_id = m.id
+        JOIN Person p ON pr.patient_id = p.id
         WHERE p.id = $1
         ORDER BY pr.prescription_date DESC
     `;

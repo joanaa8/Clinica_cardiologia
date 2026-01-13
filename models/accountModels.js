@@ -1,19 +1,14 @@
-const db = require('../config/db.js');
+const pool = require('../config/db');
 
-const Account = {
-    getByUserId: async (id_user) => {
-        try {
-            const query = `
-                SELECT name, email, professional_license
-                FROM Account
-                WHERE id_user = $1
-            `;
-            const result = await db.query(query, [id_user]);
-            return result.rows[0];
-        } catch (error) {
-            throw error;
-        }
-    }
+// Busca a conta do profissional baseada no ID de utilizador (Login)
+const getByUserId = async (userId) => {
+    const query = `
+        SELECT id, name, professional_license 
+        FROM Account 
+        WHERE id_user = $1 AND deleted_at IS NULL;
+    `;
+    const result = await pool.query(query, [userId]);
+    return result.rows[0];
 };
 
-module.exports = Account;
+module.exports = { getByUserId };

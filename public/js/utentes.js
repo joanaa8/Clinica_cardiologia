@@ -1,189 +1,191 @@
-let utentes = []; // Lista global de utentes
-let utenteSelecionado = null; // Guarda o utente atualmente selecionado no modal
+let todosUtentes = []; // Variável para guardar a lista completa (para a pesquisa funcionar)
+let utenteSelecionado = null; // Variável global crucial para os botões do modal
 
 document.addEventListener("DOMContentLoaded", async function() {
     const token = localStorage.getItem("medico_token");
-    if (!token) {
-        window.location.href = "index.html";
-        return;
-    }
-    console.log("DOM carregado. Token encontrado.");
+    if (!token) { window.location.href = "index.html"; return; }
+    
     await carregarUtentes(token);
     configurarPesquisa();
 });
 
-function configurarPesquisa() {
-    const inputPesquisa = document.getElementById("inputPesquisa");
-    if (!inputPesquisa) return;
-
-    inputPesquisa.addEventListener("input", function() {// Filtra os utentes à medida que o utilizador escreve
-        const termo = inputPesquisa.value.toLowerCase();
-        const filtrados = utentes.filter(function(u) {
-            const nome = u.name ? u.name.toLowerCase() : "";
-            const sns = u.health_number ? u.health_number : "";
-            return nome.includes(termo) || sns.includes(termo);
-        });
-        renderizarUtentes(filtrados);
-    });
-}
-
-// Função genérica para pedidos GET à API com autenticação
-async function apiGet(url, token) {
-    console.log("Chamando API: " + url);
-    const res = await fetch(url, {
-        method: "GET",
-        headers: { 
-            "Authorization": "Bearer " + token,
-            "Content-Type": "application/json"
-        }
-    });
-
-    if (!res.ok) {
-        console.error("Erro na resposta da API (" + url + "): " + res.status);
-        throw new Error("Erro ao carregar " + url);
-    }
-    return res.json();
-}
-
-// Carrega todos os utentes da API
+// --- CARREGAR DADOS ---
 async function carregarUtentes(token) {
+    const container = document.getElementById("utentesList");
     try {
-        utentes = await apiGet("/api/utentes", token);
-        console.log("Utentes carregados:", utentes.length);
-        renderizarUtentes(utentes);
+        const res = await fetch("/api/utentes", { headers: { 'Authorization': 'Bearer ' + token } });
+        if (!res.ok) throw new Error("Erro API");
+        
+        todosUtentes = await res.json(); // Guarda na variável global
+        renderizarUtentes(todosUtentes); // Renderiza a lista inicial
+        
     } catch (err) {
-        console.error("Erro ao carregarUtentes:", err);
-        alert("Não foi possível carregar os utentes.");
+        console.error(err);
+        container.innerHTML = '<p style="text-align:center; color:white;">Erro ao carregar dados.</p>';
     }
 }
 
+// --- RENDERIZAR LISTA PRINCIPAL ---
 function renderizarUtentes(lista) {
     const container = document.getElementById("utentesList");
-    if (!container) return;
-    container.innerHTML = "";// Limpa a lista antes de renderizar novamente
+    container.innerHTML = "";
 
-    if (lista.length === 0) {
-        container.innerHTML = "<p>Não há utentes registados.</p>";
-        return;
+    if (!lista || lista.length === 0) { 
+        container.innerHTML = "<p style='text-align:center; color:#ccc;'>Nenhum utente encontrado.</p>"; 
+        return; 
     }
 
-    lista.forEach(function(u) {
+    lista.forEach(u => {
         const card = document.createElement("div");
-        card.className = "utente-card";
-         // Formatação da data de nascimento
-        const dataNasc = u.date_of_birth ? new Date(u.date_of_birth).toLocaleDateString("pt-PT") : "--/--/----";
-
+        card.className = "utente-card"; 
+        
+        // O CSS trata do estilo, mas mantemos a estrutura limpa
         card.innerHTML = `
             <div class="card-info">
                 <h3>${u.name}</h3>
-                <p>SNS: ${u.health_number || "--"}</p>
-                <p>Data de Nascimento: ${dataNasc}</p>
+                <p>SNS: ${u.sns_number || u.health_number || '---'}</p>
             </div>
-            <button class="btn-detalhes" data-id="${u.id}">Ver Detalhes</button>
+            <button class="btn-detalhes" onclick="abrirModalUtente(${u.id})">
+                <i class="fa-solid fa-eye"></i> Detalhes
+            </button>
         `;
-
-        card.querySelector(".btn-detalhes").addEventListener("click", function() {
-            abrirModalUtente(u.id);
-        });
         container.appendChild(card);
     });
 }
 
-async function abrirModalUtente(id) {
+// --- ABRIR MODAL (Carrega tudo) ---
+window.abrirModalUtente = async (id) => {
     const token = localStorage.getItem("medico_token");
-    console.log("Abrindo modal para utente ID: " + id);
     
+    // 1. Reset Visual (Limpar modal antes de carregar novos dados)
+    document.getElementById('m-nome').textContent = "A carregar...";
+    document.getElementById('m-sns-badge').textContent = "SNS: ...";
+    document.getElementById('m-idade-badge').textContent = "-- Anos";
+    
+    // Limpar listas
+    document.getElementById('lista-alergias').innerHTML = "";
+    document.getElementById('lista-problemas').innerHTML = "";
+    document.getElementById('lista-medicacao').innerHTML = "";
+    
+    // Limpar grelha de dados
+    document.getElementById('m-telemovel').textContent = "--";
+    document.getElementById('m-email').textContent = "--";
+    document.getElementById('m-sexo').textContent = "--";
+    document.getElementById('m-sangue').textContent = "--";
+
+    // Mostrar modal
+    document.getElementById('modalUtente').classList.add('open'); 
+
     try {
-        utenteSelecionado = await apiGet("/api/utentes/" + id, token);// Carrega os dados principais do utente
-        preencherDadosPessoais(utenteSelecionado);
-
-        console.log("Iniciando Promise.all para dados complementares...");
-
-        // Carrega dados complementares em paralelo
-        const [alergias, problemas, medicacao, consultas, prescricoes] = await Promise.all([
-            apiGet("/api/utentes/" + id + "/alergies", token).catch(e => { console.warn("Falha alergies"); return []; }),
-            apiGet("/api/utentes/" + id + "/problemas", token).catch(e => { console.warn("Falha problemas"); return []; }),
-            apiGet("/api/utentes/" + id + "/medicacao", token).catch(e => { console.warn("Falha medicacao"); return []; }),
-            apiGet("/api/utentes/" + id + "/consultas", token).catch(e => { console.warn("Falha consultas"); return []; }),
-            apiGet("/api/utentes/" + id + "/prescricoes", token).catch(e => { console.warn("Falha prescricoes"); return []; })
+        // 2. Fetch de todos os dados em paralelo (Performance)
+        const [resDetalhes, resAlergias, resProblemas, resMedicacao] = await Promise.all([
+            fetch(`/api/utentes/${id}`, { headers: { 'Authorization': 'Bearer ' + token } }),
+            fetch(`/api/utentes/${id}/alergies`, { headers: { 'Authorization': 'Bearer ' + token } }),
+            fetch(`/api/utentes/${id}/problemas`, { headers: { 'Authorization': 'Bearer ' + token } }),
+            fetch(`/api/utentes/${id}/medicacao`, { headers: { 'Authorization': 'Bearer ' + token } })
         ]);
 
-        console.log("Dados recebidos. Alergias:", alergias);
+        const u = await resDetalhes.json();
+        utenteSelecionado = u; // <--- ISTO É O QUE FAZ OS BOTÕES DE AÇÃO FUNCIONAREM
 
-        // Alergias
-        const obsAlergias = document.getElementById("m-obsAlergias");
-        const gravidade = document.getElementById("m-gravidade");
-        if (alergias && alergias.length > 0) {
-            obsAlergias.textContent = alergias.map(a => a.allergy).join(", ");
-            gravidade.textContent = alergias.map(a => a.gravity || "--").join(", ");
-        } else {
-            obsAlergias.textContent = "Sem Observações registadas";
-            gravidade.textContent = "--";
-        }
-
-        // Problemas
-        const pDesc = document.getElementById("m-descricaoProblema");
-        const pCid = document.getElementById("m-codigodoenca");
-        const pSnomed = document.getElementById("m-snomedct");
-        const pTipo = document.getElementById("m-tipoProblema");
-        if (problemas && problemas.length > 0) {
-            pDesc.textContent = problemas[0].description || "--";
-            pCid.textContent = problemas[0].cid_code || "--";
-            pSnomed.textContent = problemas[0].snomed_ct || "--";
-            pTipo.textContent = problemas[0].problem_type || "--";
-        } else {
-            pDesc.textContent = "--"; pCid.textContent = "--"; pSnomed.textContent = "--"; pTipo.textContent = "--";
-        }
-
-        // Medicação
-        const mMed = document.getElementById("m-medicamento");
-        const mSrc = document.getElementById("m-Source");
-        const mVal = document.getElementById("m-Validade");
-        if (medicacao && medicacao.length > 0) {
-            mMed.textContent = medicacao[0].medication_name || "--";
-            mSrc.textContent = medicacao[0].source || "SNS";
-            mVal.textContent = medicacao[0].end_date ? new Date(medicacao[0].end_date).toLocaleDateString("pt-PT") : "--/--/----";
-        } else {
-            mMed.textContent = "--"; mSrc.textContent = "--"; mVal.textContent = "--/--/----";
-        }
-
-        // Consultas e Prescrições
-        document.getElementById("m-dataEmissao").textContent = (consultas && consultas.length > 0) ? new Date(consultas[0].appointment_date).toLocaleDateString("pt-PT") : "--/--/----";
+        // 3. Preencher Cabeçalho
+        document.getElementById('m-nome').textContent = u.name;
+        document.getElementById('m-sns-badge').textContent = `SNS: ${u.health_number || u.sns_number || '--'}`;
         
-        const mDoc = document.getElementById("m-médico");
-        const mObs = document.getElementById("m-obsPrescricao");
-        if (prescricoes && prescricoes.length > 0) {
-            mDoc.textContent = prescricoes[0].doctor_name || "--";
-            mObs.textContent = prescricoes[0].notes || "--";
+        // Calcular Idade
+        let idade = "--";
+        if (u.date_of_birth) {
+            const diff = Date.now() - new Date(u.date_of_birth).getTime();
+            idade = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+        }
+        document.getElementById('m-idade-badge').textContent = `${idade} Anos`;
+
+        // 4. Preencher Dados Pessoais
+        document.getElementById('m-telemovel').textContent = u.phone || '--';
+        document.getElementById('m-email').textContent = u.email || '--';
+        document.getElementById('m-sexo').textContent = u.gender || u.sex || '--';
+        document.getElementById('m-sangue').textContent = u.blood_type || '--';
+
+        // 5. Preencher Listas (Usando a função auxiliar corrigida)
+        preencherLista(document.getElementById('lista-alergias'), await resAlergias.json(), 'allergy', 'Sem alergias.');
+        preencherLista(document.getElementById('lista-problemas'), await resProblemas.json(), 'description', 'Sem problemas clínicos.');
+        
+        // 6. Preencher Medicação (Estrutura específica)
+        const meds = await resMedicacao.json();
+        const listaMed = document.getElementById('lista-medicacao');
+        
+        if(!meds || meds.length === 0) {
+            listaMed.innerHTML = '<p style="color:#888; font-style:italic;">Sem registos no histórico.</p>';
         } else {
-            mDoc.textContent = "--"; mObs.textContent = "--";
+            meds.forEach(m => {
+                // CORREÇÃO: Usar class="list-item" para bater certo com o CSS
+                listaMed.innerHTML += `
+                <div class="list-item">
+                    <div>
+                        <strong>${m.medication_name}</strong>
+                        <small>${m.notes || m.dosage_info || ''}</small>
+                    </div>
+                    <span class="badge badge-active">Ativo</span>
+                </div>`;
+            });
         }
 
-        document.getElementById("modalUtente").classList.add("open");
-        console.log("Modal aberto com sucesso.");
     } catch (err) {
-        console.error("Erro fatal ao abrir modal:", err);
+        console.error("Erro ao abrir modal:", err);
         alert("Erro ao carregar detalhes do utente.");
     }
-}
+};
 
-function fecharModal() {
-    document.getElementById("modalUtente").classList.remove("open");
-}
+// --- FUNÇÕES DOS BOTÕES ---
 
-function preencherDadosPessoais(u) {
-    document.getElementById("m-nome").textContent = u.name || "--";
-    document.getElementById("m-dataNasc").textContent = u.date_of_birth ? new Date(u.date_of_birth).toLocaleDateString("pt-PT") : "--/--/----";
-    document.getElementById("m-sexo").textContent = u.sex || "--";
-    document.getElementById("m-tipoSangu").textContent = u.blood_type || "--";
-    document.getElementById("m-telemovel").textContent = u.phone || "--";
-    document.getElementById("m-email").textContent = u.email || "--";
-    document.getElementById("m-contactoEmergencia").textContent = u.emergency_contact || "--"
-    document.getElementById("m-sns").textContent = u.health_number || "--";
- 
-     // Gera as iniciais do nome para o avatar
-    if (u.name) {
-        const iniciais = u.name.split(" ").map(n => n[0]).join("").toUpperCase().substring(0, 2);
-        document.getElementById("m-avatar").textContent = iniciais;
+window.fecharModal = () => {
+    document.getElementById('modalUtente').classList.remove('open');
+};
+
+window.irParaPrescricao = () => {
+    if(!utenteSelecionado) return;
+    // Redireciona enviando ID e Nome
+    window.location.href = `prescricoes.html?patient_id=${utenteSelecionado.id}&patient_name=${encodeURIComponent(utenteSelecionado.name)}`;
+};
+
+window.irParaHistorico = () => {
+    if(!utenteSelecionado) return;
+    // Redireciona para a página nova
+    window.location.href = `historico.html?patient_id=${utenteSelecionado.id}&patient_name=${encodeURIComponent(utenteSelecionado.name)}`;
+};
+
+// --- FUNÇÕES AUXILIARES ---
+
+// Preenche listas genéricas (Alergias, Problemas)
+function preencherLista(container, dados, campoChave, msgVazio) {
+    container.innerHTML = ""; // Limpar
+    if (!dados || dados.length === 0) {
+        container.innerHTML = `<p style="color:#888; font-style:italic;">${msgVazio}</p>`;
+        return;
     }
+    dados.forEach(item => {
+        // CORREÇÃO: Usar class="list-item" para o CSS funcionar
+        container.innerHTML += `
+            <div class="list-item">
+                <strong>${item[campoChave]}</strong>
+            </div>`;
+    });
+}
+
+// Lógica de Pesquisa (Filtra a lista global sem ir à API)
+function configurarPesquisa() {
+    const input = document.getElementById("inputPesquisa");
+    if(!input) return;
+
+    input.addEventListener("input", (e) => {
+        const termo = e.target.value.toLowerCase();
+        
+        const filtrados = todosUtentes.filter(u => 
+            (u.name && u.name.toLowerCase().includes(termo)) || 
+            (u.sns_number && String(u.sns_number).includes(termo)) ||
+            (u.health_number && String(u.health_number).includes(termo))
+        );
+        
+        renderizarUtentes(filtrados);
+    });
 }

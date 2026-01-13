@@ -1,247 +1,190 @@
 <!DOCTYPE html>
 <html lang="pt-pt">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>Prescrições - Clínica Dr. Machado Lemos</title>
-        <link rel="stylesheet" href="css/prescricoes.css"> 
-        
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-        <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
-    </head>
-    <body>
-        <div class="dashboard-container">
+<head>
+    <meta charset="UTF-8">
+    <title>Nova Prescrição</title>
+    <link rel="stylesheet" href="css/prescricoes.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
 
-            <aside class="sidebar">
-                <div class="sidebar-top">
-                    <a href="profissional.html" class="user-profile-link">
-                        <div class="user-profile">
-                            <div class="avatar-circle" id="sidebar-avatar"></div>
-                                <h3 id="nome-medico">A carregar...</h3>
-                                <span class="user-role">Profissional de Saúde</span>
-                        </div>
-                    </a>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="user-profile">
+                <div class="avatar-circle" id="sidebar-avatar">--</div>
+                <h3 id="nome-medico">A carregar...</h3>
+                <span class="user-role">Profissional de Saúde</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="consultas.html" class="nav-btn"><i class="fa-solid fa-calendar-check"></i> Consultas</a></li>
+                    <li><a href="lista_prescricoes.html" class="nav-btn active"><i class="fa-solid fa-file-prescription"></i> Prescrições</a></li>
+                    <li><a href="utente.html" class="nav-btn"><i class="fa-solid fa-users"></i> Utentes</a></li>
+                    <li><a href="perfil.html" class="nav-btn"><i class="fa-solid fa-user-doctor"></i> Perfil</a></li>
+                </ul>
+            </nav>
+            <button class="logout-btn" onclick="terminarSessao()">Terminar Sessão</button>
+        </aside>
 
-                    <nav>
-                        <ul>
-                            <li><a href="consultas.html" class="nav-btn active"><span class="icon-dot"></span> Consultas</a></li>
-                            <li><a href="prescricoes.html" class="nav-btn active"><span class="icon-dot"></span> Prescrições</a></li>
-                            <li><a href="utente.html" class="nav-btn active"><span class="icon-dot"></span> Utentes</a></li>
-                            <li><a href="perfil.html" class="nav-btn"><span class="icon-dot"></span> Perfil</a></li>
+        <main class="main-content">
+            <header class="header-banner">
+                <h1>Nova Prescrição</h1>
+                <a href="lista_prescricoes.html" class="btn-primary" style="background-color: var(--cor-botao-sair);">
+                    <i class="fa-solid fa-arrow-left"></i> Voltar
+                </a>
+            </header>
 
-                        </ul>
-                    </nav>
+            <div class="content-card">
+                
+                <div class="form-group" style="position:relative;">
+                    <label>Utente</label>
+                    <input type="text" id="input-patient-search" placeholder="Pesquisar por nome ou número de utente..." autocomplete="off">
+                    <input type="hidden" id="patient_id_input">
+                    <ul id="lista-sugestoes-pacientes" class="dropdown-list"></ul>
                 </div>
 
-                <button class="logout-btn" onclick="terminarSessao()">Terminar Sessão</button>
-            </aside>
-
-            <main class="main-content">
-                <header class="header-banner">
-                    <div class="header-wrapper">
-                        <div class="titulo-e-acao">
-                            <h1>Prescrições</h1>
-                        </div>
-
-                        <div class="filter-box">
-                            <select id="filtro-tipo" onchange="aplicarFiltro()" aria-label="Filtrar prescrições">
-                                <option value="todas" selected>Todas as Prescrições</option>
-                                <option value="ativas">Prescrições Ativas</option>
-                                <option value="expirar">Prestes a Expirar (10 dias)</option>
+                <h3 style="margin-top:10px; color:var(--cor-primaria);">Adicionar Medicamentos</h3>
+                <div class="form-grid">
+                    <div class="form-group" style="position:relative;">
+                        <label>Medicamento</label>
+                        <input type="text" id="input-med-search" placeholder="Pesquisar..." autocomplete="off">
+                        <ul id="lista-sugestoes" class="dropdown-list"></ul>
+                    </div>
+                    <div class="form-group">
+                        <label>Forma</label>
+                        <select id="input-form" disabled><option>Selecione medicamento...</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Dose</label>
+                        <div style="display:flex; gap:10px;">
+                            <select id="input-dose" disabled style="flex:1;">
+                                <option>Selecione forma...</option>
                             </select>
+                            
+                            <button id="btn-open-calc" type="button" class="btn-primary" 
+                                    style="padding: 0 15px; background-color: #607d8b;" 
+                                    title="Calculadora de Posologia"
+                                    onclick="abrirCalculadora()"> <i class="fa-solid fa-calculator"></i>
+                            </button>
                         </div>
                     </div>
-                </header>
-
-                <div class="content-area">
-                    <table class="prescricoes-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 50px;"></th> <th scope="col">Nome do Utente</th>
-                                <th scope="col">MCDTs</th>
-                                <th scope="col">Data de Emissão</th>
-                                <th scope="col">Validade da Prescrição</th>
-                                <th scope="col">Mais Informações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="lista-prescricoes">
-                            </tbody>
-                    </table>
+                    <div class="form-group">
+                        <label>Qtd.</label>
+                        <input type="number" id="input-qty" value="1" min="1">
+                    </div>
                 </div>
-            </main>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Data Início</label>
+                        <input type="date" id="input-start-date">
+                    </div>
+                    <div class="form-group">
+                        <label>Data Fim</label>
+                        <input type="date" id="input-end-date">
+                    </div>
+                    <div class="form-group">
+                        <label>Regularidade</label>
+                        <select id="input-regularidade">
+                            <option value="diaria">Diária</option>
+                            <option value="semanal">Semanal</option>
+                        </select>
+                    </div>
+                     <div class="form-group">
+                        <label>Instruções</label>
+                        <input type="text" id="input-instruction" placeholder="Ex: Ao pequeno-almoço...">
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; margin-bottom:20px;">
+                    <button id="btn-add-med" class="btn-primary">
+                        <i class="fa-solid fa-plus"></i> Adicionar
+                    </button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Medicamento</th>
+                            <th>Detalhes</th>
+                            <th>Posologia</th>
+                            <th style="text-align:center;">Remover</th>
+                        </tr>
+                    </thead>
+                    <tbody id="medication-tbody"></tbody>
+                </table>
+                <p id="empty-msg" style="text-align:center; color:#999; padding:20px;">Nenhum medicamento adicionado.</p>
+
+                <div id="interaction-alert-box" class="interaction-box">
+                    <div class="interaction-title">
+                        <i class="fa-solid fa-triangle-exclamation"></i> ALERTA DE SEGURANÇA DETETADO
+                    </div>
+                    <div id="interaction-list" class="interaction-list">
+                        </div>
+                    <div class="form-group justificativa-area">
+                        <label>Justificação Clínica Obrigatória para Prosseguir:</label>
+                        <textarea id="input-justificacao-clinica" rows="2" placeholder="Descreva a razão clínica para manter a prescrição apesar do risco..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top:20px;">
+                    <label>Notas Gerais (Opcional)</label>
+                    <textarea id="justification-box" rows="2" placeholder="Observações para a receita..."></textarea>
+                </div>
+
+                <button id="btn-submit-prescription" class="btn-primary" style="width:100%; justify-content:center; padding:15px; font-size:1.1rem;" disabled>
+                     Emitir Prescrição
+                </button>
+
+            </div>
+        </main>
+    </div>
+<div id="modal-calculadora" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-header-clean">
+            <h2>Calculadora de Dosagem</h2>
+            <button class="close-btn-clean" onclick="fecharCalculadora()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
         </div>
-
-        <div id="modal-detalhes" class="modal-overlay" role="dialog" aria-hidden="true">
-            <div class="modal-content">
-                <span class="close-btn" onclick="fecharModal()">&times;</span>
-                
-                <div class="modal-header">
-                    <h2>Detalhes da Prescrição</h2>
-                    <span id="status-badge" class="status-badge">Informação</span>
-                </div>
-
-                <div class="modal-body">
-                    <div class="info-group"> 
-                        <label>Utente:</label>
-                        <p id="modal-paciente" class="texto-destaque">--</p>
-                    </div>
-                    
-                    <div class="info-row">
-                        <div class="info-group">
-                            <label>Prescritor:</label>
-                            <p id="modal-prescritor">--</p>
-                        </div>
-                        <div class="info-group">
-                            <label>Local:</label>
-                            <p id="modal-local">--</p>
-                        </div>
-                    </div>
-                        
-                    <div class="info-row">
-                        <div class="info-group">
-                            <label>Data de Emissão:</label>
-                            <p id="modal-dataemissao">--</p>
-                        </div>
-                        <div class="info-group">
-                            <label>Validade:</label>
-                            <p id="modal-validade">--</p>
-                        </div>
-                    </div>
-
-                    <div class="info-group">
-                        <label>Código de Acesso:</label>
-                        <p id="modal-codacesso">--</p>
-                    </div>
-                        
-                    <hr class="modal-divider">
-
-                    <h3>Medicamento</h3>
-                    <div class="medication-box">
-                        <h4 id="modal-medicamento">--</h4>
-                        
-                        <div class="med-details-grid">
-                            <div>
-                                <label>Qtd. Dispensa:</label>
-                                <p id="modal-quantidadedispensa">--</p>
-                            </div>
-                            <div>
-                                <label>Dosagem e Freq:</label>
-                                <p id="modal-dosagemfrequencia">--</p>
-                            </div>
-                            <div>
-                                <label>Forma Farmacêutica:</label>
-                                <p id="modal-formafarma">--</p>
-                            </div>
-                            <div>
-                                <label>Observações:</label>
-                                <p id="modal-observacoes">--</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal-actions">
-                        <button id="btn-desativar" class="btn-desativar" onclick="desativarPrescricao()" style="display: none;">
-                            &#x21bb; Desativar Prescrição
-                        </button>
-                        <button id="btn-renovar" class="btn-renovar" onclick="renovarPrescricao()" style="display: none;">
-                            &#x21bb; Renovar Prescrição
-                        </button>
-                    </div>
-                </div>
+        
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Medicamento Selecionado</label>
+                <input type="text" id="calc-med-name" readonly style="background:#eee; color:#555;">
+            </div>
+        </div>
+        
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Peso (kg)</label>
+                <input type="number" id="calc-peso" placeholder="Ex: 70">
+            </div>
+            <div class="form-group">
+                <label>Idade (anos)</label>
+                <input type="number" id="calc-idade" placeholder="Ex: 35">
             </div>
         </div>
 
-        <div id="meuModalDesativar" class="modal-overlay" role="dialog" aria-hidden="true" style="z-index: 1200;">
-            <div class="modal-content" style="width: 500px;"> <span class="close-btn" onclick="fecharModalDesativar()">&times;</span>
-                
-                <div class="modal-header">
-                    <h2>Desativar Prescrição</h2>
-                    <span class="status-badge" style="background-color: var(--cor-secundaria); color: white;"></span>
-                </div>
-                <div class="modal-body">
-                    <form id="formdesativar">
-                        <div class="form-group">
-                            <label>Observação:</label>
-                            <input type="text" id="obs-desativar" name="observacao">
-                        </div>
-                        <div class="modal-actions">
-                            <button type="submit" class="btn-confirm-desativar">Confirmar</button>
-                        </div>
-                    </form>
-                </div>
+        <button onclick="calcularDoseAPI()" class="btn-primary" style="width:100%; justify-content:center; margin-top:10px;">
+            <i class="fa-solid fa-gears"></i> Calcular
+        </button>
+
+        <div id="calc-resultado-area" style="margin-top:25px; display:none; border-top:1px solid #eee; padding-top:20px;">
+            <h3 style="font-size:1rem; color:#00bcd4; margin-bottom:15px;">Resultados</h3>
+            
+            <div class="data-box" style="background:#e0f7fa; border:1px solid #b2ebf2; margin-bottom:15px;">
+                <span class="data-label">Dose Recomendada</span>
+                <span class="data-value" id="res-dose" style="color:#006064; font-size:1.3rem;">--</span>
+                <small id="res-detalhe" style="display:block; margin-top:5px; color:#00838f;">--</small>
             </div>
-        </div>
 
-        <div id="meuModalRenovacao" class="modal-overlay" role="dialog" aria-hidden="true" style="z-index: 1200;">
-            <div class="modal-content" style="width: 500px;"> <span class="close-btn" onclick="fecharModalRenovacao()">&times;</span>
-
-                <div class="modal-header">
-                    <h2>Renovar Prescrição</h2>
-                    <span class="status-badge" style="background-color: var(--cor-secundaria); color: white;">Ação</span>
+            <div id="res-alertas-lista" style="display:flex; flex-direction:column; gap:10px;">
                 </div>
-
-                <div class="modal-body">
-                    <form id="formRenovacao">
-                        
-                        <div class="form-group">
-                            <label>Utente:</label>
-                            <input type="text" id="renew-utente" name="utente" readonly class="input-readonly">
-                        </div>
-
-                        <div class="info-row">
-                            <div class="form-group" style="flex: 1;">
-                                <label>Local:</label>
-                                <input type="text" id="renew-local" name="local" readonly class="input-readonly">
-                            </div>
-                            <div class="form-group" style="flex: 1;">
-                                <label>Prescritor:</label>
-                                <input type="text" id="renew-prescritor" name="prescritor" readonly class="input-readonly">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Data de Emissão:</label>
-                            <input type="date" id="renew-data" name="dataEmissao" readonly class="input-readonly">
-                        </div>
-
-                        <hr class="modal-divider" style="margin: 20px 0; border: 0; border-top: 1px solid #eee;"> 
-
-                        <div class="form-group">
-                            <label>Medicamento:</label>
-                            <input type="text" id="renew-medicamento" name="medicamento">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Validade:</label>
-                            <input type="text" id="renew-validade" name="validade">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Qtd Dispensa:</label>
-                            <input type="text" id="renew-qtd-dispensa" name="qtdDispensa">
-                        </div>
-
-                        <div class="form-group">    
-                            <label>Forma Farmacêutica:</label>
-                            <input type="text" id="renew-forma-farma" name="formaFarmaceutica">
-                        </div>
-
-                        <div class="form-group">    
-                            <label>Dosagem e Frequência:</label>
-                            <textarea id="renew-dosagem-frequencia" name="dosagemFrequencia" rows="2"></textarea>
-                        </div>
-                        <div class="form-group">    
-                            <label>Observações:</label>
-                            <textarea id="renew-observacoes" name="observacoes" rows="4"></textarea>
-                        </div>
-                        <div class="modal-actions">
-                            <button type="button" class="btn-cancel" onclick="fecharModalRenovacao()">Cancelar</button>
-                            <button type="submit" class="btn-confirm">Confirmar Renovação</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
         </div>
-        <script src="js/auth.js"></script>
-    </body> 
+    </div>
+</div>
+    <script src="js/auth.js"></script>
+    <script src="js/prescricoes.js"></script>
+</body>
 </html>
