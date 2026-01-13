@@ -1,36 +1,65 @@
-const axios = require('axios');
-
-exports.calculateDosage = async (req, res) => {
-    // Recebe os dados do Frontend (Site)
-    const { med_name, weight, age } = req.body;
-
-    if (!med_name) {
-        return res.status(400).json({ message: "Selecione um medicamento." });
-    }
-
+const calcularDosagem = async (req, res) => {
     try {
-        // 1. O Node.js chama o Microserviço Python (Porta 8000)
-        // Envia o nome, peso e idade para o "cérebro" Python processar
-        const response = await axios.post('http://127.0.0.1:8000/calculate', {
-            med_name,
-            weight,
-            age
+        const { weight, age, medication_name } = req.body;
+
+        if (!weight || !medication_name) {
+            return res.status(400).json({ error: "Peso e nome do medicamento são obrigatórios." });
+        }
+
+        // URL da tua API Python
+        const PYTHON_API_URL = 'http://127.0.0.1:8000/calculate';
+
+        // 1. Envia os dados para o Python
+        const response = await fetch(PYTHON_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                med_name: medication_name,
+                weight: parseFloat(weight),
+                age: parseInt(age || 30) 
+            })
         });
 
-        // 2. Recebe a resposta matemática do Python e devolve ao site
-        res.json(response.data);
+        if (!response.ok) {
+            throw new Error(`Erro na API Python: ${response.statusText}`);
+        }
 
-    } catch (error) {
-        console.error("Erro na comunicação com a Calculadora Python:", error.message);
-        
-        // Se o Python estiver desligado, avisamos o utilizador
-        if (error.code === 'ECONNREFUSED') {
-            return res.status(503).json({ 
+        const data = await response.json();
+
+        // 2. Processa a resposta do Python
+        if (data.found) {
+            // Prepara a sugestão de texto para o input
+            let sugestaoTexto = `${data.calculo.dose_recomendada}`;
+            if (data.calculo.instrucao) {
+                sugestaoTexto += ` (${data.calculo.instrucao})`;
+            }
+
+            res.json({
+                found: true,
+                // Mapeamento das novas chaves do Python
+                dose: data.calculo.dose_recomendada,
+                sugestao: sugestaoTexto,
+                calculo: data.calculo.detalhe_matematico || "Dose padrão",
+                tipo: data.calculo.tipo,
+                
+                // Passar os alertas de segurança e notas
+                alertas: data.alertas || [],
+                nota: data.nota_clinica || ""
+            });
+        } else {
+            res.json({ 
                 found: false, 
-                message: "O sistema de calculadora está offline. Verifique se o terminal Python está aberto." 
+                message: data.message || "Não foi encontrada regra de dosagem." 
             });
         }
-        
-        res.status(500).json({ message: "Erro ao processar o cálculo." });
+
+    } catch (error) {
+        console.error("Erro no CDSS Controller:", error.message);
+        res.status(502).json({ 
+            found: false, 
+            message: "Serviço de cálculo indisponível (Verifique se o Python está a correr)." 
+        });
     }
 };
+
+module.exports = { calcularDosagem };

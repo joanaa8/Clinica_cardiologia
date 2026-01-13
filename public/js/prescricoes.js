@@ -10,22 +10,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 2. Configurar Listeners
     configurarEventos();
 
-    // 3. Verificar se viemos da página de Utentes (Redirecionamento)
+    // 3. Verificar se viemos da página de Utentes (Redirecionamento normal)
     const params = new URLSearchParams(window.location.search);
-    const pId = params.get('patient_id') || params.get('id'); // Aceita ambos
+    const pId = params.get('patient_id') || params.get('id'); 
 
     if (pId) {
         await carregarUtentePorId(pId);
     }
+
+    // 4. VERIFICAR RENOVAÇÃO (Lógica integrada)
+    await verificarRenovacao();
 });
 
-// --- FUNÇÃO CORRIGIDA COM TOKEN ---
+// --- CARREGAR UTENTE ---
 async function carregarUtentePorId(id) {
     const token = localStorage.getItem('medico_token');
     if (!token) return;
 
     try {
-        // Usa a rota de utentes que sabemos que funciona
         const res = await fetch(`/api/utentes/${id}`, {
             headers: { 'Authorization': 'Bearer ' + token }
         });
@@ -33,7 +35,6 @@ async function carregarUtentePorId(id) {
         if (res.ok) {
             const utente = await res.json();
             selecionarUtente(utente); 
-            // Bloqueio visual opcional para indicar que veio pré-selecionado
             const inputSearch = document.getElementById('input-patient-search');
             if(inputSearch) {
                 inputSearch.style.backgroundColor = "#e0f7fa";
@@ -159,9 +160,13 @@ function configurarPesquisaMedicamento() {
     }
 }
 
+// Carrega variações e devolve promise
 async function carregarVariações(nomeMedicamento) {
-    document.getElementById('input-med-search').value = nomeMedicamento;
-    document.getElementById('lista-sugestoes').style.display = 'none';
+    const inputSearch = document.getElementById('input-med-search');
+    const lista = document.getElementById('lista-sugestoes');
+    
+    if(inputSearch) inputSearch.value = nomeMedicamento;
+    if(lista) lista.style.display = 'none';
 
     try {
         const res = await fetch(`/api/prescricoes/variations?name=${encodeURIComponent(nomeMedicamento)}`);
@@ -170,7 +175,7 @@ async function carregarVariações(nomeMedicamento) {
         if (variacoesAtuais.length > 0) {
             atualizarSelectForma();
         } else {
-            alert("Erro: Nenhuma variação encontrada.");
+            console.warn("Nenhuma variação encontrada.");
         }
     } catch (err) { console.error(err); }
 }
@@ -268,7 +273,7 @@ function renderizarTabela() {
     const emptyMsg = document.getElementById('empty-msg');
     const btnSubmit = document.getElementById('btn-submit-prescription');
     
-    tbody.innerHTML = '';
+    if(tbody) tbody.innerHTML = '';
 
     if (listaMedicamentos.length === 0) {
         if(emptyMsg) emptyMsg.style.display = 'block';
@@ -289,7 +294,7 @@ function renderizarTabela() {
                 <button class="btn-remove" onclick="removerItem(${index})"><i class="fa-solid fa-trash"></i></button>
             </td>
         `;
-        tbody.appendChild(tr);
+        if(tbody) tbody.appendChild(tr);
     });
 }
 
@@ -310,81 +315,26 @@ function limparFormularioMedicamento() {
     selectDose.disabled = true;
 
     document.getElementById('input-instruction').value = '';
+    document.getElementById('input-qty').value = '1';
     medSelecionado = null;
     variacoesAtuais = [];
 }
 
-
-// --- FUNÇÃO SUBMETER BLINDADA ---
+// --- SUBMETER ---
 async function submeterPrescricao() {
     const patientId = document.getElementById('patient_id_input').value;
-    const notes = document.getElementById('justification-box').value;
-    
-    // Elementos do Alerta Integrado
-    const alertBox = document.getElementById('interaction-alert-box');
-    const alertList = document.getElementById('interaction-list');
+    const notes = document.getElementById('justification-box') ? document.getElementById('justification-box').value : "";
     const inputJustificacao = document.getElementById('input-justificacao-clinica');
-    
     const btn = document.getElementById('btn-submit-prescription');
 
     if (!patientId) { alert("Erro: Nenhum utente selecionado."); return; }
     if (listaMedicamentos.length === 0) { alert("A prescrição está vazia."); return; }
 
     const token = localStorage.getItem('medico_token');
-    if (!token) { window.location.href = 'index.html'; return; }
-
-    // BLOQUEIA O BOTÃO
     btn.disabled = true;
-    btn.textContent = "A verificar...";
+    btn.textContent = "A gravar...";
 
-    // RESETAR O ALERTA
-    alertBox.style.display = 'none'; 
-    alertList.innerHTML = '';
-    
-    const temTextoJustificativo = inputJustificacao.value.trim().length > 0;
-    
     try {
-        if (!temTextoJustificativo) {
-            const novosMedsIds = listaMedicamentos.map(m => m.medication_id).filter(id => id !== null);
-            
-            const resCheck = await fetch('/api/prescricoes/check-interactions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                body: JSON.stringify({ patient_id: patientId, new_meds_ids: novosMedsIds })
-            });
-            
-            const interacoes = await resCheck.json();
-
-            if (interacoes && interacoes.length > 0) {
-                alertBox.style.display = 'block'; 
-                
-                interacoes.forEach(i => {
-                    const div = document.createElement('div');
-                    div.className = 'interaction-item';
-                    div.innerHTML = `<i class="fa-solid fa-circle-exclamation" style="margin-top:3px;"></i> 
-                                     <div><strong>${i.severity}:</strong> ${i.medicamento_1} + ${i.medicamento_2}<br>
-                                     <small>${i.message}</small></div>`;
-                    alertList.appendChild(div);
-                });
-
-                btn.textContent = "⚠️ Confirmar com Justificação";
-                btn.disabled = false;
-                btn.style.backgroundColor = "#d32f2f"; 
-                alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-                return;
-            }
-        }
-
-        if (alertList.children.length > 0 && !inputJustificacao.value.trim()) {
-             alert("É obrigatório preencher a justificação clínica.");
-             alertBox.style.display = 'block';
-             btn.disabled = false;
-             return;
-        }
-
-        btn.textContent = "A gravar...";
-        
         const res = await fetch('/api/prescricoes', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
@@ -392,12 +342,11 @@ async function submeterPrescricao() {
                 patient_id: patientId,
                 notes: notes,
                 items: listaMedicamentos,
-                justificacao: inputJustificacao.value 
+                justificacao: inputJustificacao ? inputJustificacao.value : ""
             })
         });
 
         const result = await res.json();
-        
         if (res.ok) {
             alert(`✅ Sucesso! Receita Nº: ${result.data.prescription_number}`);
             window.location.href = 'lista_prescricoes.html'; 
@@ -405,9 +354,7 @@ async function submeterPrescricao() {
             alert("Erro: " + result.message);
             btn.disabled = false;
             btn.textContent = "✅ Emitir Prescrição";
-            btn.style.backgroundColor = ""; 
         }
-
     } catch (err) {
         console.error(err);
         alert("Erro técnico.");
@@ -415,105 +362,97 @@ async function submeterPrescricao() {
     }
 }
 
+// --- FUNÇÃO DE RENOVAÇÃO (Compatível com os teus IDs) ---
+async function verificarRenovacao() {
+    const params = new URLSearchParams(window.location.search);
+    const renewId = params.get('renew_id'); // Obtém o ID da URL
 
-// --- LÓGICA DA CALCULADORA (GLOBAL) ---
+    if (!renewId) return;
 
-// 1. Abrir Calculadora
-window.abrirCalculadora = function() {
-    const medInput = document.getElementById('input-med-search');
-    const modal = document.getElementById('modal-calculadora');
-    const nomeCampo = document.getElementById('calc-med-name');
-    const resArea = document.getElementById('calc-resultado-area');
-
-    if (!modal) { alert("Erro HTML: Modal não encontrado."); return; }
-
-    if (!medInput || !medInput.value) {
-        alert("⚠️ Selecione primeiro um medicamento na pesquisa.");
-        return;
-    }
-    
-    if (nomeCampo) nomeCampo.value = medInput.value;
-    modal.classList.add('open');
-    if (resArea) resArea.style.display = 'none';
-};
-
-// 2. Fechar Calculadora
-window.fecharCalculadora = function() {
-    const modal = document.getElementById('modal-calculadora');
-    if (modal) modal.classList.remove('open');
-};
-
-// 3. Chamar API e Calcular
-window.calcularDoseAPI = async function() {
-    const medName = document.getElementById('calc-med-name').value;
-    const peso = document.getElementById('calc-peso').value;
-    const idade = document.getElementById('calc-idade').value;
-
-    if (!peso || !idade) {
-        alert("Por favor preencha Peso e Idade.");
-        return;
-    }
-
-    const token = localStorage.getItem('medico_token');
+    const token = localStorage.getItem("medico_token");
 
     try {
-        const btn = document.querySelector('#modal-calculadora .btn-primary');
-        const originalText = btn.innerHTML;
-        btn.textContent = "A calcular...";
-        btn.disabled = true;
-
-        const res = await fetch('/api/prescricoes/calculate-dosage', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token 
-            },
-            body: JSON.stringify({ med_name: medName, weight: peso, age: idade })
+        // 1. Pedir os detalhes completos da prescrição antiga
+        const res = await fetch(`/api/prescricoes/${renewId}/details`, {
+            headers: { 'Authorization': 'Bearer ' + token }
         });
 
-        const data = await res.json();
+        if (!res.ok) throw new Error("Erro ao buscar dados da renovação");
+
+        const dados = await res.json();
+        const header = dados.header;
+        const item = dados.items[0]; // Vamos preencher com o primeiro medicamento da lista
+
+        // 2. Preencher Utente
+        // Se usares Select2 ou Dropdown normal
+        const selectUtente = document.getElementById("patientSelect"); // Verifica se o ID do teu HTML é este
+        if(selectUtente) {
+            selectUtente.value = header.patient_id; 
+            selectUtente.dispatchEvent(new Event('change')); // Força a atualização visual
+            
+            // Se o valor não mudar (porque o utente não estava carregado), tenta carregar texto
+            const option = document.createElement("option");
+            option.text = header.nome_paciente;
+            option.value = header.patient_id;
+            selectUtente.add(option);
+            selectUtente.value = header.patient_id;
+        }
+
+        // 3. Preencher Medicamento (Nome, Dose, Forma, Frequência)
+        if (item) {
+            // Preenche o campo de pesquisa/nome
+            const inputNome = document.getElementById("medicationSearch") || document.getElementById("medicationName");
+            if (inputNome) inputNome.value = item.commercial_name || "";
+
+            // Preenche Dose
+            const inputDose = document.getElementById("dosage");
+            if (inputDose) inputDose.value = item.dose || "";
+
+            // Preenche Forma Farmacêutica (Comprimido, Xarope...)
+            const inputForma = document.getElementById("formFactor");
+            if (inputForma) inputForma.value = item.form_factor || "";
+            
+            // Preenche Frequência/Regularidade
+            const inputFreq = document.getElementById("frequency");
+            if (inputFreq) inputFreq.value = item.regularidade || "";
+            
+            // Preenche Instruções
+            const inputInstr = document.getElementById("instructions");
+            if (inputInstr) inputInstr.value = item.instructions || "";
+            
+            // Guardar ID do medicamento (campo oculto se tiveres)
+            const hiddenId = document.getElementById("selectedMedicationId");
+            if(hiddenId) hiddenId.value = item.medication_id;
+        }
+
+        // 4. Calcular e Preencher Datas
+        // Data Início = Hoje
+        const hoje = new Date();
+        const startStr = hoje.toISOString().split('T')[0];
         
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-
-        const areaRes = document.getElementById('calc-resultado-area');
-        const spanDose = document.getElementById('res-dose');
-        const spanDetalhe = document.getElementById('res-detalhe');
-        const listaAlertas = document.getElementById('res-alertas-lista');
-
-        areaRes.style.display = 'block';
-        listaAlertas.innerHTML = '';
-
-        if (!data.found) {
-            spanDose.textContent = "Sem dados automáticos";
-            spanDose.style.color = "#777";
-            spanDetalhe.textContent = data.message || "Tente ajustar o nome.";
-            return;
+        // Calcular duração da receita antiga
+        let duracaoDias = 30; // Padrão
+        if (item && item.start_date && item.end_date) {
+            const oldStart = new Date(item.start_date);
+            const oldEnd = new Date(item.end_date);
+            const diffTime = Math.abs(oldEnd - oldStart);
+            duracaoDias = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         }
 
-        if (data.calculo) {
-            spanDose.textContent = data.calculo.dose_diaria;
-            spanDose.style.color = "#006064";
-            spanDetalhe.textContent = `${data.calculo.tipo} | ${data.calculo.detalhe}`;
-        } else {
-            spanDose.textContent = "Consultar Nota Clínica";
-            spanDose.style.color = "#555";
-            spanDetalhe.textContent = "";
-        }
+        // Nova Data Fim = Hoje + Duração Antiga
+        const novaDataFim = new Date();
+        novaDataFim.setDate(hoje.getDate() + duracaoDias);
+        const endStr = novaDataFim.toISOString().split('T')[0];
 
-        if (data.alertas && data.alertas.length > 0) {
-            data.alertas.forEach(msg => {
-                const div = document.createElement('div');
-                div.style.cssText = "background:#fff3cd; color:#856404; padding:10px; border-radius:6px; border:1px solid #ffeeba; font-size:0.9rem;";
-                div.textContent = msg;
-                listaAlertas.appendChild(div);
-            });
-        }
+        // Inserir nos inputs
+        if(document.getElementById("startDate")) document.getElementById("startDate").value = startStr;
+        if(document.getElementById("endDate")) document.getElementById("endDate").value = endStr;
 
-    } catch (err) {
-        console.error(err);
-        alert("Erro ao calcular. Verifique se o servidor Python está a correr.");
-        const btn = document.querySelector('#modal-calculadora .btn-primary');
-        if(btn) { btn.disabled = false; btn.textContent = "Calcular"; }
+        // Feedback visual
+        // alert(`Dados carregados para renovação de: ${item.commercial_name}`);
+
+    } catch (e) {
+        console.error("Erro ao renovar:", e);
+        alert("Não foi possível carregar os dados para renovação.");
     }
-};
+}

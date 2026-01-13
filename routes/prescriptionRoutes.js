@@ -14,7 +14,7 @@ router.get('/my-prescriptions', verifyToken, prescriptionController.getMyPrescri
 router.get('/:id/details', verifyToken, prescriptionController.getPrescriptionDetails);
 router.put('/:id/cancel', verifyToken, prescriptionController.cancelPrescription);
 router.post('/check-interactions', verifyToken, prescriptionController.checkInteractions);
-router.post('/calculate-dosage', verifyToken, cdssController.calculateDosage);
+
 // Rota de criar prescrição (PROTEGIDA pelo verifyToken)
 router.post('/', verifyToken, prescriptionController.createPrescription);
 
