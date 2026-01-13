@@ -2,16 +2,14 @@ const db = require('../config/db');
 
 // --- FUNÇÕES AUXILIARES (Gerar Códigos) ---
 function gerarNumeroReceita() {
-    // Gera 13 dígitos aleatórios (simulação)
     return Math.floor(Math.random() * 1000000000000).toString().padStart(13, '0');
 }
 
 function gerarCodigoAcesso() {
-    // Gera 4 dígitos aleatórios
     return Math.floor(Math.random() * 10000).toString().padStart(4, '0');
 }
 
-// 1. Pesquisa de Medicamentos (Autocomplete)
+// 1. Pesquisa de Medicamentos
 exports.searchMeds = async (req, res) => {
     const termo = req.query.term ? `%${req.query.term}%` : '%';
     try {
@@ -29,7 +27,7 @@ exports.searchMeds = async (req, res) => {
     }
 };
 
-// 2. Buscar Variações por Nome Exato
+// 2. Buscar Variações
 exports.getVariations = async (req, res) => {
     const { name } = req.query;
     if (!name) return res.status(400).json([]);
@@ -49,11 +47,9 @@ exports.getVariations = async (req, res) => {
     }
 };
 
-// 3. Criar Prescrição (CORRIGIDO)
+// 3. Criar Prescrição (CORRIGIDO: 'ativo')
 exports.createPrescription = async (req, res) => {
-    // Recebe justificacao do frontend
     const { patient_id, items, notes, justificacao } = req.body;
-    
     const authUserId = req.user.id_user; 
 
     if (!items || items.length === 0) {
@@ -70,112 +66,19 @@ exports.createPrescription = async (req, res) => {
         const resDoctor = await client.query(queryDoctor, [authUserId]);
 
         if (resDoctor.rows.length === 0) {
-            throw new Error("Perfil de médico não encontrado para este utilizador.");
-        }
-        const doctor_id = resDoctor.rows[0].id; 
-        
-        // --- CORREÇÃO DO ERRO ---
-        // Temos de gerar os números aqui antes de usar na Query
-        const novoNumeroReceita = gerarNumeroReceita();
-        const novoCodigoAcesso = gerarCodigoAcesso();
-        // ------------------------
-
-        // 2. Inserir Cabeçalho (Com Justificação e Códigos Gerados)
-        const queryHeader = `
-            INSERT INTO Prescription 
-            (patient_id, doctor_id, prescription_date, notes, status, prescription_number, access_code, justificacao) 
-            VALUES ($1, $2, NOW(), $3, 'active', $4, $5, $6) 
-            RETURNING id, prescription_number, access_code
-        `;
-        
-        const resHeader = await client.query(queryHeader, [
-            patient_id, 
-            doctor_id, 
-            notes, 
-            novoNumeroReceita,  // $4
-            novoCodigoAcesso,   // $5
-            justificacao || null // $6 (Pode ser null se não houver conflito)
-        ]);
-
-        const { id: prescricaoId, prescription_number, access_code } = resHeader.rows[0];
-
-        // 3. Inserir Itens
-        const queryItem = `
-            INSERT INTO Prescription_item 
-            (prescription_id, medication_id, dose, instructions, quantity, start_date, end_date, regularidade, form_factor) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-        `;
-
-        for (const item of items) {
-            await client.query(queryItem, [
-                prescricaoId,
-                item.medication_id || null, 
-                item.dose,
-                item.instructions,
-                item.quantity,
-                item.start_date,
-                item.end_date,
-                item.regularidade,
-                item.forma
-            ]);
-        }
-
-        await client.query('COMMIT');
-
-        res.status(201).json({
-            message: "Criado com sucesso",
-            data: { prescription_number, access_code }
-        });
-
-    } catch (error) {
-        await client.query('ROLLBACK');
-        console.error("Erro Prescrição:", error);
-        
-        if (error.message.includes("Perfil de médico")) {
-            return res.status(403).json({ message: error.message });
-        }
-        
-        res.status(500).json({ message: "Erro ao processar prescrição." });
-    } finally {
-        client.release();
-    }
-
-
-
-
-};// 3. Criar Prescrição 
-exports.createPrescription = async (req, res) => {
-    // Recebe justificacao do frontend
-    const { patient_id, items, notes, justificacao } = req.body;
-    
-    const authUserId = req.user.id_user; 
-
-    if (!items || items.length === 0) {
-        return res.status(400).json({ message: "Sem itens na prescrição." });
-    }
-
-    const client = await db.connect();
-
-    try {
-        await client.query('BEGIN');
-
-        // 1. Obter ID do médico
-        const queryDoctor = `SELECT id FROM Account WHERE id_user = $1`;
-        const resDoctor = await client.query(queryDoctor, [authUserId]);
-
-        if (resDoctor.rows.length === 0) {
-            throw new Error("Perfil de médico não encontrado para este utilizador.");
+            throw new Error("Perfil de médico não encontrado.");
         }
         const doctor_id = resDoctor.rows[0].id; 
         
         const novoNumeroReceita = gerarNumeroReceita();
         const novoCodigoAcesso = gerarCodigoAcesso();
 
-        // 2. Inserir Cabeçalho
+        // 2. Inserir Cabeçalho da Prescrição
+        // IMPORTANTE: Status 'ativo'
         const queryHeader = `
             INSERT INTO Prescription 
             (patient_id, doctor_id, prescription_date, notes, status, prescription_number, access_code, justificacao) 
-            VALUES ($1, $2, NOW(), $3, 'active', $4, $5, $6) 
+            VALUES ($1, $2, NOW(), $3, 'ativo', $4, $5, $6) 
             RETURNING id, prescription_number, access_code
         `;
         
@@ -190,22 +93,23 @@ exports.createPrescription = async (req, res) => {
 
         const { id: prescricaoId, prescription_number, access_code } = resHeader.rows[0];
 
-        // 3. Inserir Itens E Atualizar Histórico
+        // 3. Preparar Queries
         const queryItem = `
             INSERT INTO Prescription_item 
             (prescription_id, medication_id, dose, instructions, quantity, start_date, end_date, regularidade, form_factor) 
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         `;
 
-        // Query para adicionar ao Histórico de Medicação do Utente
+        // 4. Inserir no Histórico (CORREÇÃO CRÍTICA AQUI)
+        // O erro estava aqui: enviávamos 'active', agora enviamos 'ativo'
         const queryHistory = `
             INSERT INTO Patient_Medication_History
             (person_id, medication_name, start_date, end_date, status, source, notes)
-            VALUES ($1, $2, CURRENT_DATE, $3, 'active', 'prescrito', $4)
+            VALUES ($1, $2, CURRENT_DATE, $3, 'ativo', 'prescrito', $4)
         `;
 
         for (const item of items) {
-            // A. Insere na Prescrição
+            // Inserir Item
             await client.query(queryItem, [
                 prescricaoId,
                 item.medication_id || null, 
@@ -218,20 +122,19 @@ exports.createPrescription = async (req, res) => {
                 item.forma
             ]);
 
-            // B. Insere no Histórico (Sincronização Automática)
-            // Assumindo que item.medication_name vem do frontend, ou usamos um fallback
+            // Inserir Histórico
             await client.query(queryHistory, [
                 patient_id,
-                item.medication_name || "Medicamento ID " + item.medication_id, // Nome do medicamento
-                item.end_date, // Data fim
-                `Prescrito via receita nº ${novoNumeroReceita}. ${item.instructions || ''}` // Notas
+                item.medication_name || "Medicamento ID " + item.medication_id, 
+                item.end_date, 
+                `Receita nº ${novoNumeroReceita}. ${item.instructions || ''}`
             ]);
         }
 
         await client.query('COMMIT');
 
         res.status(201).json({
-            message: "Criado com sucesso",
+            message: "Prescrição criada com sucesso",
             data: { prescription_number, access_code }
         });
 
@@ -239,10 +142,10 @@ exports.createPrescription = async (req, res) => {
         await client.query('ROLLBACK');
         console.error("Erro Prescrição:", error);
         
-        if (error.message.includes("Perfil de médico")) {
-            return res.status(403).json({ message: error.message });
+        if (error.code === '22P02') {
+             // Detalha o erro de ENUM para ajudar no debug
+            return res.status(500).json({ message: "Erro de Base de Dados: Status inválido (ENUM)." });
         }
-        
         res.status(500).json({ message: "Erro ao processar prescrição." });
     } finally {
         client.release();
@@ -281,7 +184,7 @@ exports.getPatientById = async (req, res) => {
     }
 };
 
-// 6. Listar Prescrições do Médico Logado (Atualizado com nomes dos medicamentos)
+// 6. Listar Prescrições
 exports.getMyPrescriptions = async (req, res) => {
     const authUserId = req.user.id_user; 
 
@@ -303,15 +206,17 @@ exports.getMyPrescriptions = async (req, res) => {
                 TO_CHAR(p.prescription_date, 'DD/MM/YYYY') as data_formatada,
                 p.status, 
                 per.name as nome_paciente,
+                p.patient_id,
                 p.access_code,
-                STRING_AGG(mc.commercial_name, ', ') as lista_medicamentos
+                STRING_AGG(mc.commercial_name, ', ') as lista_medicamentos,
+                MAX(pi.end_date) as data_fim
             FROM Prescription p
             JOIN Person per ON p.patient_id = per.id
             LEFT JOIN Prescription_item pi ON p.id = pi.prescription_id
             LEFT JOIN Medication_catalog mc ON pi.medication_id = mc.id
             WHERE p.doctor_id = $1
-            GROUP BY p.id, per.name, p.prescription_date, p.status, p.prescription_number, p.access_code
-            ORDER BY p.created_at DESC
+            GROUP BY p.id, per.name, p.patient_id, p.prescription_date, p.status, p.prescription_number, p.access_code
+            ORDER BY p.prescription_date DESC
         `;
         
         const { rows } = await client.query(queryList, [doctorId]);
@@ -324,7 +229,7 @@ exports.getMyPrescriptions = async (req, res) => {
     }
 };
 
-// 7. Obter Detalhes Completos
+// 7. Detalhes
 exports.getPrescriptionDetails = async (req, res) => {
     const { id } = req.params;
     try {
@@ -353,14 +258,12 @@ exports.getPrescriptionDetails = async (req, res) => {
     }
 };
 
-// 8. Anular Prescrição (Com Justificativa)
+// 8. Anular
 exports.cancelPrescription = async (req, res) => {
     const { id } = req.params;
     const { reason } = req.body;
 
-    if (!reason) {
-        return res.status(400).json({ message: "É obrigatório indicar uma justificativa para anular." });
-    }
+    if (!reason) return res.status(400).json({ message: "Justificativa obrigatória." });
 
     try {
         const query = `
@@ -371,47 +274,37 @@ exports.cancelPrescription = async (req, res) => {
         `;
         const result = await db.query(query, [id, reason]);
 
-        if (result.rows.length === 0) return res.status(404).json({ message: "Prescrição não encontrada" });
+        if (result.rows.length === 0) return res.status(404).json({ message: "Não encontrada" });
 
-        res.json({ message: "Prescrição anulada com sucesso.", status: 'cancelled' });
+        res.json({ message: "Anulada com sucesso.", status: 'cancelled' });
     } catch (error) {
         console.error("Erro Anular:", error);
-        res.status(500).json({ message: "Erro ao anular prescrição." });
+        res.status(500).json({ message: "Erro ao anular." });
     }
 };
 
-// 9. Verificar Interações (SAD)
+// 9. Interações
 exports.checkInteractions = async (req, res) => {
     const { patient_id, new_meds_ids } = req.body;
-
-    if (!new_meds_ids || new_meds_ids.length === 0) {
-        return res.json([]);
-    }
+    if (!new_meds_ids || new_meds_ids.length === 0) return res.json([]);
 
     try {
         const client = await db.connect();
-
-        // 1. Medicamentos Ativos do Paciente
-        const queryActive = `
-            SELECT pi.medication_id
-            FROM Prescription p
+        const queryAtivo = `
+            SELECT pi.medication_id FROM Prescription p
             JOIN Prescription_item pi ON p.id = pi.prescription_id
-            WHERE p.patient_id = $1 
-              AND p.status = 'active'
-              AND pi.end_date >= CURRENT_DATE
+            WHERE p.patient_id = $1 AND p.status = 'ativo' AND pi.end_date >= CURRENT_DATE
         `;
-        const resActive = await client.query(queryActive, [patient_id]);
-        const activeMedsIds = resActive.rows.map(r => r.medication_id);
+        const resAtivo = await client.query(queryAtivo, [patient_id]);
+        const ativoMedsIds = resAtivo.rows.map(r => r.medication_id);
 
-        // 2. Juntar tudo (Novos + Antigos)
-        const allMedsToCheck = [...new Set([...activeMedsIds, ...new_meds_ids])].filter(id => id);
+        const allMedsToCheck = [...new Set([...ativoMedsIds, ...new_meds_ids])].filter(id => id);
 
         if (allMedsToCheck.length < 2) {
             client.release();
             return res.json([]);
         }
 
-        // 3. Verificar Regras
         const queryInteractions = `
             WITH MedsIngredients AS (
                 SELECT c.id_medication, c.id_active_ingredient, m.commercial_name
@@ -419,11 +312,7 @@ exports.checkInteractions = async (req, res) => {
                 JOIN Medication_catalog m ON c.id_medication = m.id
                 WHERE c.id_medication = ANY($1::int[])
             )
-            SELECT DISTINCT
-                r.severity,
-                r.message,
-                m1.commercial_name as medicamento_1,
-                m2.commercial_name as medicamento_2
+            SELECT DISTINCT r.severity, r.message, m1.commercial_name as medicamento_1, m2.commercial_name as medicamento_2
             FROM Interaction_component ic
             JOIN Interaction_Rule r ON ic.rule_id = r.id
             JOIN MedsIngredients m1 ON m1.id_active_ingredient = ic.pa_id_1
@@ -433,11 +322,10 @@ exports.checkInteractions = async (req, res) => {
 
         const { rows } = await client.query(queryInteractions, [allMedsToCheck]);
         client.release();
-
         res.json(rows);
 
     } catch (error) {
-        console.error("Erro Check Interactions:", error);
+        console.error("Erro Interações:", error);
         res.status(500).json({ message: "Erro ao verificar interações." });
     }
 };

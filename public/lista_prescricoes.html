@@ -27,12 +27,28 @@
         </aside>
 
         <main class="main-content">
-            <header class="header-banner">
-                <h1>As Minhas Prescrições</h1>
-                <a href="prescricoes.html" class="btn-primary">
-                    <i class="fa-solid fa-plus"></i> Nova Prescrição
-                </a>
-            </header>
+            <div class="header-banner">
+    <h1>Minhas Prescrições</h1>
+    
+    <div style="display:flex; gap:15px; align-items:center;">
+        
+        <a href="prescricoes.html" class="btn-primary" style="text-decoration:none; display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-plus"></i> Nova Receita
+        </a>
+
+        <div class="sort-wrapper">
+            <select id="filtroPrescricoes" onchange="aplicarFiltro()" style="padding: 10px; border-radius: 12px; border: 1px solid #ccc; cursor:pointer; outline:none;">
+                <option value="recent">Mais Recentes</option>
+                <option value="expiring">Quase a Expirar</option>
+                <option value="inactive">Inativos / Histórico</option>
+            </select>
+        </div>
+
+        <div class="search-wrapper">
+            <input type="text" id="inputPesquisa" placeholder="Pesquisar..." style="padding: 10px 15px; border-radius: 12px; border: 1px solid #ddd; outline: none;">
+        </div>
+    </div>
+</div>
 
             <div class="content-card">
                 <table id="tabela-prescricoes">
