@@ -320,21 +320,93 @@ function limparFormularioMedicamento() {
     variacoesAtuais = [];
 }
 
-// --- SUBMETER ---
+// --- SUBMETER PRESCRIÇÃO (COM BLOQUEIO DE INTERAÇÕES) ---
 async function submeterPrescricao() {
     const patientId = document.getElementById('patient_id_input').value;
     const notes = document.getElementById('justification-box') ? document.getElementById('justification-box').value : "";
-    const inputJustificacao = document.getElementById('input-justificacao-clinica');
+    const inputJustificacao = document.getElementById('input-justificacao-clinica'); // Campo da justificação obrigatória
     const btn = document.getElementById('btn-submit-prescription');
+    
+    // Elementos do Alerta
+    const alertBox = document.getElementById('interaction-alert-box'); // Certifica-te que tens esta div no HTML
+    const alertList = document.getElementById('interaction-list');
 
+    // 1. Validações Básicas
     if (!patientId) { alert("Erro: Nenhum utente selecionado."); return; }
     if (listaMedicamentos.length === 0) { alert("A prescrição está vazia."); return; }
 
     const token = localStorage.getItem('medico_token');
+    
+    // Feedback visual
+    const textoOriginal = btn.textContent;
     btn.disabled = true;
-    btn.textContent = "A gravar...";
+    btn.textContent = "A verificar interações...";
 
     try {
+        // 2. Verificar Interações (Chamada à API)
+        // Extrair apenas os IDs dos medicamentos novos
+        const novosMedsIds = listaMedicamentos.map(m => m.medication_id).filter(id => id);
+        
+        console.log("A verificar interações para:", novosMedsIds);
+
+        const resCheck = await fetch('/api/prescricoes/check-interactions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify({ patient_id: patientId, new_meds_ids: novosMedsIds })
+        });
+
+        const interacoes = await resCheck.json();
+        console.log("Interações detetadas:", interacoes);
+
+        // 3. Lógica de Bloqueio
+        const temInteracoes = interacoes && interacoes.length > 0;
+        const temJustificacao = inputJustificacao && inputJustificacao.value.trim().length > 0;
+
+        // SE houver interações E NÃO houver justificação -> BLOQUEIA
+        if (temInteracoes && !temJustificacao) {
+            
+            // Mostra a caixa de alerta (se existir no HTML)
+            if (alertBox && alertList) {
+                alertBox.style.display = 'block';
+                alertList.innerHTML = ''; // Limpa alertas anteriores
+                
+                interacoes.forEach(i => {
+                    const div = document.createElement('div');
+                    div.className = 'alert-item'; // Podes dar estilo CSS a isto
+                    div.style.cssText = "background: #ffebee; color: #c62828; padding: 10px; margin-bottom: 5px; border-left: 5px solid #c62828;";
+                    div.innerHTML = `
+                        <strong>⚠️ INTERAÇÃO GRAVE (${i.severity})</strong><br>
+                        Entre: <b>${i.medicamento_1}</b> e <b>${i.medicamento_2}</b><br>
+                        <small>${i.message}</small>
+                    `;
+                    alertList.appendChild(div);
+                });
+            } else {
+                // Fallback se não tiveres a DIV de alerta
+                let msg = " ATENÇÃO: Interações detetadas!\n\n";
+                interacoes.forEach(i => msg += `- ${i.medicamento_1} + ${i.medicamento_2}: ${i.message}\n`);
+                msg += "\nÉ OBRIGATÓRIO preencher o campo 'Justificação Clínica' para prosseguir.";
+                alert(msg);
+            }
+
+            // Destaca o campo de justificação
+            if(inputJustificacao) {
+                inputJustificacao.style.border = "2px solid red";
+                inputJustificacao.focus();
+            }
+
+            // Muda o botão para vermelho
+            btn.disabled = false;
+            btn.textContent = " Confirmar com Justificação";
+            btn.style.backgroundColor = "#d32f2f"; 
+            
+            // IMPORTANTE: O return aqui impede a prescrição de ser gravada!
+            return; 
+        }
+
+        // 4. Se chegou aqui, ou não tem interações, ou já justificou.
+        btn.textContent = "A gravar...";
+
         const res = await fetch('/api/prescricoes', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
@@ -342,23 +414,26 @@ async function submeterPrescricao() {
                 patient_id: patientId,
                 notes: notes,
                 items: listaMedicamentos,
-                justificacao: inputJustificacao ? inputJustificacao.value : ""
+                justificacao: temJustificacao ? inputJustificacao.value : "" 
             })
         });
 
         const result = await res.json();
+        
         if (res.ok) {
             alert(`✅ Sucesso! Receita Nº: ${result.data.prescription_number}`);
             window.location.href = 'lista_prescricoes.html'; 
         } else {
-            alert("Erro: " + result.message);
+            alert("Erro ao gravar: " + result.message);
             btn.disabled = false;
-            btn.textContent = "✅ Emitir Prescrição";
+            btn.textContent = textoOriginal;
         }
+
     } catch (err) {
-        console.error(err);
-        alert("Erro técnico.");
+        console.error("Erro no processo:", err);
+        alert("Erro técnico ao verificar interações ou gravar.");
         btn.disabled = false;
+        btn.textContent = textoOriginal;
     }
 }
 
