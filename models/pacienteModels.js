@@ -47,8 +47,6 @@ const getMyAppointments = async (personId) => {
     return result.rows;
 };
 // Obter Prescrições
-// models/pacienteModels.js
-
 const getMyPrescriptions = async (personId) => {
     const query = `
         SELECT 
