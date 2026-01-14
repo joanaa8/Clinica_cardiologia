@@ -525,3 +525,106 @@ body, html {
     margin: 5px 0 0 0; /* Espaçamento para as instruções */
     color: #333;
 }
+/* --- ESTILOS DO MODAL (JANELA) --- */
+.modal {
+    display: none; /* Escondido por defeito */
+    position: fixed;
+    z-index: 2000; /* Fica por cima de tudo */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(13, 26, 38, 0.7); /* Fundo escuro azulado */
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(3px);
+}
+
+.modal-conteudo {
+    background-color: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 95%;
+    max-width: 600px;
+    
+    /* SCROLL INTERNO */
+    max-height: 90vh;
+    overflow-y: auto;
+    
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    position: relative;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.fechar-modal {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    color: #999;
+    cursor: pointer;
+    font-weight: bold;
+}
+.fechar-modal:hover { color: var(--cor-alerta); }
+
+/* Detalhes Internos */
+.modal-header-custom {
+    margin-bottom: 15px;
+    padding-right: 30px;
+}
+.modal-header-custom h2 { color: var(--cor-primaria); margin-bottom: 5px; }
+
+.dose-tag {
+    background: #f0f2f5; color: #555; 
+    padding: 2px 8px; border-radius: 6px; font-size: 0.9rem; font-weight: 600;
+}
+
+.modal-status-bar {
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.modal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.info-group label {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+}
+
+.info-group strong, .info-group span {
+    color: var(--cor-primaria);
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.modal-divider {
+    border: 0; border-top: 1px solid #eee; margin: 20px 0;
+}
+
+.modal-section h3 {
+    font-size: 1rem; color: var(--cor-primaria); margin-bottom: 10px;
+}
+
+.instrucoes-box {
+    background-color: #e0f7fa; /* Fundo ciano muito claro */
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid var(--cor-secundaria);
+    color: #006064;
+    line-height: 1.5;
+}

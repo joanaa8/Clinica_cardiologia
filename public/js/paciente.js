@@ -4,11 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. SEGURANÇA E AUTH
     // =========================================================
     
-    // MUDANÇA: Usar um nome de token específico para o paciente
     const token = localStorage.getItem('paciente_token');
 
     if (!token) {
-        window.location.href = 'index.html'; // Garante que tens um index.html de login
+        window.location.href = 'index.html'; 
         return;
     }
 
@@ -24,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.status === 401 || response.status === 403) {
                 alert("A sua sessão expirou. Por favor, faça login novamente.");
-                localStorage.removeItem('paciente_token'); // Remover o token correto
+                localStorage.removeItem('paciente_token'); 
                 window.location.href = 'index.html';
                 return null;
             }
@@ -36,11 +35,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // ... (CÓDIGO DE NAVEGAÇÃO SPA MANTÉM-SE IGUAL) ...
-    // Vou omitir a parte da Navegação (Alternar Aba) pois está correta no teu original
-    // Basta manteres o código das abas aqui.
+    // =========================================================
+    // 2. NAVEGAÇÃO
+    // =========================================================
 
-   const setupNavigation = () => {
+    const setupNavigation = () => {
         const links = [
             { id: 'link-perfil', view: 'view-perfil' },
             { id: 'link-consultas', view: 'view-consultas', loadFunc: carregarConsultas },
@@ -53,22 +52,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (linkElement) {
                 linkElement.addEventListener('click', (e) => {
                     e.preventDefault();
-
-                    // 1. Remover classe 'active' de todos os links
                     document.querySelectorAll('.sidebar nav ul li a').forEach(a => a.classList.remove('active'));
-                    // 2. Adicionar 'active' ao clicado
                     linkElement.classList.add('active');
 
-                    // 3. Esconder todas as views
                     document.getElementById('view-perfil').classList.add('hidden');
                     document.getElementById('view-consultas').classList.add('hidden');
                     document.getElementById('view-prescricoes').classList.add('hidden');
 
-                    // 4. Mostrar a view desejada
                     const viewAlvo = document.getElementById(linkObj.view);
                     viewAlvo.classList.remove('hidden');
 
-                    // 5. Carregar dados específicos se necessário (para não carregar tudo no início)
                     if (linkObj.loadFunc) {
                         linkObj.loadFunc();
                     }
@@ -88,22 +81,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const getIniciais = (nomeCompleto) => {
         if (!nomeCompleto) return "EU";
-        const nomes = nomeCompleto.trim().split(/\s+/); // Divide por espaços
+        const nomes = nomeCompleto.trim().split(/\s+/); 
         if (nomes.length === 1) return nomes[0].charAt(0).toUpperCase();
         
         const primeiraLetra = nomes[0].charAt(0);
         const ultimaLetra = nomes[nomes.length - 1].charAt(0);
         return (primeiraLetra + ultimaLetra).toUpperCase();
     };
+
     // --- A. PERFIL COMPLETO ---
     const carregarPerfil = async () => {
         const dados = await fetchAPI('/api/paciente/perfil');
-        
         if (!dados) return;
 
         document.getElementById('nomeUtente').textContent = safeText(dados.name);
         document.getElementById('nome-lateral').textContent = safeText(dados.name);
-
         document.getElementById('sidebar-avatar').textContent = getIniciais(dados.name);
 
         document.getElementById('numUtente').textContent = safeText(dados.health_number);
@@ -120,7 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('peso').textContent = safeText(dados.weight_kg, " kg");
         document.getElementById('altura').textContent = safeText(dados.height_cm, " cm");
 
-        // ... (Lógica de Alergias e Problemas mantém-se igual) ...
         const listaAlergias = document.getElementById('listaAlergias');
         listaAlergias.innerHTML = ''; 
         if (dados.alergias && dados.alergias.length > 0) {
@@ -137,29 +128,29 @@ document.addEventListener('DOMContentLoaded', () => {
         listaProblemas.innerHTML = '';
         if (dados.problemas && dados.problemas.length > 0) {
             dados.problemas.forEach(prob => {
-             const li = document.createElement('li');
-            li.className = "problem-item"; // Adicionei uma classe para estilizar
-            const cid = prob.cid_code || 'N/A';
-            const snomed = prob.snomed_ct || 'N/A';
-                
-            li.innerHTML = `
-                <div class="prob-header">
-                    <strong>${prob.description}</strong>
-                    <div class="prob-badges">
-                        <span class="status-badge ${prob.problem_type}">${prob.problem_type}</span>
-                        <span class="status-badge ${prob.status}">${prob.status}</span>
+                const li = document.createElement('li');
+                li.className = "problem-item";
+                const cid = prob.cid_code || 'N/A';
+                const snomed = prob.snomed_ct || 'N/A';
+                    
+                li.innerHTML = `
+                    <div class="prob-header">
+                        <strong>${prob.description}</strong>
+                        <div class="prob-badges">
+                            <span class="status-badge ${prob.problem_type}">${prob.problem_type}</span>
+                            <span class="status-badge ${prob.status}">${prob.status}</span>
+                        </div>
                     </div>
-                </div>
-                <div class="prob-codes">
-                    <small><strong>CID:</strong> ${cid}</small>
-                    <small><strong>SNOMED:</strong> ${snomed}</small>
-                </div>
-            `;
-            listaProblemas.appendChild(li);   
-        });
-    } else {
-         listaProblemas.innerHTML = '<li>Nenhum problema ativo.</li>';
-    }
+                    <div class="prob-codes">
+                        <small><strong>CID:</strong> ${cid}</small>
+                        <small><strong>SNOMED:</strong> ${snomed}</small>
+                    </div>
+                `;
+                listaProblemas.appendChild(li);   
+            });
+        } else {
+             listaProblemas.innerHTML = '<li>Nenhum problema ativo.</li>';
+        }
     };
 
     // --- B. CONSULTAS ---
@@ -179,10 +170,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 : '--/--/----';
 
             let statusClass = 'agendada';
-            // Ajustar status para bater certo com o ENUM do SQL ('scheduled', 'completed','cancelled')
             if (c.status === 'cancelled') statusClass = 'cancelada'; 
             if (c.status === 'completed') statusClass = 'completa';
-            // Se o status for 'scheduled', usa a classe default 'agendada'
 
             const row = `
                 <tr>
@@ -195,52 +184,48 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    // --- C. PRESCRIÇÕES (MODIFICADO PARA SUPORTAR CLIQUE) ---
+    const carregarPrescricoes = async () => {
+        const receitas = await fetchAPI('/api/paciente/prescricoes'); 
+        const container = document.getElementById('listaPrescricoes');
+        container.innerHTML = ''; 
 
-    // --- C. PRESCRIÇÕES ---
-const carregarPrescricoes = async () => {
-    // A tua API tem de devolver: start_date, end_date, quantity, regularidade, instructions, etc.
-    const receitas = await fetchAPI('/api/paciente/prescricoes'); 
-    const container = document.getElementById('listaPrescricoes');
-    container.innerHTML = ''; 
+        if (!receitas || receitas.length === 0) {
+            container.innerHTML = '<p style="padding: 20px; text-align: center;">Sem prescrições registadas.</p>';
+            return;
+        }
 
-    if (!receitas || receitas.length === 0) {
-        container.innerHTML = '<p style="padding: 20px; text-align: center;">Sem prescrições registadas.</p>';
-        return;
-    }
+        receitas.forEach(r => {
+            // Formatar datas
+            const dataEmissao = r.prescription_date ? new Date(r.prescription_date).toLocaleDateString('pt-PT') : '--/--/----';
+            const dataValidade = r.end_date ? new Date(r.end_date).toLocaleDateString('pt-PT') : '--/--/----';
 
-    receitas.forEach(r => {
-        // --- AQUI ESTÁ A CORRESPONDÊNCIA QUE PEDISTE ---
-        // start_date -> Data de Emissão
-        const dataEmissao = r.start_date 
-            ? new Date(r.start_date).toLocaleDateString('pt-PT') 
-            : '--/--/----';
+            // Definir classes de cor para o estado
+            let statusClass = 'ativo';
+            let statusTexto = 'Ativa';
             
-        // end_date -> Data de Validade
-        const dataValidade = r.end_date 
-            ? new Date(r.end_date).toLocaleDateString('pt-PT') 
-            : '--/--/----';
-        // ------------------------------------------------
+            if (r.status === 'expired') { statusClass = 'expirado'; statusTexto = 'Expirada'; }
+            if (r.status === 'cancelled') { statusClass = 'cancelada'; statusTexto = 'Cancelada'; }
+            if (r.status === 'completed') { statusClass = 'completa'; statusTexto = 'Dispensada'; }
 
-        // Define a cor do status
-        let statusClass = 'ativo';
-        if (r.status === 'expired') statusClass = 'expirado';
-        if (r.status === 'cancelled') statusClass = 'cancelada';
-        if (r.status === 'completed') statusClass = 'completa';
+            // CRIAÇÃO DO ELEMENTO (Em vez de string, para permitir o click)
+            const card = document.createElement('div');
+            card.className = 'presc-card';
+            card.style.cursor = 'pointer'; // Cursor de clique
 
-        const cardHTML = `
-            <div class="presc-card">
+            card.innerHTML = `
                 <div class="presc-top">
                     <div class="med-info">
                         <h3>${r.medication_name || 'Medicamento'}</h3>
-                        <span class="dose-badge">${r.dose || ''}</span>
+                        <span class="dose-badge">${r.dosage || ''}</span>
                     </div>
-                    <span class="status-badge ${statusClass}">${r.status}</span>
+                    <span class="status-badge ${statusClass}">${statusTexto}</span>
                 </div>
 
                 <div class="presc-details">
                     <div class="detail-group">
                         <small>Médico</small>
-                        <strong>${r.doctor_name || 'N/A'}</strong>
+                        <strong>${r.doctor_name || 'Desconhecido'}</strong>
                     </div>
 
                     <div class="detail-group">
@@ -255,35 +240,85 @@ const carregarPrescricoes = async () => {
 
                     <div class="detail-group">
                         <small>Quantidade</small>
-                        <strong>${r.quantity || '1'} Emb.</strong>
+                        <strong>${r.quantity || '1'} Unid.</strong>
                     </div>
 
                     <div class="detail-group">
-                        <small>Regularidade</small>
-                        <strong style="text-transform: capitalize;">${r.regularidade || 'N/A'}</strong>
+                        <small>Forma</small>
+                        <strong style="text-transform: capitalize;">${r.form_factor || '-'}</strong>
                     </div>
                 </div>
 
                 <div class="presc-notes">
                     <strong>Instruções:</strong>
-                    <p>${r.instructions || 'Seguir indicações médicas.'}</p>
-                    
-                    ${r.notes ? `<p style="margin-top:5px; font-size:0.9em; color:#666"><em>Nota: ${r.notes}</em></p>` : ''}
+                    <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;">
+                        ${r.instructions || 'Seguir indicações médicas.'}
+                    </p>
+                    <div style="margin-top:10px; color:var(--cor-secundaria); font-size:0.85rem; font-weight:bold;">
+                        <i class="fa-solid fa-eye"></i> Ver detalhes completos
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
 
-        container.innerHTML += cardHTML;
-    });
-};
+            // ADICIONAR EVENTO DE CLIQUE
+            card.addEventListener('click', () => abrirModalPrescricao(r, statusTexto, statusClass, dataEmissao, dataValidade));
+
+            container.appendChild(card);
+        });
+    };
+
+    // --- FUNÇÃO PARA ABRIR O MODAL (ADICIONADA) ---
+    function abrirModalPrescricao(r, statusTexto, statusClass, dataEmissao, dataValidade) {
+        const modal = document.getElementById('modal-prescricao');
+        if(!modal) return; 
+
+        // Preencher os campos
+        document.getElementById('m-nome').textContent = r.medication_name || 'Sem nome';
+        document.getElementById('m-dose').textContent = r.dosage || '-';
+        
+        const elStatus = document.getElementById('m-status');
+        elStatus.textContent = statusTexto;
+        elStatus.className = `status-badge ${statusClass}`; 
+
+        document.getElementById('m-medico').textContent = r.doctor_name || 'Desconhecido';
+        document.getElementById('m-qtd').textContent = (r.quantity || '1') + ' Embalagem(ns)';
+        document.getElementById('m-data-emissao').textContent = dataEmissao;
+        document.getElementById('m-data-validade').textContent = dataValidade;
+        document.getElementById('m-forma').textContent = r.form_factor || 'Não especificado';
+        
+        document.getElementById('m-instrucoes').textContent = r.instructions || 'Sem instruções especiais.';
+
+        // Mostrar notas apenas se existirem
+        const boxNotas = document.getElementById('box-notas');
+        if (r.notes) {
+            document.getElementById('m-notas').textContent = r.notes;
+            boxNotas.style.display = 'block';
+        } else {
+            boxNotas.style.display = 'none';
+        }
+
+        // Mostrar o modal
+        modal.style.display = 'flex';
+
+        // Lógica de fechar
+        const spanFechar = modal.querySelector('.fechar-modal');
+        if(spanFechar) spanFechar.onclick = () => modal.style.display = 'none';
+
+        window.onclick = (event) => {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    }
 
     const btnLogout = document.getElementById('logoutBtn');
     if (btnLogout) {
         btnLogout.addEventListener('click', () => {
-            localStorage.removeItem('paciente_token'); // Correção do nome
+            localStorage.removeItem('paciente_token'); 
             window.location.href = 'index.html';
         });
     }
+
     setupNavigation();
     carregarPerfil();
 });

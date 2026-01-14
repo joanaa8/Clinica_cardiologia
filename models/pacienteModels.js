@@ -47,19 +47,44 @@ const getMyAppointments = async (personId) => {
     return result.rows;
 };
 // Obter Prescrições
+// models/pacienteModels.js
+
 const getMyPrescriptions = async (personId) => {
     const query = `
-        SELECT pr.id, pr.patient_id, pr.doctor_id, pr.status, pr.prescription_date, pr.notes, pr.justificacao
+        SELECT 
+            pr.id, 
+            pr.status, 
+            pr.prescription_date, 
+            pr.notes,
+            
+            -- ESTA LINHA É A QUE FALTAVA PARA O NOME DO MÉDICO:
+            acc.name as doctor_name, 
+
+            -- Dados do Medicamento e Item
+            mc.commercial_name as medication_name, 
+            mc.dosage,
+            mc.form_factor,
+            pi.end_date,
+            pi.quantity,
+            pi.instructions
+            
         FROM Prescription pr
-        JOIN Account m ON pr.doctor_id = m.id
-        JOIN Person p ON pr.patient_id = p.id
-        WHERE p.id = $1
+        JOIN Account acc ON pr.doctor_id = acc.id  -- Liga à tabela de contas (Médicos)
+        JOIN Prescription_item pi ON pr.id = pi.prescription_id
+        JOIN Medication_catalog mc ON pi.medication_id = mc.id
+        WHERE pr.patient_id = $1
         ORDER BY pr.prescription_date DESC
     `;
-    // CORREÇÃO: Mudei de db.execute para db.query para ser consistente
-    const result = await db.query(query, [personId]); 
-    return result.rows;
+    
+    try {
+        const result = await db.query(query, [personId]); 
+        return result.rows;
+    } catch (err) {
+        console.error("Erro ao buscar prescrições:", err);
+        return [];
+    }
 };
+
 const findPatientByHealthNumber = async (healthNumber) => {
     // 1. Log para ver o que estamos a procurar (Ajuda a ver se há espaços em branco)
     console.log(`[MODEL] A procurar paciente na BD com Health Number: '${healthNumber}'`);
