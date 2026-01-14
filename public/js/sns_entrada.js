@@ -31,14 +31,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ username, password })
             });
 
+            // ... dentro do if(response.ok) ...
+
             if(response.ok){
                 //login correto 
                 const data = await response.json();
-                //guardar dados
+
+                // --- ADICIONA ESTAS 3 LINHAS (Isto é que faltava!) ---
+                sessionStorage.setItem('utenteId', data.userId);
+                sessionStorage.setItem('utenteNome', data.nome);
+                sessionStorage.setItem('utenteSaude', data.healthNumber);
+                // -----------------------------------------------------
 
                 window.location.href= '/sns_simulacao.html'; 
-                //redireciona para a pagina do ficheiro html 
-            }else {
+            }
+            else {
                 alert('Credenciais inválidas. Tente de novo.');
             }
         }catch(error){

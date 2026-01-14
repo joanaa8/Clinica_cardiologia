@@ -1,4 +1,4 @@
-const { PrescriptionSNSById } = require ('../models/sns_simulacaoModels.js');
+const PrescriptionSNSById = require ('../models/sns_simulacaoModels.js');
 
 const PrescriptionSNSController = {
     // Devolve a lista de prescrições  do utente que entrou no portal

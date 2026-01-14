@@ -2,66 +2,87 @@
 <html lang="pt">
 
     <head>
-        <meta charset="UTF-8">                                                                  <!--serve para permitir acentos-->
-        <meta http-equiv="X-UA-Compatible" content="IE-edge">                                   <!--compatibilidade com dispositivos de telemovel-->
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">  <!--controlo da tela, tag responsiva-->
+        <meta charset="UTF-8">                                                                  
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">                                   
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> 
         <title>Minhas Prescrições - SNS</title>
         <link rel="stylesheet" href="css/sns_simulacao.css"> 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> 
-        
     </head>
 
     <body>
 
         <div class="main-container">
         
-        <div class="card-id">
-            <div class="campo-id">Nome do utente: <span id="nome-exibido">ANDRÉ VICENTE</span></div>
-            <div class="campo-id">Número de saúde: <span id="n_saude-exibido">123 456 789</span></div>
-        </div>
-
-        <h2 class="titulo-pagina">Receitas</h2>
-
-        <div class="filtros">
-            <button class="btn-filtro ativo">Todas</button>
-            <button class="btn-filtro">Ativas</button>
-        </div>
-
-        <div class="seccao-info">Últimos 12 meses</div>
-
-        <div id="lista-receitas">
-
-            <div class="receita-card">
-                <div class="receita-nome">Paracetamol, 1000 mg, Comprimido, Blister - 20 unidade(s)</div>
-                <span class="status-tag">Dispensada</span>
-                <div class="receita-detalhes">
-                    <p>Data da prescrição: <span>13 dez 2025</span></p>
-                    <p>Prescritor: <span>RUI COSTA CUNHA</span></p>
-                </div>
+            <div class="card-id">
+                <div class="campo-id">Nome do utente: <span id="nome-exibido">A carregar...</span></div>
+                <div class="campo-id">Número de saúde: <span id="n_saude-exibido">...</span></div>
             </div>
 
-            <div class="receita-card">
-                <div class="receita-nome">Etinilestradiol + Etonogestrel [Ornibel], 0.015 mg/24 h + 0.12 mg/24 h, Sistema de libertação vaginal, Saqueta - 3 unidade(s)</div>
-                <span class="status-tag">Dispensada</span>
-                <div class="receita-detalhes">
-                    <p>Data da prescrição: <span>27 fev 2025</span></p>
-                    <p>Prescritor: <span>F. CARDOSO RICARDO</span></p>
-                </div>
+            <h2 class="titulo-pagina">Receitas</h2>
+
+            <div class="filtros">
+                <button class="btn-filtro ativo">Todas</button>
+                <button class="btn-filtro">Ativas</button>
             </div>
 
-            <div class="receita-card">
-                <div class="receita-nome">Fosfomicina, 3000 mg, Granulado para solução oral, Saqueta - 2 unidade(s)</div>
-                <span class="status-tag">Expirada</span>
-                <div class="receita-detalhes">
-                    <p>Data da prescrição: <span>19 jan 2025</span></p>
-                    <p>Prescritor: <span>CONSTANÇA LOURENÇO MONTEIRO</span></p>
-                </div>
+            <div class="seccao-info">Últimos 12 meses</div>
+
+            <div id="lista-receitas">
+                <p style="text-align: center; color: #666; margin-top: 20px;">A carregar prescrições...</p>
             </div>
 
         </div>
 
-    </div>
+        <div id="modal-detalhes" class="modal">
+            <div class="modal-conteudo">
+                <span class="fechar-modal">&times;</span>
+                
+                <h3 id="m-nome-medicamento">Nome do Medicamento</h3>
+                <p class="modal-subtitulo" id="m-dosagem">Dosagem</p>
 
+                <div class="modal-grid">
+                    <div class="modal-campo">
+                        <label>Estado:</label>
+                        <span id="m-status" class="status-tag">Ativa</span>
+                    </div>
+                    <div class="modal-campo">
+                        <label>Data:</label>
+                        <span id="m-data">--/--/----</span>
+                    </div>
+                    <div class="modal-campo">
+                        <label>Nº Receita:</label>
+                        <span id="m-numero">000000</span>
+                    </div>
+                    <div class="modal-campo">
+                        <label>Cód. Acesso:</label>
+                        <span id="m-codigo" style="font-weight:bold; letter-spacing: 2px;">----</span>
+                    </div>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+
+                <div class="modal-campo-texto">
+                    <label>Instruções de Toma (Posologia):</label>
+                    <p id="m-instrucoes" style="margin-top: 5px;">...</p>
+                </div>
+
+                <div class="modal-grid" style="margin-top: 15px;">
+                    <div class="modal-campo">
+                        <label>Quantidade:</label>
+                        <span id="m-quantidade">1</span>
+                    </div>
+                    <div class="modal-campo">
+                        <label>Forma:</label>
+                        <span id="m-forma">Comprimido</span>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <p>Médico: <span id="m-medico">Dr. Nome</span></p>
+                </div>
+            </div>
+        </div>
 
     <script src="js/sns_simulacao.js"></script>
     </body>

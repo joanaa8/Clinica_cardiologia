@@ -17,25 +17,24 @@ const PrescriptionSNSById = {
     GetPrescriptionsSNS : async ( patientId) => {
         const query = 
         `SELECT 
-         p.prescription_number, p.status, p.prescription_date,
-         mc.commercial_name,  mc.dosage,
-         pi.instructions,
-         acc.name as doctor_name
-             FROM Prescription p
-             JOIN Prescription_item pi ON p.id = pi.prescription_id
-             JOIN Medication_catalog mc ON pi.medication_id = mc.id
-             JOIN Account acc ON p.doctor_id = acc.id
-             WHERE p.patient_id = $1
-             ORDER BY p.prescription_date DESC;`; 
+        p.prescription_number, p.status, p.prescription_date, p.access_code,
+        mc.commercial_name,  mc.dosage, mc.form_factor,
+        pi.instructions, pi.quantity, pi.dose,
+        acc.name as doctor_name
+            FROM Prescription p
+            JOIN Prescription_item pi ON p.id = pi.prescription_id
+            JOIN Medication_catalog mc ON pi.medication_id = mc.id
+            JOIN Account acc ON p.doctor_id = acc.id
+            WHERE p.patient_id = $1
+            ORDER BY p.prescription_date DESC;`; 
 
-    try{
-         const { rows } = await pool.query(query,  [patientId]);
-         return rows; // Retorna todas as prescriçoes 
-    } catch (err) {
-         console.error("Erro na base de dados:", err);
-         throw err;
-    }   
-    
+        try{
+            const { rows } = await pool.query(query,  [patientId]);
+            return rows; 
+        } catch (err) {
+            console.error("Erro na base de dados:", err);
+            throw err;
+        }   
     }
 };
 

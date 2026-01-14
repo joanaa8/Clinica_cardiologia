@@ -65,7 +65,7 @@ const findPatientByHealthNumber = async (healthNumber) => {
     console.log(`[MODEL] A procurar paciente na BD com Health Number: '${healthNumber}'`);
 
     // 2. CORREÇÃO: Adicionei 'projeto.' antes de Person
-    const query = `SELECT * FROM projeto.Person WHERE health_number = $1`;
+    const query = `SELECT * FROM Person WHERE health_number = $1`;
     
     try {
         const result = await db.query(query, [healthNumber]);
