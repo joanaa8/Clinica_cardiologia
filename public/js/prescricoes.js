@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 1. Configurar Data de Hoje
     const dateInput = document.getElementById('input-start-date');
     if (dateInput) dateInput.valueAsDate = new Date();
+
+  
+    await verificarRenovacao();
     
     // 2. Configurar Listeners
     configurarEventos();
@@ -18,8 +21,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         await carregarUtentePorId(pId);
     }
 
-    // 4. VERIFICAR RENOVAÇÃO (Lógica integrada)
-    await verificarRenovacao();
 });
 
 // --- CARREGAR UTENTE ---
@@ -437,97 +438,102 @@ async function submeterPrescricao() {
     }
 }
 
-// --- FUNÇÃO DE RENOVAÇÃO (Compatível com os teus IDs) ---
+
+// --- FUNÇÃO DE RENOVAÇÃO ---
 async function verificarRenovacao() {
     const params = new URLSearchParams(window.location.search);
-    const renewId = params.get('renew_id'); // Obtém o ID da URL
+    const renewId = params.get('renew_id'); // Pega o ID da URL
 
-    if (!renewId) return;
+    if (!renewId) return; // Se não houver ID, não faz nada (modo criação normal)
 
     const token = localStorage.getItem("medico_token");
 
     try {
-        // 1. Pedir os detalhes completos da prescrição antiga
+        // 1. Pedir os detalhes da prescrição antiga
         const res = await fetch(`/api/prescricoes/${renewId}/details`, {
             headers: { 'Authorization': 'Bearer ' + token }
         });
 
-        if (!res.ok) throw new Error("Erro ao buscar dados da renovação");
+        if (!res.ok) throw new Error("Erro ao carregar dados da renovação");
 
         const dados = await res.json();
         const header = dados.header;
-        const item = dados.items[0]; // Vamos preencher com o primeiro medicamento da lista
+        const items = dados.items;
 
-        // 2. Preencher Utente
-        // Se usares Select2 ou Dropdown normal
-        const selectUtente = document.getElementById("patientSelect"); // Verifica se o ID do teu HTML é este
-        if(selectUtente) {
-            selectUtente.value = header.patient_id; 
-            selectUtente.dispatchEvent(new Event('change')); // Força a atualização visual
+        console.log("Dados para renovação:", dados);
+
+        // 2. Preencher o Utente (Reutiliza a tua função de carregar utente)
+        if (header.patient_id) {
+            // Preenche o campo hidden
+            const inputId = document.getElementById('patient_id_input');
+            const inputNome = document.getElementById('input-patient-search');
             
-            // Se o valor não mudar (porque o utente não estava carregado), tenta carregar texto
-            const option = document.createElement("option");
-            option.text = header.nome_paciente;
-            option.value = header.patient_id;
-            selectUtente.add(option);
-            selectUtente.value = header.patient_id;
+            if (inputId) inputId.value = header.patient_id;
+            if (inputNome) {
+                inputNome.value = header.nome_paciente;
+                inputNome.style.backgroundColor = "#e8f5e9"; // Verde claro para indicar sucesso
+            }
         }
 
-        // 3. Preencher Medicamento (Nome, Dose, Forma, Frequência)
-        if (item) {
-            // Preenche o campo de pesquisa/nome
-            const inputNome = document.getElementById("medicationSearch") || document.getElementById("medicationName");
-            if (inputNome) inputNome.value = item.commercial_name || "";
-
-            // Preenche Dose
-            const inputDose = document.getElementById("dosage");
-            if (inputDose) inputDose.value = item.dose || "";
-
-            // Preenche Forma Farmacêutica (Comprimido, Xarope...)
-            const inputForma = document.getElementById("formFactor");
-            if (inputForma) inputForma.value = item.form_factor || "";
-            
-            // Preenche Frequência/Regularidade
-            const inputFreq = document.getElementById("frequency");
-            if (inputFreq) inputFreq.value = item.regularidade || "";
-            
-            // Preenche Instruções
-            const inputInstr = document.getElementById("instructions");
-            if (inputInstr) inputInstr.value = item.instructions || "";
-            
-            // Guardar ID do medicamento (campo oculto se tiveres)
-            const hiddenId = document.getElementById("selectedMedicationId");
-            if(hiddenId) hiddenId.value = item.medication_id;
-        }
-
-        // 4. Calcular e Preencher Datas
-        // Data Início = Hoje
+        // 3. TRATAR DAS DATAS (O Pulo do Gato 🐈)
+        // Queremos iniciar HOJE, mas manter a DURAÇÃO da receita antiga
         const hoje = new Date();
-        const startStr = hoje.toISOString().split('T')[0];
-        
-        // Calcular duração da receita antiga
-        let duracaoDias = 30; // Padrão
-        if (item && item.start_date && item.end_date) {
-            const oldStart = new Date(item.start_date);
-            const oldEnd = new Date(item.end_date);
+        const inputInicio = document.getElementById('input-start-date');
+        const inputFim = document.getElementById('input-end-date');
+
+        if (inputInicio) inputInicio.valueAsDate = hoje;
+
+        // Calcular duração média do primeiro item (para definir a data de fim do formulário)
+        let diasDuracao = 30; // Padrão
+        if (items.length > 0 && items[0].start_date && items[0].end_date) {
+            const oldStart = new Date(items[0].start_date);
+            const oldEnd = new Date(items[0].end_date);
             const diffTime = Math.abs(oldEnd - oldStart);
-            duracaoDias = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            diasDuracao = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         }
 
-        // Nova Data Fim = Hoje + Duração Antiga
+        // Definir nova data de fim = Hoje + Duração Antiga
         const novaDataFim = new Date();
-        novaDataFim.setDate(hoje.getDate() + duracaoDias);
-        const endStr = novaDataFim.toISOString().split('T')[0];
+        novaDataFim.setDate(hoje.getDate() + diasDuracao);
+        
+        if (inputFim) inputFim.valueAsDate = novaDataFim;
+        
+        // Formatamos a string da data fim para usar nos objetos (YYYY-MM-DD)
+        const dataFimStr = novaDataFim.toISOString().split('T')[0];
+        const dataInicioStr = hoje.toISOString().split('T')[0];
 
-        // Inserir nos inputs
-        if(document.getElementById("startDate")) document.getElementById("startDate").value = startStr;
-        if(document.getElementById("endDate")) document.getElementById("endDate").value = endStr;
+        // 4. Adicionar os Medicamentos à Tabela
+        // Limpamos a lista atual para garantir
+        listaMedicamentos = []; 
 
-        // Feedback visual
-        // alert(`Dados carregados para renovação de: ${item.commercial_name}`);
+        items.forEach(item => {
+            // Criamos o objeto exatamente como o backend espera
+            const novoItem = {
+                medication_id: item.medication_id,
+                nome_medicamento: item.commercial_name, // Nome que vem do JOIN
+                dose: item.dose,
+                forma: item.form_factor, // Atenção: backend tem de enviar isto no details
+                quantity: item.quantity,
+                regularidade: item.regularidade,
+                instructions: item.instructions,
+                
+                // AQUI ESTÁ A CHAVE: Usamos as NOVAS datas
+                start_date: dataInicioStr,
+                end_date: dataFimStr
+            };
+
+            listaMedicamentos.push(novoItem);
+        });
+
+        // Atualiza a tabela visualmente
+        renderizarTabela();
+        
+        // Aviso visual discreto
+        const btnSubmit = document.getElementById('btn-submit-prescription');
+        if(btnSubmit) btnSubmit.textContent = "Renovar Receita";
 
     } catch (e) {
-        console.error("Erro ao renovar:", e);
+        console.error("Erro no processo de renovação:", e);
         alert("Não foi possível carregar os dados para renovação.");
     }
 }

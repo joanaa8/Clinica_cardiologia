@@ -176,13 +176,16 @@ exports.getPatientById = async (req, res) => {
     } catch (error) { res.status(500).json({ message: "Erro ao buscar utente." }); }
 };
 
-// 6. Listar Prescrições
+
+// 6. Listar Prescrições (CORRIGIDO COM DATA_FIM)
 exports.getMyPrescriptions = async (req, res) => {
     let authUserId = null;
     if (req.user) authUserId = req.user.id_user || req.user.id;
 
     try {
         const client = await db.connect();
+        
+        // 1. Obter ID do Médico
         const queryDoctor = `SELECT id FROM Account WHERE id_user = $1`;
         const resDoctor = await client.query(queryDoctor, [authUserId]);
         
@@ -192,10 +195,19 @@ exports.getMyPrescriptions = async (req, res) => {
         }
         const doctorId = resDoctor.rows[0].id;
 
+        // 2. Query Principal (ALTERADA)
         const queryList = `
-            SELECT p.id, p.prescription_number, TO_CHAR(p.prescription_date, 'DD/MM/YYYY') as data_formatada,
-                   p.status, per.name as nome_paciente, p.patient_id, p.access_code,
-                   STRING_AGG(mc.commercial_name, ', ') as lista_medicamentos
+            SELECT 
+                p.id, 
+                p.prescription_number, 
+                TO_CHAR(p.prescription_date, 'DD/MM/YYYY') as data_formatada,
+                p.status, 
+                per.name as nome_paciente, 
+                p.patient_id, 
+                p.access_code,
+                STRING_AGG(mc.commercial_name, ', ') as lista_medicamentos,
+                -- ADICIONADO: Pega a maior data de fim entre os itens desta receita
+                MAX(pi.end_date) as data_fim
             FROM Prescription p
             JOIN Person per ON p.patient_id = per.id
             LEFT JOIN Prescription_item pi ON p.id = pi.prescription_id
@@ -208,7 +220,11 @@ exports.getMyPrescriptions = async (req, res) => {
         const { rows } = await client.query(queryList, [doctorId]);
         client.release();
         res.json(rows);
-    } catch (error) { res.status(500).json({ message: "Erro ao listar." }); }
+
+    } catch (error) { 
+        console.error("Erro ao listar prescrições:", error);
+        res.status(500).json({ message: "Erro ao listar." }); 
+    }
 };
 
 // 7. Detalhes

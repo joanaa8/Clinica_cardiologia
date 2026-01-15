@@ -76,13 +76,17 @@ function aplicarFiltro() {
     renderizarTabela(listaFiltrada, filtro);
 }
 
-// --- 3. RENDERIZAR TABELA (COM BOTÃO RENOVAR) ---
+
+// --- 3. RENDERIZAR TABELA (CORRIGIDO) ---
 function renderizarTabela(lista, tipoFiltro) {
     const tbody = document.querySelector('#tabela-prescricoes tbody');
-    tbody.innerHTML = '';
+    
+    // Limpa a tabela atual
+    if (tbody) tbody.innerHTML = '';
 
-    if (lista.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">Sem resultados.</td></tr>';
+    // Se não houver dados
+    if (!lista || lista.length === 0) {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">Sem resultados.</td></tr>';
         return;
     }
 
@@ -91,63 +95,74 @@ function renderizarTabela(lista, tipoFiltro) {
     lista.forEach(p => {
         const tr = document.createElement('tr');
         
-        // Classes de estado
+        // --- 1. Lógica de Estado (CSS) ---
         let statusClass = 'status-badge status-active';
         let statusLabel = 'Ativa';
         
         if (p.status === 'cancelled') { statusClass = 'status-badge status-cancelled'; statusLabel = 'Anulada'; }
         else if (p.status === 'expired') { statusClass = 'status-badge status-expired'; statusLabel = 'Expirada'; }
 
-        // Texto longo
+        // --- 2. Formatação de Textos ---
         const meds = p.lista_medicamentos || '---';
         const medsResumo = meds.length > 40 ? meds.substring(0, 40) + '...' : meds;
         const numReceita = p.prescription_number || '<span style="color:#aaa;">---</span>';
+        const dataCriacao = p.data_formatada || (p.created_at ? new Date(p.created_at).toLocaleDateString() : 'N/A');
 
-        // LÓGICA DO BOTÃO RENOVAR
-       let btnRenovar = '';
+        // --- 3. LÓGICA DO BOTÃO RENOVAR (DEBUG + CORREÇÃO) ---
+        let btnRenovar = '';
 
-        // Verifica se existe data de fim
-        const dataFim = p.data_fim ? new Date(p.data_fim) : (p.end_date ? new Date(p.end_date) : null);
+        // Tenta obter a data de fim (suporta 'data_fim' ou 'end_date')
+        const rawDate = p.data_fim || p.end_date;
+        const dataFim = rawDate ? new Date(rawDate) : null;
 
-        if (dataFim && p.status === 'active') {
-            const hoje = new Date();
-            const diasParaExpirar = Math.ceil((dataFim - hoje) / (1000 * 60 * 60 * 24));
+        if (p.status === 'active') {
             
-            // Se faltarem 10 dias ou menos (e não tiver expirado há muito tempo)
-            if (diasParaExpirar <= 10 && diasParaExpirar >= -5) {
+            if (dataFim && !isNaN(dataFim.getTime())) {
+                // Cálculo: (DataFim - Hoje) em milissegundos convertidos para dias
+                const diasParaExpirar = Math.ceil((dataFim - hoje) / (1000 * 60 * 60 * 24));
                 
-                // CORREÇÃO: Enviamos apenas o ID da prescrição antiga
-                btnRenovar = `
-                    <button onclick="renovarPrescricao(${p.id})" 
-                        class="btn-icon-only" 
-                        style="color: #ff9800; border: 1px solid #ff9800; margin-right:5px;" 
-                        title="Renovar Prescrição">
-                        <i class="fa-solid fa-rotate"></i>
-                    </button>
-                `;
+                // DIAGNÓSTICO: Abre o F12 e vê o que aparece aqui!
+                console.log(`ID: ${p.id} | Fim: ${rawDate} | Dias Restantes: ${diasParaExpirar}`);
+
+                // Aumentei para 30 dias para garantir que vês o botão
+                if (diasParaExpirar <= 10 && diasParaExpirar >= -5) {
+                    btnRenovar = `
+                        <button onclick="renovarPrescricao(${p.id})" 
+                            class="btn-icon-only" 
+                            style="color: #2e7d32; margin-right:8px; border:none; background:none; cursor:pointer;" 
+                            title="Renovar (Faltam ${diasParaExpirar} dias)">
+                            <i class="fa-solid fa-rotate"></i>
+                        </button>
+                    `;
+                }
+            } else {
+                console.warn(`Receita ID ${p.id} tem data inválida:`, rawDate);
             }
         }
 
+        // --- 4. Montar HTML da Linha ---
         tr.innerHTML = `
-            <td><strong>${p.nome_paciente}</strong></td>
+            <td><strong>${p.nome_paciente || 'Desconhecido'}</strong></td>
             <td title="${meds}" style="color:#666;">${medsResumo}</td>
-            <td>${p.data_formatada || new Date(p.created_at).toLocaleDateString()}</td>
+            <td>${dataCriacao}</td>
             <td style="font-family:monospace;">${numReceita}</td>
             <td><span class="${statusClass}">${statusLabel}</span></td>
-            <td style="text-align:center; display:flex; justify-content:center; gap:5px;">
+            <td style="text-align:center; display:flex; justify-content:center; align-items:center;">
                 ${btnRenovar}
-                <button onclick="abrirDetalhes(${p.id})" class="btn-icon-only" title="Ver Detalhes">
+                <button onclick="abrirDetalhes(${p.id})" class="btn-icon-only" title="Ver Detalhes" style="border:none; background:none; cursor:pointer; color:#555;">
                     <i class="fa-regular fa-eye"></i>
                 </button>
             </td>
         `;
-        tbody.appendChild(tr);
+        
+        if (tbody) tbody.appendChild(tr);
     });
 }
 
-// --- 4. FUNÇÃO DE REDIRECIONAMENTO (RENOVAR) ---
-window.renovarPrescricao = (dadosString) => {
-    window.location.href = `prescricoes.html?renew_data=${dadosString}`;
+// --- 4. FUNÇÃO DE REDIRECIONAMENTO CORRIGIDA ---
+window.renovarPrescricao = (idPrescricao) => {
+    // CORREÇÃO: Mudámos de 'renew_data' para 'renew_id' para bater certo com a outra página
+    window.location.href = `prescricoes.html?renew_id=${idPrescricao}`;
 };
 
 // --- 5. DETALHES E MODAL (CÓDIGO ANTIGO MANTIDO) ---
